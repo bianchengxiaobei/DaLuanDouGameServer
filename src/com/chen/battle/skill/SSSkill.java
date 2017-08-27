@@ -1,20 +1,18 @@
 package com.chen.battle.skill;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 
-import org.ietf.jgss.Oid;
+import org.apache.ibatis.annotations.Case;
 
+import com.chen.battle.skill.config.SSSkillConfig;
 import com.chen.battle.skill.structs.ESkillReleaseWay;
 import com.chen.battle.skill.structs.ESkillState;
 import com.chen.battle.skill.structs.ESkillTargetType;
-import com.chen.battle.skill.structs.SSSkillConfig;
 import com.chen.battle.structs.BattleContext;
 import com.chen.battle.structs.CVector3D;
 import com.chen.battle.structs.EGOActionState;
 import com.chen.battle.structs.SSGameUnit;
 import com.chen.battle.structs.SSHero;
-import com.chen.config.Config;
 
 public class SSSkill 
 {
@@ -24,7 +22,7 @@ public class SSSkill
 	public boolean bIfCanCooldown;//是否有cd
 	public SSGameUnit theOwner;
 	public SSGameUnit target;
-	public CVector3D targetPos;
+	public CVector3D targetPos = new CVector3D(0, 0, 0);
 	public CVector3D dir;
 	public ESkillState eSkillState;
 	public long stateTime;//状态切换时间
@@ -79,6 +77,7 @@ public class SSSkill
 		if (hero != null)
 		{
 			//pHero->SyncSkillStateToGC(cpsCfg->un32SkillID);
+			hero.SyncSkillState(this.skillConfig.skillId);
 		}
 	}
 	/**
@@ -178,6 +177,140 @@ public class SSSkill
 		}
 		this.CheckAndDoInstanceSkill();
 	}
+	
+	public int HeartBeat(long now,long tick)
+	{
+		//ESkillState heartBeatStartState = eSkillState;
+		int heartBeatStartState = eSkillState.value;
+		int rst = 1;//normal
+		do
+		{
+			if (CheckStatus() == false)
+			{
+				rst = 0;
+			}
+			if (eSkillState.value <= ESkillState.Releasing.value && theOwner.IfInReleaseSkillRange(target, skillConfig, 1000) == false)
+			{
+				rst = 2;//NUllPointer
+				break;
+			}
+			//等待 状态
+			if (eSkillState == ESkillState.Free)
+			{
+				eSkillState = ESkillState.Preparing;
+				stateTime = now;
+				SetSkillDir();
+			}
+			//准备 状态
+			if (eSkillState == ESkillState.Preparing)
+			{
+				long deltaTime = now - stateTime;
+				//如果需要等待,直接返回
+				if (deltaTime < this.skillConfig.prepareTime)
+				{
+					rst = 1;
+					break;
+				}
+				//如果不需要等待就进入技能的释放前摇
+				eSkillState = ESkillState.Releasing;
+				stateTime = now;
+			}
+			//技能前摇
+			if (eSkillState == ESkillState.Releasing)
+			{
+				int releaseTime = this.skillConfig.releaseTime;
+				if (this.skillConfig.bIsNormalAttack)
+				{
+					
+				}
+				long span = now - stateTime;
+				if (span < releaseTime)
+				{
+					rst = 1;
+					break;
+				}
+				MakeSkillEffect(now);
+				eSkillState = ESkillState.Using;
+				stateTime = now;
+				normalAttackReleaseTime = 0;
+			}
+			//使用 状态
+			if (eSkillState == ESkillState.Using)
+			{
+				System.out.println("33333");
+				boolean bIfUsing = false;
+				//遍历所有的使用中的技能效果,看其是否依然在占用中
+				for (int i=0; i<32; i++)
+				{
+					int effectId = this.usingEffectArray[i];
+					if (effectId != 0)
+					{
+						SSSkillEffect effect = theOwner.battle.effectManager.GetEffect(effectId);
+						if (effect != null)
+						{
+							bIfUsing = true;
+						}
+						else
+						{
+							this.usingEffectArray[i] = 0;
+						}
+					}
+				}
+				//
+				if (bIfUsing == false)
+				{
+					ClearUsingEffects();
+					eSkillState = ESkillState.Lasting;
+					stateTime = now;
+				}
+			}
+			//后摇状态
+			if (eSkillState == ESkillState.Lasting)
+			{
+				System.out.println("111111");
+				if (stateTime + skillConfig.lastTime > now)
+				{
+					rst = 1;
+					break;
+				}
+				eSkillState = ESkillState.End;
+				stateTime = now;
+			}
+			//结束状态
+			if (eSkillState == ESkillState.End)
+			{
+				System.out.println("222222");
+				rst = 3;
+				End();
+				break;
+			}
+		}
+		while(false);
+		//如果状态改变了，则需要同步到对象身上
+		if (heartBeatStartState != eSkillState.value)
+		{
+			System.out.println("通知就开始");
+			if (eSkillState == ESkillState.Preparing)
+			{
+				theOwner.BeginActionPrepareSkill(this, dir, true);
+			}
+			else if(eSkillState == ESkillState.Releasing)
+			{
+				theOwner.BeginActionReleaseSkill(this, dir, true);
+			}
+			else if(eSkillState == ESkillState.Using)
+			{
+				theOwner.BeginActionUsingSkill(this, dir, true);
+			}
+			else if (eSkillState == ESkillState.Lasting)
+			{
+				theOwner.BeginActionLastingSkill(this, dir, true);
+			}
+		}
+		return rst;
+	}
+	
+	
 	public void CheckAndDoInstanceSkill()
 	{
 		if (IfImpactSkill())
@@ -192,6 +325,25 @@ public class SSSkill
 				eSkillState = ESkillState.Using;
 				this.stateTime = System.currentTimeMillis();
 			}
+		}
+	}
+	/**
+	 * 设置技能方向
+	 */
+	public void SetSkillDir()
+	{
+		this.dir = theOwner.GetCurDir();
+		switch (this.skillConfig.eReleaseWay) {
+		case Need_Target:
+		case Auto:
+			if (target != null)
+			{
+				dir = target.GetCurDir();
+				dir.y = 0;
+				dir.normalized();
+				theOwner.curActionInfo.dir = dir;
+			}
+			break;
 		}
 	}
 	public void MakeSkillEffect(long now)

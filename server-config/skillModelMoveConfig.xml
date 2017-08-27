@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<skillConfigs>
+	<skill name="飞腿">
+		<skillModelId>10001</skillModelId>
+		<bIsCooldown>true</bIsCooldown>
+		<bIsCanMove>true</bIsCanMove>
+		<bIsCanBreak>true</bIsCanBreak>
+		<bIsPenetrate>true</bIsPenetrate>
+		<bIsImpact>true</bIsImpact>
+		<eMoveType>2</eMoveType>
+		<eMovedTargetType>1</eMovedTargetType>
+		<eMoveToTargetType>3</eMoveToTargetType>
+		<angle>0</angle>
+		<speed>1500</speed>
+		<distance>1000</distance>
+		<impactEvents>10002:0</impactEvents>
+		<eventId>0</eventId>
+	</skill>
+	<skill name="飞腿">
+		<skillModelId>10002</skillModelId>
+		<bIsCooldown>false</bIsCooldown>
+		<bIsCanMove>true</bIsCanMove>
+		<bIsCanBreak>false</bIsCanBreak>
+		<bIsPenetrate>false</bIsPenetrate>
+		<bIsImpact>false</bIsImpact>
+		<eMoveType>2</eMoveType>
+		<eMovedTargetType>0</eMovedTargetType>
+		<eMoveToTargetType>0</eMoveToTargetType>
+		<angle>0</angle>
+		<speed>1500</speed>
+		<distance>700</distance>
+		<eventId>0</eventId>
+	</skill>
+</skillConfigs>

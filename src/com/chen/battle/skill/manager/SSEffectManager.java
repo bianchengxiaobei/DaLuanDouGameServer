@@ -2,11 +2,15 @@ package com.chen.battle.skill.manager;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.chen.battle.skill.SSSkill;
 import com.chen.battle.skill.SSSkillEffect;
-import com.chen.battle.skill.loader.SkillEffectConfigXmlLoader;
+import com.chen.battle.skill.loader.SkillEffectTypeConfigXmlLoader;
 import com.chen.battle.skill.structs.ESkillEffectType;
 import com.chen.battle.skill.structs.NextSkillEffectConfig;
 import com.chen.battle.skill.structs.SSSkillEffect_Move;
@@ -15,14 +19,15 @@ import com.chen.battle.skill.structs.SkillModelMoveConfig;
 import com.chen.battle.structs.BattleContext;
 import com.chen.battle.structs.CVector3D;
 import com.chen.battle.structs.SSGameUnit;
+import com.chen.data.manager.DataManager;
 
 public class SSEffectManager
 {
 	public Map<Integer, SSSkillEffect> waittingEffectMap = new HashMap<Integer, SSSkillEffect>();
-	public Map<Integer, SSSkillEffect> updatingEffectMap = new HashMap<Integer, SSSkillEffect>();
-	public Map<Integer, ESkillEffectType> skillTypeConfig = new HashMap<>();
-	public Map<Integer, SkillModelMoveConfig> skillModelMoveConfig = new HashMap<>();
-	public static final String skillTypeConfigPath = "server-config/skillTypeConfig.xml";
+	//public Map<Integer, SSSkillEffect> updatingEffectMap = new HashMap<Integer, SSSkillEffect>();
+	public ConcurrentHashMap<Integer, SSSkillEffect> updatingEffectMap = new ConcurrentHashMap<Integer, SSSkillEffect>();
+	
+
 	public BattleContext battle;
 	
 	public SSSkillEffect GetEffect(int id)
@@ -44,19 +49,26 @@ public class SSEffectManager
 	public void RemoveEffect(int effectId)
 	{
 		//移除效果时，要注意需要将其强制停止
-		SSSkillEffect effect = this.GetEffect(effectId);
-		if (effect != null)
-		{
-			effect.ForceStop();
-		}
-		DestoryAFreeEffect(effect);
+		SSSkillEffect effect = null;
 		if (this.waittingEffectMap.containsKey(effectId))
 		{
-			this.waittingEffectMap.remove(effectId);
-		}
+			effect = this.waittingEffectMap.remove(effectId);
+			if (effect != null)
+			{
+				effect.ForceStop();
+			}
+			DestoryAFreeEffect(effect);
+			return;
+		}	
 		if (this.updatingEffectMap.containsKey(effectId))
 		{
-			this.updatingEffectMap.remove(effectId);
+			effect = this.updatingEffectMap.remove(effectId);
+			if (effect != null)
+			{
+				effect.ForceStop();
+			}
+			DestoryAFreeEffect(effect);
+			return;
 		}
 	}
 	/**
@@ -73,7 +85,7 @@ public class SSEffectManager
 	public void AddEffectsFromConfig(NextSkillEffectConfig[] effectCfg,SSGameUnit theOwner,SSGameUnit target,CVector3D pos,CVector3D dir,
 			SSSkill skill,long beginTime,SSGameUnit startSkillGo)
 	{
-		if (effectCfg == null || theOwner == null)
+		if (theOwner == null)
 		{
 			return ;
 		}
@@ -83,6 +95,10 @@ public class SSEffectManager
 		for (int i=0;i<16;i++)
 		{
 			NextSkillEffectConfig config = effectCfg[i];
+			if (config == null)
+			{
+				continue;
+			}
 			if (config.skillEffectId == 0)
 			{
 				continue;
@@ -150,6 +166,7 @@ public class SSEffectManager
 				effect.CheckCooldown();
 				effect.End();
 				DestoryAFreeEffect(effect);
+				return;
 			}
 		}
 		effect.CheckCooldown();
@@ -158,27 +175,16 @@ public class SSEffectManager
 	{
 		SkillEffectBaseConfig config = null;
 		SSSkillEffect effect = null;
-		if (skillTypeConfig.isEmpty())
-		{
-			skillTypeConfig = new SkillEffectConfigXmlLoader().load(skillTypeConfigPath);
-		}
-		ESkillEffectType effectType = ESkillEffectType.None;
-		if (skillTypeConfig.containsKey(effectId))
-		{
-			effectType = skillTypeConfig.get(effectId);
-		}
+		ESkillEffectType effectType = DataManager.getInstance().skillTypeConfigLoader.skillEffectTypeMap.get(effectId);		
 		switch (effectType) {
 		case Move:
-			config = this.skillModelMoveConfig.get(effectId);
+			config = DataManager.getInstance().skillModelMoveConfigLoader.skillModelMoveConfig.get(effectId);
 			if (config == null)
 			{
 				break;
 			}
 			effect = new SSSkillEffect_Move();
 			break;
-
-		default:
-			return null;
 		}
 		if (effect == null)
 		{
@@ -232,18 +238,23 @@ public class SSEffectManager
 		}
 		if (this.updatingEffectMap.isEmpty() == false)
 		{
-			for (SSSkillEffect uEffect : this.updatingEffectMap.values())
+			Iterator<Map.Entry<Integer, SSSkillEffect>> iterator = this.updatingEffectMap.entrySet().iterator();
+			while (iterator.hasNext())
 			{
+				Map.Entry<Integer, SSSkillEffect> entry = iterator.next();
+				Integer id = entry.getKey();
+				SSSkillEffect uEffect = entry.getValue();
 				if (uEffect == null)
 				{
+					System.err.println("UEffect == null");
+					iterator.remove();
 					continue;
 				}
-				int id = uEffect.id;
 				if (uEffect.IsInvalid())
 				{
 					uEffect.Clear();
 					DestoryAFreeEffect(uEffect);
-					this.updatingEffectMap.remove(id);
+					iterator.remove();
 					continue;
 				}
 				if (uEffect.Update(now, tick) == false)
@@ -252,10 +263,45 @@ public class SSEffectManager
 					uEffect.End();
 					uEffect.Clear();
 					DestoryAFreeEffect(uEffect);
-					this.updatingEffectMap.remove(id);
+					iterator.remove();
 					continue;
 				}
 			}
+//			for (SSSkillEffect uEffect : this.updatingEffectMap.values())
+//			{
+//				if (uEffect == null)
+//				{
+//					System.err.println("UEffect == null");
+//					continue;
+//				}
+//				int id = uEffect.id;
+//				if (uEffect.IsInvalid())
+//				{
+//					//uEffect.Clear();
+//					//DestoryAFreeEffect(uEffect);
+//					//this.updatingEffectMap.remove(id);
+//					deleteEffectIds.add(id);
+//					continue;
+//				}
+//				if (uEffect.Update(now, tick) == false)
+//				{
+//					uEffect.StopDependedEffect();
+//					uEffect.End();
+//					//uEffect.Clear();
+//					//DestoryAFreeEffect(uEffect);
+//					//this.updatingEffectMap.remove(id);
+//					deleteEffectIds.add(id);
+//					continue;
+//				}
+//			}
+////			for (int id : deleteEffectIds)
+////			{
+////				if (updatingEffectMap.containsKey(id))
+////				{
+////					System.out.println("delete EffectId:"+id);
+////					this.updatingEffectMap.remove(id);
+////				}
+////			}
 		}
 		
 	}

@@ -1,27 +1,26 @@
-package com.chen.move.handler;
+package com.chen.battle.skill.handler;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import com.chen.battle.manager.BattleManager;
+import com.chen.battle.skill.message.req.ReqAskUseSkillMessage;
 import com.chen.battle.structs.BattleContext;
-import com.chen.battle.structs.CVector3D;
 import com.chen.battle.structs.SSPlayer;
 import com.chen.command.Handler;
-import com.chen.move.message.req.ReqAskMoveMessage;
 import com.chen.player.manager.PlayerManager;
 import com.chen.player.structs.Player;
 
-public class ReqAskMoveHandler extends Handler
+public class ReqAskUseSkillHandler extends Handler
 {
-
-	private Logger log = LogManager.getLogger(ReqAskMoveHandler.class);
+	
+	private Logger log = LogManager.getLogger(ReqAskUseSkillHandler.class);
 	@Override
 	public void action() 
 	{
 		try 
 		{
-			ReqAskMoveMessage msg = (ReqAskMoveMessage)getMessage();
+			ReqAskUseSkillMessage msg = (ReqAskUseSkillMessage)getMessage();
 			Player player = PlayerManager.getInstance().getPlayer(msg.getRoleId().get(0));
 			if (player == null)
 			{
@@ -37,8 +36,7 @@ public class ReqAskMoveHandler extends Handler
 			SSPlayer player2 = battle.getUserBattleInfo(player).sPlayer;
 			if (player2 != null)
 			{
-				CVector3D dir = new CVector3D(msg.x * 0.001f, 0,msg.z * 0.001f);
-				BattleManager.getInstance().askMove(player2,dir);
+				BattleManager.getInstance().AskUseSkill(player2, msg.skillId);
 			}else
 			{
 				log.error("不存在SSPlayer");
@@ -46,7 +44,8 @@ public class ReqAskMoveHandler extends Handler
 			
 		} catch (Exception e)
 		{
-			log.error("玩家加载游戏场景失败");
+			log.error("玩家释放技能失败");
 		}		
 	}
+
 }

@@ -18,10 +18,11 @@ public abstract class SSMoveObject
 	public ColVector dir;//实际方向
 	public ColVector beforeMovePos;//上次位移坐标
 	public ColSphere stepMoveTarget;
+	public boolean bIfForceMoveImapce;//强制位移是否需要检测碰撞
 	
 	public abstract ColVector GetColVector();
 	public abstract ColSphere GetColSphere();
-	public abstract int GetColRadius();
+	public abstract float GetColRadius();
 	public abstract boolean IfCanImpact();
 	public abstract float GetSpeed();
 	public abstract void OnMoved(ColVector pos);

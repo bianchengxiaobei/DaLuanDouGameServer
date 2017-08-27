@@ -1,4 +1,10 @@
-package com.chen.battle.skill.structs;
+package com.chen.battle.skill.config;
+
+import com.chen.battle.skill.structs.ESkillReleaseWay;
+import com.chen.battle.skill.structs.ESkillTargetType;
+import com.chen.battle.skill.structs.ESkillTriggerWay;
+import com.chen.battle.skill.structs.ESkillType;
+import com.chen.battle.skill.structs.NextSkillEffectConfig;
 
 public class SSSkillConfig
 {

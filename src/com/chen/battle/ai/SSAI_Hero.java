@@ -160,4 +160,34 @@ public class SSAI_Hero extends SSAI
 			this.nowSkill.TryCancle();
 		}
 	}
+	@Override
+	public void HeartBeat(long now,long tick)
+	{
+		if (nowSkill != null)
+		{
+			System.out.println("NOwSkill");
+			UseSkillHeartBeat(now, tick);
+		}
+	}
+	public void UseSkillHeartBeat(long now,long tick)
+	{
+		int rst = this.nowSkill.HeartBeat(now, tick);
+		if (rst != 1)
+		{
+			if (rst != 3)
+			{
+				this.nowSkill.TryCancle();
+			}
+			this.nowSkill = null;
+			TryFree();
+			if (nextSkill != null)
+			{
+				TryUseSkillWithAnyType(nextSkill);
+			}
+		}
+	}
+	public void TryUseSkillWithAnyType(SSSkill skill)
+	{
+		AskUseSkill(skill.skillConfig.skillId);
+	}
 }

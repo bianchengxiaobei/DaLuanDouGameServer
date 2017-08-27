@@ -8,4 +8,7 @@ public class SkillModelMoveConfig extends SkillEffectBaseConfig
 	public int angle;
 	public int distance;
 	public int speed;
+	public boolean bIsPenetrate;//是否穿透
+	public boolean bIsImpact;//是否有碰撞的位移
+	public NextSkillEffectConfig[] impactEvents = new NextSkillEffectConfig[16];
 }

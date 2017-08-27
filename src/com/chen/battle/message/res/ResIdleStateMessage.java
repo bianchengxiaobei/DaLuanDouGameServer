@@ -7,12 +7,9 @@ import com.chen.message.Message;
 public class ResIdleStateMessage extends Message
 {
 	public long playerId;
-	public float posX;
-	public float posY;	
-	public float posZ;
-	public float dirX;
-	public float dirY;
-	public float dirZ;
+	public int posX;
+	public int posZ;
+	public int angle;
 	@Override
 	public int getId() {
 		// TODO Auto-generated method stub
@@ -42,12 +39,9 @@ public class ResIdleStateMessage extends Message
 	public boolean write(IoBuffer buffer) 
 	{
 		writeLong(buffer, playerId);
-		writeFloat(buffer, posX);
-		writeFloat(buffer, posY);
-		writeFloat(buffer, posZ);
-		writeFloat(buffer, dirX);
-		writeFloat(buffer, dirY);
-		writeFloat(buffer, dirZ);
+		writeInt(buffer, posX);
+		writeInt(buffer, posZ);
+		writeInt(buffer, angle);
 		return true;
 	}
 	

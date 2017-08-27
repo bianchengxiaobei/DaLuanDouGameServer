@@ -6,8 +6,8 @@ import com.chen.message.Message;
 
 public class ReqAskMoveMessage extends Message
 {
-	public float x;
-	public float z;
+	public int x;
+	public int z;
 	@Override
 	public int getId() {
 		// TODO Auto-generated method stub
@@ -29,8 +29,8 @@ public class ReqAskMoveMessage extends Message
 	@Override
 	public boolean read(IoBuffer buffer)
 	{
-		this.x = readFloat(buffer);
-		this.z = readFloat(buffer);
+		this.x = readInt(buffer);
+		this.z = readInt(buffer);
 		return true;
 	}
 

@@ -1,26 +1,22 @@
-package com.chen.battle.message.res;
+package com.chen.battle.skill.message.req;
 
 import org.apache.mina.core.buffer.IoBuffer;
 
 import com.chen.message.Message;
 
-public class ResRunningStateMessage extends Message
+public class ReqAskUseSkillMessage extends Message
 {
-	public long playerId;
-	public int posX;
-	public int posZ;
-	public int angle;
-	public int moveSpeed;
+	public int skillId;
 	@Override
 	public int getId() {
 		// TODO Auto-generated method stub
-		return 1025;
+		return 1030;
 	}
 
 	@Override
 	public String getQueue() {
 		// TODO Auto-generated method stub
-		return null;
+		return "Local";
 	}
 
 	@Override
@@ -30,19 +26,15 @@ public class ResRunningStateMessage extends Message
 	}
 
 	@Override
-	public boolean read(IoBuffer buffer) {
+	public boolean read(IoBuffer arg0) {
 		// TODO Auto-generated method stub
+		this.skillId = readInt(arg0);
 		return true;
 	}
 
 	@Override
-	public boolean write(IoBuffer buffer)
-	{
-		writeLong(buffer, playerId);
-		writeInt(buffer, posX);
-		writeInt(buffer, posZ);
-		writeInt(buffer, angle);
-		writeInt(buffer, moveSpeed);
+	public boolean write(IoBuffer arg0) {
+		// TODO Auto-generated method stub
 		return true;
 	}
 

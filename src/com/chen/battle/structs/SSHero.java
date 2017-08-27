@@ -4,17 +4,22 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.chen.battle.ai.SSAI_Hero;
+import com.chen.battle.hero.config.SHeroConfig;
 import com.chen.battle.skill.SSSkill;
+import com.chen.battle.skill.config.SSSkillConfig;
+import com.chen.battle.skill.message.res.ResSkillInfoChangeMessage;
 import com.chen.battle.skill.structs.ESkillState;
-import com.chen.battle.skill.structs.SSSkillConfig;
+import com.chen.data.manager.DataManager;
 import com.chen.move.struct.ColVector;
+import com.chen.utils.MessageUtil;
 
 public class SSHero extends SSGameUnit
 {
 	private Logger log = LogManager.getLogger(SSHero.class);
+	SSPlayer player;
 	public SHeroConfig config;
 	public CVector3D bornPos;
-	public int colliderRadius;
+	public float colliderRadius;
 	public SSSkill[] skillArray = new SSSkill[7];//最多7个技能
 	public long lockedTargetId;//技能锁定目标id
 	public SSHero(long playerId, BattleContext battle)
@@ -39,8 +44,9 @@ public class SSHero extends SSGameUnit
 			{
 				continue;
 			}
+			System.out.println("Skillconfig:"+DataManager.getInstance().skillConfigXMLLoader.skillConfigMap.size());
 			//通过xml加载成配置类
-			SSSkillConfig cpSkillConfig = null;
+			SSSkillConfig cpSkillConfig = DataManager.getInstance().skillConfigXMLLoader.skillConfigMap.get(skillId);
 			if (cpSkillConfig == null)
 			{
 				log.error("找不到该技能配置："+skillId);
@@ -56,19 +62,19 @@ public class SSHero extends SSGameUnit
 				normalAttackSkill = skillArray[i];
 			}
 		}
-		this.colliderRadius = config.colliderRadios;
+		this.colliderRadius = config.colliderRadius;
 		//加入基础属性
 		//加满血量，通知客户端血量改变
 	}
 	@Override
-	public int GetColliderRadius()
+	public float GetColliderRadius()
 	{	
 		return colliderRadius;
 	}
 	@Override
 	public float GetSpeed() 
 	{	
-		return 3;
+		return 1;
 	}
 	@Override
 	public void OnMoved(ColVector pos)
@@ -90,6 +96,12 @@ public class SSHero extends SSGameUnit
 		SSAI_Hero hAi = (SSAI_Hero)ai;
 		if (hAi != null)
 			hAi.AskStopMove();
+	}
+	public void AskUseSkill(int skillId)
+	{
+		SSAI_Hero hAi = (SSAI_Hero)ai;
+		if (hAi != null)
+			hAi.AskUseSkill(skillId);
 	}
 	public void ResetAI()
 	{
@@ -156,4 +168,56 @@ public class SSHero extends SSGameUnit
 		}
 		return this.lockedTargetId;
 	}
+	public void SyncSkillState(int skillId)
+	{
+		if (skillId != 0)
+		{
+			for (int i=0;i<this.skillArray.length;i++)
+			{
+				if (this.skillArray[i].skillConfig != null && this.skillArray[i].skillConfig.skillId == skillId)
+				{
+					this.SyncSkillState(this.skillArray[i],i);
+					break;
+				}
+			}
+		}
+	}
+	private void SyncSkillState(SSSkill skill,int skillSlotIndex)
+	{
+		if (skill == null)
+		{
+			return;
+		}
+		if (player == null)
+		{
+			return;
+		}
+		ResSkillInfoChangeMessage message = new ResSkillInfoChangeMessage();
+		message.playerId = this.id;
+		message.skillSlotIndex = skillSlotIndex;
+		message.skillId = skill.skillConfig.skillId;
+		message.coolTime = skill.skillConfig.cooldownTime;
+		int tDiff = (int)(skill.cooldownTime - System.currentTimeMillis());
+		if (tDiff < 0)
+		{
+			System.err.println("Skill.Time < 0");
+			tDiff = 0;
+		}
+		message.time = tDiff;
+		MessageUtil.tell_player_message(this.player.player, message);
+	}
+	@Override
+	public int OnHeartBeat(long now, long tick)
+	{
+		OnGameUnitHeartBeat(now, tick);
+		return 0;
+	}
+	public void OnGameUnitHeartBeat(long now,long tick)
+	{
+		if (ai != null)
+		{
+			ai.HeartBeat(now, tick);
+		}
+	}
+	
 }

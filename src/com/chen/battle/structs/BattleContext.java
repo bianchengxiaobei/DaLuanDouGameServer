@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.chen.battle.hero.config.SHeroConfig;
 import com.chen.battle.manager.BattleManager;
 import com.chen.battle.message.res.ResBattleTipMessage;
 import com.chen.battle.message.res.ResEnterSceneMessage;
@@ -20,6 +21,7 @@ import com.chen.battle.message.res.ResGamePrepareMessage;
 import com.chen.battle.message.res.ResSceneLoadedMessage;
 import com.chen.battle.message.res.ResSelectHeroMessage;
 import com.chen.battle.skill.manager.SSEffectManager;
+import com.chen.data.manager.DataManager;
 import com.chen.message.Message;
 import com.chen.move.manager.SSMoveManager;
 import com.chen.move.struct.ColVector;
@@ -36,6 +38,7 @@ public class BattleContext extends BattleServer
 	private EBattleServerState battleState = EBattleServerState.eSSBS_SelectHero;
 	private long battleId;
 	private long battleStateTime;
+	public long battleHeartBeatTime;
 	private long lastCheckPlayTimeout;
 	private long battleFinishProtectTime = 0;
 	private BattleUserInfo[] m_battleUserInfo = new BattleUserInfo[maxMemberCount];
@@ -77,6 +80,7 @@ public class BattleContext extends BattleServer
 		this.battleType = type;
 		this.moveManager = new SSMoveManager();
 		this.effectManager = new SSEffectManager();
+		this.effectManager.battle = this;
 	}
 	
 	@Override
@@ -88,19 +92,36 @@ public class BattleContext extends BattleServer
 	public void run()
 	{
 		super.run();
-		new Timer("Time out").schedule(new TimerTask() {
-			@Override
-			public void run() 
-			{			
-				BattleContext.this.OnHeartBeat(System.currentTimeMillis(), 100);
-				if (BattleContext.this.battleState == EBattleServerState.eSSBS_Finished)
-				{
-					BattleContext.this.stop(true);
-					BattleManager.getInstance().allBattleMap.remove(BattleContext.this.battleId);
-					BattleManager.getInstance().mServers.remove(BattleContext.this.battleId, BattleContext.this);
-				}
+		while (true)
+		{
+			this.battleHeartBeatTime = System.currentTimeMillis();
+			this.OnHeartBeat(BattleContext.this.battleHeartBeatTime, 100);
+			if (this.battleState == EBattleServerState.eSSBS_Finished)
+			{
+				this.stop(true);
+				BattleManager.getInstance().allBattleMap.remove(this.battleId);
+				BattleManager.getInstance().mServers.remove(this.battleId, this);
 			}
-		},100,100);
+			try {
+				Thread.sleep(100);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+//		new Timer("Time out").schedule(new TimerTask() {
+//			@Override
+//			public void run() 
+//			{			
+//				BattleContext.this.battleHeartBeatTime = System.currentTimeMillis();
+//				BattleContext.this.OnHeartBeat(BattleContext.this.battleHeartBeatTime, 100);
+//				if (BattleContext.this.battleState == EBattleServerState.eSSBS_Finished)
+//				{
+//					BattleContext.this.stop(true);
+//					BattleManager.getInstance().allBattleMap.remove(BattleContext.this.battleId);
+//					BattleManager.getInstance().mServers.remove(BattleContext.this.battleId, BattleContext.this);
+//				}
+//			}
+//		},100,100);
 		//((ServerThread)this.thread_pool.get(Server.DEFAULT_MAIN_THREAD)).addTimeEvent(event);
 	}
 	public void OnHeartBeat(long now,long tickSpan)
@@ -114,7 +135,7 @@ public class BattleContext extends BattleServer
 		this.checkSelectHeroTimeout();
 		this.checkPrepareTimeout();
 		this.checkLoadingTimeout();
-		this.DoPlayHeartBeat();
+		this.DoPlayHeartBeat(now,tickSpan);
 	}
 	public void EnterBattleState(Player player)
 	{
@@ -297,13 +318,21 @@ public class BattleContext extends BattleServer
 			this.setBattleState(EBattleServerState.eSSBS_Loading, true);
 		}
 	}
-	public void DoPlayHeartBeat()
+	public void DoPlayHeartBeat(long now,long tick)
 	{
 		if (this.battleState != EBattleServerState.eSSBS_Playing)
 		{
 			return;
 		}
 		this.moveManager.OnHeartBeat();
+		for (SSGameUnit unit : gameObjectMap.values())
+		{
+			if (unit != null)
+			{
+				unit.OnHeartBeat(now, tick);
+			}
+		}		
+		this.effectManager.OnHeartBeat(now, tick);
 	}
 	public void BoradTipsByType(EBattleTipType type,Player player)
 	{
@@ -403,6 +432,18 @@ public class BattleContext extends BattleServer
 	{
 		return moveManager.AskStopMoveObject(player, EAskStopMoveType.Target);
 	}
+	/**
+	 * 请求开始强制移动
+	 * @param player
+	 * @param dir
+	 * @param speed
+	 * @param bIfImpact
+	 * @return
+	 */
+	public boolean AskStartMoveForced(SSGameUnit player, CVector3D dir, float speed, boolean bIfImpact)
+	{
+		return moveManager.AskMoveForced(player, new ColVector(dir.x, dir.y, dir.z), speed, bIfImpact);
+	}
 	public boolean AskStopMoveObjectForceMove(SSGameUnit player)
 	{
 		return moveManager.AskStopMoveObject(player, EAskStopMoveType.ForceMove);
@@ -427,9 +468,18 @@ public class BattleContext extends BattleServer
 	public SSHero AddHero(Long playerId,CVector3D pos,CVector3D dir,SSPlayer user,int heroId)
 	{
 		//取得英雄配置表加载基础数据
+		SHeroConfig heroConfig = DataManager.getInstance().heroConfigXMLLoader.heroConfigMap.get(heroId);
+		if (heroConfig == null)
+		{
+			log.error("找不到英雄："+heroId);
+			return null;
+		}
+		
 		SSHero hero = new SSHero(playerId,this);
+		hero.LoadHeroConfig(heroConfig);
 		//hero.LOadHeroConfig
 		user.sHero = hero;
+		hero.player = user;
 		hero.BeginActionIdle(false);
 		hero.bornPos = pos;
 		hero.ResetAI();
@@ -537,6 +587,31 @@ public class BattleContext extends BattleServer
 			return this.gameObjectMap.get(id);
 		}
 		return null;
+	}
+	/**
+	 * 找到周围物体存入set集合中
+	 * @param startPos
+	 * @param radius
+	 * @param objs
+	 */
+	public void FindAroundGo(CVector3D startPos,float radius,Set<SSGameUnit> objs)
+	{
+		float radiusSqrl = radius * radius;
+		for (SSGameUnit obj : this.gameObjectMap.values())
+		{
+			if(obj != null)
+			{
+				CVector3D pos = obj.GetCurPos();
+				if (Math.abs(pos.x - startPos.x) > radius || Math.abs(pos.z - startPos.z) > radius)
+				{
+					continue;
+				}
+				if ((pos.x - startPos.x)*(pos.x-startPos.x) + (pos.z - startPos.z)*(pos.z - startPos.z) < radiusSqrl)
+				{
+					objs.add(obj);
+				}
+			}
+		}
 	}
 	private void PostStartGameMsg()
 	{

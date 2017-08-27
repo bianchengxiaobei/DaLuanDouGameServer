@@ -120,6 +120,19 @@ public class BattleManager
 		}
 	}
 	/**
+	 * 玩家请求释放技能
+	 * @param player
+	 * @param skillId
+	 */
+	public void AskUseSkill(SSPlayer player,int skillId)
+	{
+		SSHero hero = player.sHero;
+		if (hero != null)
+		{
+			hero.AskUseSkill(skillId);
+		}
+	}
+	/**
 	 * 匹配到队友的时候
 	 * @param type
 	 * @param mapId

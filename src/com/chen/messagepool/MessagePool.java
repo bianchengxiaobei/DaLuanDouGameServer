@@ -6,6 +6,8 @@ import com.chen.battle.handler.ReqEnterSceneHandler;
 import com.chen.battle.handler.ReqSelectHeroHandler;
 import com.chen.battle.message.req.ReqEnterSceneMessage;
 import com.chen.battle.message.req.ReqSelectHeroMessage;
+import com.chen.battle.skill.handler.ReqAskUseSkillHandler;
+import com.chen.battle.skill.message.req.ReqAskUseSkillMessage;
 import com.chen.command.Handler;
 import com.chen.login.handler.ReqCreateCharacterToGameServerHandler;
 import com.chen.login.handler.ReqLoginCharacterToGameServerHandler;
@@ -42,6 +44,7 @@ public class MessagePool
 		register(1019, ReqEnterSceneMessage.class, ReqEnterSceneHandler.class);
 		register(1021, ReqAskMoveMessage.class , ReqAskMoveHandler.class);
 		register(1026, ReqAskStopMoveMessage.class , ReqAskStopMoveHandler.class);
+		register(1030, ReqAskUseSkillMessage.class, ReqAskUseSkillHandler.class);
 	}
 	private void register(int id,Class<?> messageClass,Class<?> handlerClass)
 	{

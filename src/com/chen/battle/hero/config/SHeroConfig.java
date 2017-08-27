@@ -1,7 +1,7 @@
-package com.chen.battle.structs;
+package com.chen.battle.hero.config;
 
 public class SHeroConfig 
 {
-	public int colliderRadios;
+	public float colliderRadius;
 	public int[] skillList = new int[7];
 }

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<heros>
+	<hero>
+		<id>0</id>
+		<colliderRadius>0.2</colliderRadius>
+		<skillList>1</skillList>
+	</hero>
+	<hero>
+		<id>1</id>
+		<colliderRadius>0.2</colliderRadius>
+		<skillList>1</skillList>
+	</hero>
+	<hero>
+		<id>3</id>
+		<colliderRadius>0.2</colliderRadius>
+		<skillList>3</skillList>
+	</hero>
+	<hero>
+		<id>4</id>
+		<colliderRadius>1</colliderRadius>
+		<skillList>4</skillList>
+	</hero>
+	<hero>
+		<id>5</id>
+		<colliderRadius>1</colliderRadius>
+		<skillList>5</skillList>
+	</hero>
+</heros>

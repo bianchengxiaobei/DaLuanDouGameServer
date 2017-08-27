@@ -46,7 +46,21 @@ public class SSAI
 		{
 			//停止移动到目的地
 		}
-		this.attackSkill.TryCancle();
+		if (this.attackSkill != null)
+		{
+			this.attackSkill.TryCancle();
+		}
+	}
+	public void TryFree()
+	{
+		if (theOwner.curActionInfo.eOAS.value < EGOActionState.PassiveState.value)
+		{
+			theOwner.BeginActionIdle(true);;
+		}	
+	}
+	public void HeartBeat(long now,long tick)
+	{
+		
 	}
 	public void OnTeleport()
 	{

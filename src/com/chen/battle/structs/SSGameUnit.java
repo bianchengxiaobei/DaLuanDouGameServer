@@ -7,13 +7,14 @@ import com.chen.battle.message.res.ResGoAppearMessage;
 import com.chen.battle.message.res.ResIdleStateMessage;
 import com.chen.battle.message.res.ResRunningStateMessage;
 import com.chen.battle.skill.SSSkill;
+import com.chen.battle.skill.config.SSSkillConfig;
 import com.chen.battle.skill.structs.ISSMoveObjectHolder;
-import com.chen.battle.skill.structs.SSSkillConfig;
 import com.chen.message.Message;
 import com.chen.move.struct.ColSphere;
 import com.chen.move.struct.ColVector;
 import com.chen.parameter.structs.EParameterCate;
 import com.chen.utils.MessageUtil;
+import com.chen.utils.Tools;
 
 public abstract class SSGameUnit extends SSMoveObject
 {
@@ -44,6 +45,14 @@ public abstract class SSGameUnit extends SSMoveObject
 			}
 		}
 	}
+	public void BeginActionControled()
+	{
+		SetGOActionState(EGOActionState.Controlled);
+		if (battle != null)
+		{
+			battle.SyncState(this);
+		}
+	}
 	public void BeginActionMove(CVector3D dir,boolean asyn)
 	{
 		SetGOActionState(EGOActionState.Running);;
@@ -52,6 +61,83 @@ public abstract class SSGameUnit extends SSMoveObject
 		if (asyn && battle != null)
 		{
 			battle.SyncState(this);
+		}
+	}
+	
+	public void BeginActionPrepareSkill(SSSkill skill,CVector3D dir,boolean asyn)
+	{
+		if (skill == null)
+		{
+			System.err.println("skill == null");
+			return;
+		}
+		if (curActionInfo.eOAS.value != EGOActionState.PreparingSkill.value)
+		{
+			SetGOActionState(EGOActionState.PreparingSkill);
+			this.curActionInfo.skillId = skill.skillConfig.skillId;
+			this.curActionInfo.skillTargetId = skill.target == null ? 0 : skill.target.id;
+			this.curActionInfo.dir = dir;
+			if (asyn)
+			{
+				battle.SyncState(this);
+			}
+		}
+	}
+	public void BeginActionReleaseSkill(SSSkill skill,CVector3D dir,boolean asyn)
+	{
+		if (skill == null)
+		{
+			System.err.println("skill == null");
+			return;
+		}
+		if (curActionInfo.eOAS.value != EGOActionState.ReleasingSkill.value)
+		{
+			SetGOActionState(EGOActionState.ReleasingSkill);
+			this.curActionInfo.skillId = skill.skillConfig.skillId;
+			this.curActionInfo.skillTargetId = skill.target == null ? 0 : skill.target.id;
+			this.curActionInfo.dir = dir;
+			if (asyn)
+			{
+				battle.SyncState(this);
+			}
+		}
+	}
+	public void BeginActionUsingSkill(SSSkill skill,CVector3D dir,boolean asyn)
+	{
+		if (skill == null)
+		{
+			System.err.println("skill == null");
+			return;
+		}
+		if (curActionInfo.eOAS.value != EGOActionState.UsingSkill.value)
+		{
+			SetGOActionState(EGOActionState.UsingSkill);
+			this.curActionInfo.skillId = skill.skillConfig.skillId;
+			this.curActionInfo.skillTargetId = skill.target == null ? 0 : skill.target.id;
+			this.curActionInfo.dir = dir;
+			if (asyn)
+			{
+				battle.SyncState(this);
+			}
+		}
+	}	
+	public void BeginActionLastingSkill(SSSkill skill,CVector3D dir,boolean asyn)
+	{
+		if (skill == null)
+		{
+			System.err.println("skill == null");
+			return;
+		}
+		if (curActionInfo.eOAS.value != EGOActionState.LastingSkill.value)
+		{
+			SetGOActionState(EGOActionState.LastingSkill);
+			this.curActionInfo.skillId = skill.skillConfig.skillId;
+			this.curActionInfo.skillTargetId = skill.target == null ? 0 : skill.target.id;
+			this.curActionInfo.dir = dir;
+			if (asyn)
+			{
+				battle.SyncState(this);
+			}
 		}
 	}
 	/**
@@ -98,23 +184,17 @@ public abstract class SSGameUnit extends SSMoveObject
 		case Controlled:
 			ResIdleStateMessage res = new ResIdleStateMessage();
 			res.playerId = this.id;
-			res.posX = this.curActionInfo.pos.x;
-			res.posY = this.curActionInfo.pos.y;
-			res.posZ = this.curActionInfo.pos.z;
-			res.dirX = this.curActionInfo.dir.x;
-			res.dirY = this.curActionInfo.dir.y;
-			res.dirZ = this.curActionInfo.dir.z;
+			res.posX = (int)(this.curActionInfo.pos.x * 1000);
+			res.posZ = (int)(this.curActionInfo.pos.z * 1000);
+			res.angle = Tools.GetDirAngle(this.curActionInfo.dir);
 			return res;
 		case Running:
 			ResRunningStateMessage message = new ResRunningStateMessage();
 			message.playerId = this.id;
-			message.posX = this.curActionInfo.pos.x;
-			message.posY = this.curActionInfo.pos.y;
-			message.posZ = this.curActionInfo.pos.z;
-			message.dirX = this.curActionInfo.dir.x;
-			message.dirY = this.curActionInfo.dir.y;
-			message.dirZ = this.curActionInfo.dir.z;
-			message.moveSpeed = (int)GetSpeed();
+			message.posX = (int)(this.curActionInfo.pos.x * 1000);
+			message.posZ = (int)(this.curActionInfo.pos.z * 1000);
+			message.angle = Tools.GetDirAngle(this.curActionInfo.dir);
+			message.moveSpeed = (int)(GetSpeed() * 1000);
 			return message;
 		}
 		return null;
@@ -160,7 +240,7 @@ public abstract class SSGameUnit extends SSMoveObject
 		return sphere;
 	}
 	@Override
-	public int GetColRadius()
+	public float GetColRadius()
 	{
 		return this.GetColliderRadius();
 	}
@@ -180,7 +260,8 @@ public abstract class SSGameUnit extends SSMoveObject
 	{
 		return 3;
 	}
-	public abstract int GetColliderRadius();
+	public abstract float GetColliderRadius();
+	public abstract int OnHeartBeat(long now,long tick);
 	/*
 	 * 发送移动消息
 	 * @see com.chen.battle.structs.SSMoveObject#OnStartMove(com.chen.move.struct.ColVector)
@@ -250,5 +331,13 @@ public abstract class SSGameUnit extends SSMoveObject
 			}
 		}
 		return true;
+	}
+	public void RemoveMoveEffect(int effectId)
+	{
+		if (this.moveEffectId == effectId && battle != null)
+		{
+			battle.effectManager.RemoveEffect(effectId);
+			this.moveEffectId = 0;
+		}
 	}
 }

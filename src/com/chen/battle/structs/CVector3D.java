@@ -2,9 +2,16 @@ package com.chen.battle.structs;
 
 public class CVector3D
 {
+	public static double dDegToRad = Math.PI / 180.0f;
 	public float x;
 	public float y;
 	public float z;
+	public CVector3D()
+	{
+		this.x = 0;
+		this.y = 0;
+		this.z = 0;
+	}
 	public CVector3D(float x,float y,float z)
 	{
 		this.x = x;
@@ -24,6 +31,10 @@ public class CVector3D
 	public float SqrtLength()
 	{
 		return x*x+y*y+z*z;
+	}
+	public boolean IsZero()
+	{
+		return this.x == 0 && this.y == 0 && this.z == 0;
 	}
 	public CVector3D Normalize()
 	{
@@ -60,12 +71,38 @@ public class CVector3D
 		float z = targetPos.z - this.z;
 		return x * x + y * y + z * z;
 	}
+	public void RotateAngle(double angle)
+	{
+		angle *= dDegToRad;
+		double cs = Math.cos(angle);
+		double sn = Math.sin(angle);
+		float tempX = this.x;
+		float tempZ = this.z;
+		this.x = (float)(tempX * cs - tempZ * sn);
+		this.z = (float)(tempX * sn + tempZ * cs);
+	}
 	public static CVector3D Sub(CVector3D v1,CVector3D v2)
 	{
 		CVector3D result = new CVector3D(0, 0, 0);
 		result.x = v1.x - v2.x;
 		result.y = v1.y - v2.y;
 		result.z = v1.z - v2.z;
+		return result;
+	}
+	public static CVector3D Add(CVector3D v1,CVector3D v2)
+	{
+		CVector3D result = new CVector3D();
+		result.x = v1.x + v2.x;
+		result.y = v1.y + v2.y;
+		result.z = v1.z + v2.z;
+		return result;
+	}
+	public static CVector3D Mul(CVector3D vector3d,float value)
+	{
+		CVector3D result = new CVector3D();
+		result.x = vector3d.x * value;
+		result.y = vector3d.y * value;
+		result.z = vector3d.z * value;
 		return result;
 	}
 }

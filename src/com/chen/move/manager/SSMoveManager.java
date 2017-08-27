@@ -3,6 +3,7 @@ package com.chen.move.manager;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.chen.battle.structs.CVector3D;
 import com.chen.battle.structs.SSMoveObject;
 import com.chen.move.struct.ColSphere;
 import com.chen.move.struct.ColVector;
@@ -45,6 +46,33 @@ public class SSMoveManager
 		}
 		return true;
 	}
+	/**
+	 * 请求强制位移
+	 * @param obj
+	 * @param dir
+	 * @param speed
+	 * @param bIfImpact
+	 * @return
+	 */
+	public boolean AskMoveForced(SSMoveObject obj,ColVector dir,float speed, boolean bIfImpact)
+	{
+		if (AskStartMoveCheck(obj) == false)
+		{
+			return false;
+		}
+		if (obj.moveStatus == SSMoveObjectStatus.SSMoveObjectStatus_Stand)
+		{
+			obj.moveType = ESSMoveObjectMoveType.ForceMove;
+			long now = System.currentTimeMillis();
+			obj.SetDir(dir);
+			obj.startMoveTime = now;
+			obj.moveStatus = SSMoveObjectStatus.SSMoveObjectStatus_ForceMove;
+			obj.bIfForceMoveImapce = bIfImpact;
+			obj.forceMoveSpeed = speed;
+			return true;
+		}
+		return false;
+	}
 	public boolean AskStopMoveObject(SSMoveObject obj,EAskStopMoveType type)
 	{
 		if (!this.allMoveObjectSet.contains(obj))
@@ -67,7 +95,12 @@ public class SSMoveManager
 		}
 		if (obj.moveStatus == SSMoveObjectStatus.SSMoveObjectStatus_ForceMove)
 		{
-			
+			if (type == EAskStopMoveType.All || type == EAskStopMoveType.ForceMove)
+			{
+				StopLastStep(obj, true);
+				//这里可能要处理碰撞
+				
+			}
 		}
 		return true;
 	}
@@ -161,6 +194,10 @@ public class SSMoveManager
 	private void CheckTargetMoveStatus(SSMoveObject obj,float moveDist)
 	{
 		if (obj.moveType != ESSMoveObjectMoveType.Target)
+		{
+			return;
+		}
+		if (obj.moveStatus == SSMoveObjectStatus.SSMoveObjectStatus_ForceMove)
 		{
 			return;
 		}

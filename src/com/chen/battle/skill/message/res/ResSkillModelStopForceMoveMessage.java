@@ -1,20 +1,20 @@
-package com.chen.battle.message.res;
+package com.chen.battle.skill.message.res;
 
 import org.apache.mina.core.buffer.IoBuffer;
 
 import com.chen.message.Message;
 
-public class ResRunningStateMessage extends Message
+public class ResSkillModelStopForceMoveMessage extends Message
 {
 	public long playerId;
 	public int posX;
-	public int posZ;
-	public int angle;
-	public int moveSpeed;
+	public int posY;
+	public int PosZ;
+	public int effectId;
 	@Override
 	public int getId() {
 		// TODO Auto-generated method stub
-		return 1025;
+		return 1029;
 	}
 
 	@Override
@@ -30,8 +30,9 @@ public class ResRunningStateMessage extends Message
 	}
 
 	@Override
-	public boolean read(IoBuffer buffer) {
-		// TODO Auto-generated method stub
+	public boolean read(IoBuffer buffer) 
+	{
+		
 		return true;
 	}
 
@@ -40,10 +41,10 @@ public class ResRunningStateMessage extends Message
 	{
 		writeLong(buffer, playerId);
 		writeInt(buffer, posX);
-		writeInt(buffer, posZ);
-		writeInt(buffer, angle);
-		writeInt(buffer, moveSpeed);
+		writeInt(buffer, posY);
+		writeInt(buffer, PosZ);
+		writeInt(buffer, effectId);
 		return true;
 	}
-
+	
 }

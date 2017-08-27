@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<skillConfigs>
+	<skill>
+		<!-- 飞腿  -->
+		<skillId>1</skillId>
+		<eSkillType>1</eSkillType>
+		<eReleaseWay>0</eReleaseWay>
+		<bIsNormalAttack>false</bIsNormalAttack>
+		<prepareTime>0</prepareTime>
+		<cooldownTime>5000</cooldownTime>
+		<releaseTime>0</releaseTime>
+		<lastTime>0</lastTime>
+		<releaseDis>1200</releaseDis>
+		<bImpact>true</bImpact>
+		<eSkillTargetType>4</eSkillTargetType>
+		<eventId>10001</eventId>
+	</skill>
+</skillConfigs>
