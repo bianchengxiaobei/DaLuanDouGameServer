@@ -4,7 +4,7 @@ public enum ESkillType
 {
 	Cure(0),//治疗
 	Hurt(1),
-	Control(2),
+	Control(2),//控制
 	Move(3);
 	public int value;
 	private ESkillType(int value) 

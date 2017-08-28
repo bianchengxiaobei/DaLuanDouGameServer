@@ -6,6 +6,7 @@ import com.chen.battle.hero.loader.SSHeroConfigXMLLoader;
 import com.chen.battle.skill.loader.SkillConfigXMLLoader;
 import com.chen.battle.skill.loader.SkillEffectTypeConfigXmlLoader;
 import com.chen.battle.skill.loader.SkillMoveConfigXMLLoader;
+import com.chen.battle.skill.loader.SkillRangeConfigXMLLoader;
 import com.chen.data.container.MapContainer;
 
 /**
@@ -28,6 +29,9 @@ public class DataManager
 	public SkillMoveConfigXMLLoader skillModelMoveConfigLoader = new SkillMoveConfigXMLLoader();
 	public static final String skillModelMoveConfigPath = "server-config/skillModelMoveConfig.xml";
 	
+	public SkillRangeConfigXMLLoader skillModelRangeConfigLoader = new SkillRangeConfigXMLLoader();
+	public static final String skillModelRangeConfigPath = "server-config/skillModelRangeConfig.xml";
+	
 	private static Object obj = new Object();
 	private static DataManager manager;
 	private DataManager()
@@ -37,6 +41,7 @@ public class DataManager
 		skillConfigXMLLoader.load(skillConfigPath);
 		skillTypeConfigLoader.load(skillEffectTypeConfigPath);
 		skillModelMoveConfigLoader.load(skillModelMoveConfigPath);
+		skillModelRangeConfigLoader.load(skillModelRangeConfigPath);
 	}
 	public static DataManager getInstance()
 	{

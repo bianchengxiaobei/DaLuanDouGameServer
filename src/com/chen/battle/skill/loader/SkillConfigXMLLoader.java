@@ -100,10 +100,20 @@ public class SkillConfigXMLLoader
 							else if("eventId".equals(schilds.item(j).getNodeName()))
 							{
 								NextSkillEffectConfig eConfig = new NextSkillEffectConfig();
-								String content = schilds.item(j).getTextContent().trim();
-								if (content.indexOf(":") == -1)
+								String content =  schilds.item(j).getTextContent().trim();
+								String[] nextConfigString = content.split(";");
+								for (String value : nextConfigString)
 								{
-									eConfig.skillEffectId = Integer.parseInt(content);
+									if (value.indexOf(":") == -1)
+									{
+										eConfig.skillEffectId = Integer.parseInt(value);
+									}
+									else 
+									{
+										String[] vStrings = value.split(":");
+										eConfig.skillEffectId = Integer.parseInt(vStrings[0]);
+										eConfig.delay = Integer.parseInt(vStrings[1]);
+									}
 								}
 								nextSkillEffectConfigs.add(eConfig);
 							}
@@ -112,7 +122,6 @@ public class SkillConfigXMLLoader
 						{
 							config.skillModelList[j] = nextSkillEffectConfigs.get(j);
 						}
-						System.out.println("Id:"+config.skillId);
 						this.skillConfigMap.put(config.skillId, config);
 					}
 				}

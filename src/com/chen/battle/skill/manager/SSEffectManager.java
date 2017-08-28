@@ -8,14 +8,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.xml.crypto.Data;
+
 import com.chen.battle.skill.SSSkill;
 import com.chen.battle.skill.SSSkillEffect;
+import com.chen.battle.skill.config.SkillModelMoveConfig;
 import com.chen.battle.skill.loader.SkillEffectTypeConfigXmlLoader;
 import com.chen.battle.skill.structs.ESkillEffectType;
 import com.chen.battle.skill.structs.NextSkillEffectConfig;
 import com.chen.battle.skill.structs.SSSkillEffect_Move;
+import com.chen.battle.skill.structs.SSSkillEffect_Range;
 import com.chen.battle.skill.structs.SkillEffectBaseConfig;
-import com.chen.battle.skill.structs.SkillModelMoveConfig;
 import com.chen.battle.structs.BattleContext;
 import com.chen.battle.structs.CVector3D;
 import com.chen.battle.structs.SSGameUnit;
@@ -184,6 +187,14 @@ public class SSEffectManager
 				break;
 			}
 			effect = new SSSkillEffect_Move();
+			break;
+		case Range:
+			config = DataManager.getInstance().skillModelRangeConfigLoader.skillModelRangeConfig.get(effectId);
+			if (config == null)
+			{
+				break;
+			}
+			effect = new SSSkillEffect_Range();
 			break;
 		}
 		if (effect == null)

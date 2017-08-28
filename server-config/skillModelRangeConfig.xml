@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- eSkillAOEType
+	None(0),
+	SelfCenter(1),
+	TargetCenter(2),
+	FixDist(3);
+ -->
+ <!-- eSkillRangeShapeType
+ 	None(0),
+	Circle(1),
+	Rectangle(2),
+	Sector(3);
+  -->
+<skillConfigs>
+	<skill name="旋转飞腿">
+		<skillModelId>20001</skillModelId>
+		<bIsCooldown>true</bIsCooldown>
+		<bIsCanMove>true</bIsCanMove>
+		<bIsCanBreak>true</bIsCanBreak>
+		<eSkillAOEType>1</eSkillAOEType>
+		<rangeIntervalTime>400</rangeIntervalTime>
+		<rangleTimes>1</rangleTimes>
+		<eSkillRangeShapeType>1</eSkillRangeShapeType>
+		<rangeParam1>300</rangeParam1>
+		<rangeParam2>0</rangeParam2>
+		<maxEffectObj>0</maxEffectObj>
+		<lifeTime>400</lifeTime>
+		<releaseDist>0</releaseDist>
+		<eventId>10002:0</eventId>
+	</skill>
+</skillConfigs>

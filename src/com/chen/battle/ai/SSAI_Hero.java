@@ -48,6 +48,7 @@ public class SSAI_Hero extends SSAI
 		//是否在不能操作状态
 		if (IfPassitiveState() == true)
 		{
+			System.err.println("在不能操作的阶段");
 			return;
 		}
 		//是否在沉默状态
@@ -61,16 +62,19 @@ public class SSAI_Hero extends SSAI
 		//是否符合技能使用条件
 		if (!skill.IfSkillUsable())
 		{
+			System.err.println("在技能CD当中");
 			return;
 		}
 		//检查是否是正在运行的技能，不能重复s
 		if (this.nowSkill != null && this.nowSkill.skillConfig.skillId == skillId)
 		{
+			System.err.println("重复技能："+skillId);
 			return;
 		}
 		//首先判断是否在施放技能中。如果在施放技能中，则后面的技能都进行记录，等待施放
 		if (IfUsingSkill() && (this.nowSkill.IfSkillBeforeRelease() || this.nowSkill.eSkillState == ESkillState.Using))
 		{
+			System.err.println("技能运行中："+skillId);
 			nextSkill = skill;
 			return;
 		}
@@ -80,6 +84,7 @@ public class SSAI_Hero extends SSAI
 			int rts = skill.IfSkillUsableWithNowTarget();
 			if (rts == 2)
 			{
+				System.err.println("技能释放距离不够："+skillId);
 				//如果技能射程不够，则启动自动追踪释放技能功能
 				bIsMoveDir = false;
 				wantUseSkill = skill;
@@ -90,6 +95,7 @@ public class SSAI_Hero extends SSAI
 			}
 			else if(rts != 1)
 			{
+				System.err.println("其他原因导致技能不能释放："+skillId);
 				return;
 			}
 			else

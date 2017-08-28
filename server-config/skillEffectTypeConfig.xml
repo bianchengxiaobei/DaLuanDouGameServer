@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+	None(0),
+	Caculate(1),
+	Emit(2),
+	Range(3),
+	Leading(4),
+	Summon(5),
+	Move(6),
+	Switch(7),
+	Purification(8),
+	Link(9),
+	Buffer(10); 
+ -->
 <skills>
-	<skill>
+	<skill name="飞腿">
 		<id>10001</id>
 		<type>6</type>		
 	</skill>
-	<skill>
+	<skill name="飞腿">
 		<id>10002</id>
 		<type>6</type>		
+	</skill>	
+	<skill name="旋转飞腿">
+		<id>20001</id>
+		<type>3</type>		
 	</skill>
 </skills>

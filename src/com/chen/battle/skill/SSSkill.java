@@ -68,6 +68,7 @@ public class SSSkill
 		//如果是普通技能，直接从技能放出来的时间加上CD即可
 		else
 		{
+
 			//这里可能还有技能冷却
 			this.cooldownTime = stateTime + skillConfig.cooldownTime;
 			//tCooldownMilsec = tStateMilsec + ( cpsCfg->n32CoolDown * (1.0f - pcMasterGU->GetFPData(eEffectCate_CooldownReduce) / 1000.0f) );
@@ -76,7 +77,6 @@ public class SSSkill
 		SSHero hero = (SSHero)theOwner;
 		if (hero != null)
 		{
-			//pHero->SyncSkillStateToGC(cpsCfg->un32SkillID);
 			hero.SyncSkillState(this.skillConfig.skillId);
 		}
 	}
@@ -166,6 +166,7 @@ public class SSSkill
 		boolean value = IfSkillUsable();
 		if (value == false)
 		{
+			System.err.println("技能在cd中");
 			return;
 		}
 		eSkillState = ESkillState.Free;
@@ -450,6 +451,8 @@ public class SSSkill
 		stateTime = 9;
 		cooldownTime = 0;
 		target = null;
+		bIfCanCooldown = true;
+		beginTime = 0;
 		normalAttackReleaseTime = 0;
 		targetPos.zero();
 		ClearUsingEffects();

@@ -81,6 +81,10 @@ public class CVector3D
 		this.x = (float)(tempX * cs - tempZ * sn);
 		this.z = (float)(tempX * sn + tempZ * cs);
 	}
+	public boolean equals(CVector3D v)
+	{
+		return this.x == v.x && this.y == v.y && this.z == v.z;
+	}
 	public static CVector3D Sub(CVector3D v1,CVector3D v2)
 	{
 		CVector3D result = new CVector3D(0, 0, 0);
@@ -102,7 +106,11 @@ public class CVector3D
 		CVector3D result = new CVector3D();
 		result.x = vector3d.x * value;
 		result.y = vector3d.y * value;
-		result.z = vector3d.z * value;
+		result.z = vector3d.z * value;	
 		return result;
+	}
+	public static float Mul(CVector3D vector3d,CVector3D vector3d2)
+	{
+		return vector3d.x * vector3d2.x + vector3d.y * vector3d2.y + vector3d.z * vector3d2.z;
 	}
 }

@@ -43,8 +43,7 @@ public class SSHero extends SSGameUnit
 			if (skillId == 0)
 			{
 				continue;
-			}
-			System.out.println("Skillconfig:"+DataManager.getInstance().skillConfigXMLLoader.skillConfigMap.size());
+			}			
 			//通过xml加载成配置类
 			SSSkillConfig cpSkillConfig = DataManager.getInstance().skillConfigXMLLoader.skillConfigMap.get(skillId);
 			if (cpSkillConfig == null)

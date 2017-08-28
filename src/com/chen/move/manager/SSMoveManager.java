@@ -142,7 +142,7 @@ public class SSMoveManager
 				float moveDist = this.TryMove(object, now);
 				if (moveDist > 0)
 				{
-					System.out.println("可以移动");
+					//System.out.println("可以移动");
 					++moveTargetNum;
 					CheckTargetMoveStatus(object, moveDist);
 					this.heartBeatTempArray[i] = null;

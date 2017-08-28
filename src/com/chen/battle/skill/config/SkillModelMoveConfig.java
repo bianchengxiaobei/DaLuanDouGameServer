@@ -1,4 +1,10 @@
-package com.chen.battle.skill.structs;
+package com.chen.battle.skill.config;
+
+import com.chen.battle.skill.structs.ESkillEffectMoveToTargetType;
+import com.chen.battle.skill.structs.ESkillEffectMoveType;
+import com.chen.battle.skill.structs.ESkillEffectMovedTargetType;
+import com.chen.battle.skill.structs.NextSkillEffectConfig;
+import com.chen.battle.skill.structs.SkillEffectBaseConfig;
 
 public class SkillModelMoveConfig extends SkillEffectBaseConfig
 {

@@ -8,21 +8,21 @@
 	<hero>
 		<id>1</id>
 		<colliderRadius>0.2</colliderRadius>
-		<skillList>1</skillList>
+		<skillList>1000</skillList>
 	</hero>
 	<hero>
 		<id>3</id>
 		<colliderRadius>0.2</colliderRadius>
-		<skillList>3</skillList>
+		<skillList>1000</skillList>
 	</hero>
 	<hero>
 		<id>4</id>
 		<colliderRadius>1</colliderRadius>
-		<skillList>4</skillList>
+		<skillList>1000</skillList>
 	</hero>
 	<hero>
 		<id>5</id>
 		<colliderRadius>1</colliderRadius>
-		<skillList>5</skillList>
+		<skillList>1000</skillList>
 	</hero>
 </heros>

@@ -15,11 +15,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.chen.battle.skill.config.SkillModelMoveConfig;
 import com.chen.battle.skill.structs.ESkillEffectMoveToTargetType;
 import com.chen.battle.skill.structs.ESkillEffectMoveType;
 import com.chen.battle.skill.structs.ESkillEffectMovedTargetType;
 import com.chen.battle.skill.structs.NextSkillEffectConfig;
-import com.chen.battle.skill.structs.SkillModelMoveConfig;
 
 
 public class SkillMoveConfigXMLLoader 
