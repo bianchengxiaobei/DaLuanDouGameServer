@@ -70,6 +70,14 @@ public class SSHero extends SSGameUnit
 	{	
 		return colliderRadius;
 	}
+	/**
+	 * 发射位置
+	 */
+	@Override
+	public CVector3D GetEmitPos()
+	{
+		return CVector3D.Add(this.curActionInfo.pos, this.config.emitPos);
+	}
 	@Override
 	public float GetSpeed() 
 	{	

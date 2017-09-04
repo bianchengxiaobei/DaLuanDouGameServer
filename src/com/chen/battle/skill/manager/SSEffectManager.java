@@ -10,14 +10,18 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.crypto.Data;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.chen.battle.skill.SSSkill;
 import com.chen.battle.skill.SSSkillEffect;
+import com.chen.battle.skill.SSSkillEffect_Emit;
+import com.chen.battle.skill.SSSkillEffect_Move;
+import com.chen.battle.skill.SSSkillEffect_Range;
 import com.chen.battle.skill.config.SkillModelMoveConfig;
 import com.chen.battle.skill.loader.SkillEffectTypeConfigXmlLoader;
 import com.chen.battle.skill.structs.ESkillEffectType;
 import com.chen.battle.skill.structs.NextSkillEffectConfig;
-import com.chen.battle.skill.structs.SSSkillEffect_Move;
-import com.chen.battle.skill.structs.SSSkillEffect_Range;
 import com.chen.battle.skill.structs.SkillEffectBaseConfig;
 import com.chen.battle.structs.BattleContext;
 import com.chen.battle.structs.CVector3D;
@@ -26,6 +30,7 @@ import com.chen.data.manager.DataManager;
 
 public class SSEffectManager
 {
+	public Logger logger = LogManager.getLogger(SSEffectManager.class);
 	public Map<Integer, SSSkillEffect> waittingEffectMap = new HashMap<Integer, SSSkillEffect>();
 	//public Map<Integer, SSSkillEffect> updatingEffectMap = new HashMap<Integer, SSSkillEffect>();
 	public ConcurrentHashMap<Integer, SSSkillEffect> updatingEffectMap = new ConcurrentHashMap<Integer, SSSkillEffect>();
@@ -196,6 +201,14 @@ public class SSEffectManager
 			}
 			effect = new SSSkillEffect_Range();
 			break;
+		case Emit:
+			config = DataManager.getInstance().skillModelFlyConfigLoader.skillModelFlyConfig.get(effectId);
+			if (config == null)
+			{
+				logger.error("FlyConfig == null");
+				break;
+			}
+			effect = new SSSkillEffect_Emit();
 		}
 		if (effect == null)
 		{

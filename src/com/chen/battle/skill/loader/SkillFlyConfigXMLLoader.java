@@ -15,15 +15,14 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.chen.battle.skill.config.SSkillModelRangleConfig;
-import com.chen.battle.skill.structs.ESkillAOEType;
-import com.chen.battle.skill.structs.ESkillRangeShapeType;
+import com.chen.battle.skill.config.SkillModelFlyConfig;
+import com.chen.battle.skill.structs.ESkillModelFlyType;
 import com.chen.battle.skill.structs.NextSkillEffectConfig;
 
-public class SkillRangeConfigXMLLoader 
+public class SkillFlyConfigXMLLoader 
 {
-	private Logger log = LogManager.getLogger(SkillRangeConfigXMLLoader.class);
-	public Map<Integer, SSkillModelRangleConfig> skillModelRangeConfig = new HashMap<>();
+	private Logger log = LogManager.getLogger(SkillFlyConfigXMLLoader.class);
+	public Map<Integer, SkillModelFlyConfig> skillModelFlyConfig = new HashMap<>();
 	public void load(String file)
 	{
 		try 
@@ -42,7 +41,7 @@ public class SkillRangeConfigXMLLoader
 					if (("skill").equals(childs.item(i).getNodeName()))
 					{
 						NodeList schilds = childs.item(i).getChildNodes();
-						SSkillModelRangleConfig config = new SSkillModelRangleConfig();
+						SkillModelFlyConfig config = new SkillModelFlyConfig();
 						Vector<NextSkillEffectConfig> nextSkillEffectConfigs = new Vector<>();
 						for (int j=0;j<schilds.getLength();j++)
 						{
@@ -65,42 +64,46 @@ public class SkillRangeConfigXMLLoader
 							else if("releaseTimeDelay".equals(schilds.item(j).getNodeName()))
 							{
 								config.releaseTimeDelay = Integer.parseInt(schilds.item(j).getTextContent().trim());
-							}
-							else if("eSkillAOEType".equals(schilds.item(j).getNodeName()))
+							}	
+							else if("eSkillModelFlyType".equals(schilds.item(j).getNodeName()))
 							{
-								config.eSkillAOEType = ESkillAOEType.values()[Integer.parseInt(schilds.item(j).getTextContent().trim())];
-							}
-							else if("eSkillRangeShapeType".equals(schilds.item(j).getNodeName()))
+								config.eSkillModelFlyType = ESkillModelFlyType.values()[Integer.parseInt(schilds.item(j).getTextContent().trim())];
+							}	
+							else if("flySpeed".equals(schilds.item(j).getNodeName()))
 							{
-								config.eSkillRangeShapeType = ESkillRangeShapeType.values()[Integer.parseInt(schilds.item(j).getTextContent().trim())];
+								config.flySpeed = Integer.parseInt(schilds.item(j).getTextContent().trim());
 							}
-							else if("rangeIntervalTime".equals(schilds.item(j).getNodeName()))
+							else if("flyParam1".equals(schilds.item(j).getNodeName()))
 							{
-								config.rangeIntervalTime = Integer.parseInt(schilds.item(j).getTextContent().trim());
+								config.flyParam1 = Integer.parseInt(schilds.item(j).getTextContent().trim());
 							}
-							else if("rangleTimes".equals(schilds.item(j).getNodeName()))
+							else if("flyParam2".equals(schilds.item(j).getNodeName()))
 							{
-								config.rangleTimes = Integer.parseInt(schilds.item(j).getTextContent().trim());
+								config.flyParam2 = Integer.parseInt(schilds.item(j).getTextContent().trim());
 							}
-							else if("rangeParam1".equals(schilds.item(j).getNodeName()))
+							else if("flyParam3".equals(schilds.item(j).getNodeName()))
 							{
-								config.rangeParam1 = Integer.parseInt(schilds.item(j).getTextContent().trim());
-							}
-							else if("rangeParam2".equals(schilds.item(j).getNodeName()))
-							{
-								config.rangeParam2 = Integer.parseInt(schilds.item(j).getTextContent().trim());
-							}
-							else if("maxEffectObj".equals(schilds.item(j).getNodeName()))
-							{
-								config.maxEffectObj = Integer.parseInt(schilds.item(j).getTextContent().trim());
+								config.flyParam3 = Integer.parseInt(schilds.item(j).getTextContent().trim());
 							}
 							else if("lifeTime".equals(schilds.item(j).getNodeName()))
 							{
 								config.lifeTime = Integer.parseInt(schilds.item(j).getTextContent().trim());
 							}
-							else if("releaseDist".equals(schilds.item(j).getNodeName()))
+							else if("num".equals(schilds.item(j).getNodeName()))
 							{
-								config.releaseDist = Integer.parseInt(schilds.item(j).getTextContent().trim());
+								config.num = Integer.parseInt(schilds.item(j).getTextContent().trim());
+							}
+							else if("angle".equals(schilds.item(j).getNodeName()))
+							{
+								config.angle = Integer.parseInt(schilds.item(j).getTextContent().trim());
+							}
+							else if("bIsPenetrate".equals(schilds.item(j).getNodeName()))
+							{
+								config.bIsPenetrate = Boolean.parseBoolean(schilds.item(j).getTextContent().trim());
+							}
+							else if("colliderRaius".equals(schilds.item(j).getNodeName()))
+							{
+								config.colliderRaius = Float.parseFloat(schilds.item(j).getTextContent().trim());
 							}
 							else if("eventId".equals(schilds.item(j).getNodeName()))
 							{
@@ -127,7 +130,7 @@ public class SkillRangeConfigXMLLoader
 						{
 							config.skillModelList[j] = nextSkillEffectConfigs.get(j);
 						}
-						this.skillModelRangeConfig.put(config.skillModelId, config);
+						this.skillModelFlyConfig.put(config.skillModelId, config);
 					}
 				}
 				in.close();

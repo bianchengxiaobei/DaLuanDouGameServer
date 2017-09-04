@@ -17,12 +17,16 @@
 		<id>10001</id>
 		<type>6</type>		
 	</skill>
-	<skill name="飞腿">
+	<skill name="飞腿_击飞">
 		<id>10002</id>
 		<type>6</type>		
 	</skill>	
 	<skill name="旋转飞腿">
 		<id>20001</id>
 		<type>3</type>		
+	</skill>
+		<skill name="飞球">
+		<id>30001</id>
+		<type>2</type>		
 	</skill>
 </skills>

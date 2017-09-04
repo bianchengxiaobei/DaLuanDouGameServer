@@ -1,4 +1,4 @@
-package com.chen.battle.skill.structs;
+package com.chen.battle.skill;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,10 +7,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import com.chen.battle.skill.SSSkillEffect;
 import com.chen.battle.skill.config.SkillModelMoveConfig;
 import com.chen.battle.skill.message.res.ResSkillModelStartForceMoveMessage;
 import com.chen.battle.skill.message.res.ResSkillModelStopForceMoveMessage;
+import com.chen.battle.skill.structs.ESkillEffectMoveToTargetType;
+import com.chen.battle.skill.structs.ESkillEffectMoveType;
+import com.chen.battle.skill.structs.ESkillEffectMovedTargetType;
+import com.chen.battle.skill.structs.ISSMoveObjectHolder;
 import com.chen.battle.structs.CVector3D;
 import com.chen.battle.structs.EGOActionState;
 import com.chen.battle.structs.SSGameUnit;
@@ -333,7 +336,6 @@ public class SSSkillEffect_Move extends SSSkillEffect implements ISSMoveObjectHo
 		theMoveOwner.SetMoveEffect(id, true);
 		beginTime = System.currentTimeMillis();
 		float time = (float)moveConfig.distance / (float)moveConfig.speed;
-		System.out.println("time:"+time+",LongTime:"+(long)(time*1000));
 		endTime = beginTime + (long)(time*1000);
 		lastMoveTime = beginTime;
 		theMoveOwner.BeginActionControled();

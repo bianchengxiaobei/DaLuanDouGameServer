@@ -41,7 +41,7 @@ public class SSAI
 	}
 	public void CancleAttack()
 	{
-		this.moveTarPos.zero();
+		//this.moveTarPos.zero();
 		if (eAttackState == EAttackState.Pursue)
 		{
 			//停止移动到目的地

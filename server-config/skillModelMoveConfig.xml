@@ -5,6 +5,7 @@
 		<bIsCooldown>true</bIsCooldown>
 		<bIsCanMove>true</bIsCanMove>
 		<bIsCanBreak>true</bIsCanBreak>
+		<releaseTimeDelay>0</releaseTimeDelay>
 		<bIsPenetrate>true</bIsPenetrate>
 		<bIsImpact>true</bIsImpact>
 		<eMoveType>2</eMoveType>
@@ -21,6 +22,7 @@
 		<bIsCooldown>false</bIsCooldown>
 		<bIsCanMove>true</bIsCanMove>
 		<bIsCanBreak>false</bIsCanBreak>
+		<releaseTimeDelay>0</releaseTimeDelay>
 		<bIsPenetrate>false</bIsPenetrate>
 		<bIsImpact>false</bIsImpact>
 		<eMoveType>2</eMoveType>

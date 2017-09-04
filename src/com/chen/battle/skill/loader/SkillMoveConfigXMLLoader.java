@@ -61,6 +61,10 @@ public class SkillMoveConfigXMLLoader
 							{
 								config.bIsCanMove = Boolean.parseBoolean(schilds.item(j).getTextContent().trim());
 							}
+							else if("releaseTimeDelay".equals(schilds.item(j).getNodeName()))
+							{
+								config.releaseTimeDelay = Integer.parseInt(schilds.item(j).getTextContent().trim());
+							}
 							else if("bIsPenetrate".equals(schilds.item(j).getNodeName()))
 							{
 								config.bIsPenetrate = Boolean.parseBoolean(schilds.item(j).getTextContent().trim());

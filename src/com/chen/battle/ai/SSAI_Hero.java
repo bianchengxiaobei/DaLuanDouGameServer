@@ -103,8 +103,8 @@ public class SSAI_Hero extends SSAI
 				//如果是非瞬发技能
 				if (skill.IfImpactSkill() == false || 
 						(skill.skillConfig.lastTime > 0 
-								&& bIsMoving == false && 
-								attackSkill.bIsRunning == false))
+								&& bIsMoving == false)) //&& 
+								//attackSkill.bIsRunning == false))
 				{
 					//停止攻击
 					this.CancleAttack();
@@ -169,6 +169,20 @@ public class SSAI_Hero extends SSAI
 	@Override
 	public void HeartBeat(long now,long tick)
 	{
+		if (IfPassitiveState() == true)
+		{
+			StopAllSkills(true);
+			CancleAttack();
+			StopWantUseSkill(true);
+			nextSkill = null;
+			bIsMoveDir = false;
+			if (bIsMoving)
+			{
+				theOwner.battle.AskStopMoveDir(theOwner);
+				theOwner.battle.AskStopMoveTarget(theOwner);
+			}
+			return ;
+		}
 		if (nowSkill != null)
 		{
 			System.out.println("NOwSkill");

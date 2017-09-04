@@ -1,8 +1,8 @@
-package com.chen.battle.skill.structs;
+package com.chen.battle.skill;
 
-import com.chen.battle.skill.SSSkillEffect;
 import com.chen.battle.skill.config.SSkillModelRangleConfig;
 import com.chen.battle.skill.message.res.ResSkillRangeShowMessage;
+import com.chen.battle.skill.structs.ESkillAOEType;
 import com.chen.battle.structs.CVector3D;
 import com.chen.battle.structs.SSGameUnit;
 import com.chen.utils.MessageUtil;
@@ -97,7 +97,7 @@ public class SSSkillEffect_Range extends SSSkillEffect
 		nextTime = 0;
 		rangeTimes = 0;
 		IsForceStop = false;
-		curPos.zero();
+		curPos = new CVector3D();
 	}
 	public boolean GetBeHittedObjs()
 	{
@@ -177,12 +177,13 @@ public class SSSkillEffect_Range extends SSSkillEffect
 	}
 	private boolean CallNextModule(SSGameUnit obj)
 	{
-		CVector3D targetDir = obj.GetCurDir();
+		CVector3D targetDir = CVector3D.Sub(obj.GetCurPos(), theOwner.GetCurPos()) ;
 		targetDir.y = 0;
 		targetDir.normalized();
 		battle.effectManager.AddEffectsFromConfig(this.rangeEffectConfig.skillModelList, theOwner,
 				obj, obj.GetCurPos(), targetDir, skill, System.currentTimeMillis(), null);
 		//调用技能命中
+		System.out.println("Range命中目标");
 		return true;
 	}
 	public boolean IsInCircle(CVector3D checkPos,CVector3D theOwnerPos,float radius)

@@ -3,6 +3,8 @@ package com.chen.battle.skill;
 import java.util.Arrays;
 
 import org.apache.ibatis.annotations.Case;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.chen.battle.skill.config.SSSkillConfig;
 import com.chen.battle.skill.structs.ESkillReleaseWay;
@@ -16,6 +18,7 @@ import com.chen.battle.structs.SSHero;
 
 public class SSSkill 
 {
+	private Logger logger = LogManager.getLogger(SSSkill.class);
 	public SSSkillConfig skillConfig;
 	public int normalAttackReleaseTime;
 	public boolean bIsRunning;
@@ -163,6 +166,7 @@ public class SSSkill
 	 */
 	public void Start()
 	{
+		logger.debug("Start");
 		boolean value = IfSkillUsable();
 		if (value == false)
 		{
@@ -189,15 +193,18 @@ public class SSSkill
 			if (CheckStatus() == false)
 			{
 				rst = 0;
+				break;
 			}
 			if (eSkillState.value <= ESkillState.Releasing.value && theOwner.IfInReleaseSkillRange(target, skillConfig, 1000) == false)
 			{
+				logger.error("距离不够，取消释放技能");
 				rst = 2;//NUllPointer
 				break;
 			}
 			//等待 状态
 			if (eSkillState == ESkillState.Free)
 			{
+				System.out.println("Free");
 				eSkillState = ESkillState.Preparing;
 				stateTime = now;
 				SetSkillDir();
@@ -205,6 +212,7 @@ public class SSSkill
 			//准备 状态
 			if (eSkillState == ESkillState.Preparing)
 			{
+				System.out.println("Preparing");
 				long deltaTime = now - stateTime;
 				//如果需要等待,直接返回
 				if (deltaTime < this.skillConfig.prepareTime)
@@ -219,6 +227,7 @@ public class SSSkill
 			//技能前摇
 			if (eSkillState == ESkillState.Releasing)
 			{
+				System.out.println("Releasing");
 				int releaseTime = this.skillConfig.releaseTime;
 				if (this.skillConfig.bIsNormalAttack)
 				{
@@ -249,7 +258,10 @@ public class SSSkill
 						SSSkillEffect effect = theOwner.battle.effectManager.GetEffect(effectId);
 						if (effect != null)
 						{
-							bIfUsing = true;
+							if (effect.IsUsingSkill() == true)
+							{
+								bIfUsing = true;
+							}
 						}
 						else
 						{
@@ -316,6 +328,7 @@ public class SSSkill
 	{
 		if (IfImpactSkill())
 		{
+			dir = theOwner.GetCurDir();
 			this.MakeSkillEffect(this.beginTime);
 			if (this.skillConfig.lastTime <= 0)
 			{

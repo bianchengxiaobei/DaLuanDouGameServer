@@ -118,7 +118,12 @@ public abstract class SSSkillEffect
 			skill.DoCooldown();
 		}
 	}
+	//---------------需要子类重写---------------//
 	public abstract boolean Begin();
 	public abstract boolean Update(long now,long tick);
 	public abstract void End();
+	public boolean IsUsingSkill()
+	{
+		return false;
+	}
 }

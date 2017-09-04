@@ -8,6 +8,10 @@ import com.chen.battle.message.res.ResIdleStateMessage;
 import com.chen.battle.message.res.ResRunningStateMessage;
 import com.chen.battle.skill.SSSkill;
 import com.chen.battle.skill.config.SSSkillConfig;
+import com.chen.battle.skill.message.res.ResLastingSkillStateMessage;
+import com.chen.battle.skill.message.res.ResPrepareSkillStateMessage;
+import com.chen.battle.skill.message.res.ResReleasingSkillStateMessage;
+import com.chen.battle.skill.message.res.ResUsingSkillStateMessage;
 import com.chen.battle.skill.structs.ISSMoveObjectHolder;
 import com.chen.message.Message;
 import com.chen.move.struct.ColSphere;
@@ -192,10 +196,48 @@ public abstract class SSGameUnit extends SSMoveObject
 			ResRunningStateMessage message = new ResRunningStateMessage();
 			message.playerId = this.id;
 			message.posX = (int)(this.curActionInfo.pos.x * 1000);
-			message.posZ = (int)(this.curActionInfo.pos.z * 1000);
+			message.posZ = (int)(this.curActionInfo.pos.z * 1000);			
 			message.angle = Tools.GetDirAngle(this.curActionInfo.dir);
 			message.moveSpeed = (int)(GetSpeed() * 1000);
 			return message;
+		case PreparingSkill:
+			ResPrepareSkillStateMessage resPrepareSkillStateMessage = new ResPrepareSkillStateMessage();
+			resPrepareSkillStateMessage.playerId = this.id;
+			resPrepareSkillStateMessage.PosX = (int)(this.curActionInfo.pos.x * 1000);
+			resPrepareSkillStateMessage.PosZ = (int)(this.curActionInfo.pos.z * 1000);
+			resPrepareSkillStateMessage.dirAngle = Tools.GetDirAngle(this.curActionInfo.dir);
+			resPrepareSkillStateMessage.targetId = this.curActionInfo.skillTargetId;
+			resPrepareSkillStateMessage.skillId = this.curActionInfo.skillId;
+			resPrepareSkillStateMessage.speed = (int)(this.GetSpeed() * 1000);
+			return resPrepareSkillStateMessage;
+		case ReleasingSkill:
+			ResReleasingSkillStateMessage releasingSkillStateMessage = new ResReleasingSkillStateMessage();
+			releasingSkillStateMessage.playerId = this.id;
+			releasingSkillStateMessage.PosX = (int)(this.curActionInfo.pos.x * 1000);
+			releasingSkillStateMessage.PosZ = (int)(this.curActionInfo.pos.z * 1000);
+			releasingSkillStateMessage.dirAngle = Tools.GetDirAngle(this.curActionInfo.dir);
+			releasingSkillStateMessage.targetId = this.curActionInfo.skillTargetId;
+			releasingSkillStateMessage.skillId = this.curActionInfo.skillId;
+			return releasingSkillStateMessage;
+		case UsingSkill:
+			ResUsingSkillStateMessage usingSkillStateMessage = new ResUsingSkillStateMessage();
+			usingSkillStateMessage.playerId = this.id;
+			usingSkillStateMessage.PosX = (int)(this.curActionInfo.pos.x * 1000);
+			usingSkillStateMessage.PosZ = (int)(this.curActionInfo.pos.z * 1000);
+			usingSkillStateMessage.dirAngle = Tools.GetDirAngle(this.curActionInfo.dir);
+			usingSkillStateMessage.targetId = this.curActionInfo.skillTargetId;
+			usingSkillStateMessage.skillId = this.curActionInfo.skillId;
+			return usingSkillStateMessage;
+		case LastingSkill:
+			ResLastingSkillStateMessage lastingSkillStateMessage = new ResLastingSkillStateMessage();
+			lastingSkillStateMessage.playerId = this.id;
+			lastingSkillStateMessage.PosX = (int)(this.curActionInfo.pos.x * 1000);
+			lastingSkillStateMessage.PosZ = (int)(this.curActionInfo.pos.z * 1000);
+			System.out.println(this.curActionInfo.dir == null);
+			lastingSkillStateMessage.dirAngle = Tools.GetDirAngle(this.curActionInfo.dir);
+			lastingSkillStateMessage.targetId = this.curActionInfo.skillTargetId;
+			lastingSkillStateMessage.skillId = this.curActionInfo.skillId;
+			return lastingSkillStateMessage;
 		}
 		return null;
 	}
@@ -255,6 +297,10 @@ public abstract class SSGameUnit extends SSMoveObject
 	public int GetCurHp()
 	{
 		return 100;
+	}
+	public CVector3D GetEmitPos()
+	{
+		return this.curActionInfo.pos;
 	}
 	public int GetFPData(EParameterCate cate)
 	{

@@ -3,7 +3,7 @@
 	<hero>
 		<id>0</id>
 		<colliderRadius>0.2</colliderRadius>
-		<skillList>1</skillList>
+		<skillList>1,2</skillList>
 	</hero>
 	<hero>
 		<id>1</id>
