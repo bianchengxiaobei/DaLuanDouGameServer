@@ -8,4 +8,5 @@ public class BattleUserInfo
 	public boolean bReconnect;
 	public SSPlayer sPlayer;
 	public SSHero sHero;
+	public long offlineTime;//如果掉线多少秒替换成机器人
 }

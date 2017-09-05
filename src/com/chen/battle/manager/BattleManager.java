@@ -95,6 +95,25 @@ public class BattleManager
 		}
 	}
 	/**
+	 * 移除匹配人员
+	 * @param player
+	 */
+	public void removeMatchUser(Player player)
+	{
+		if (player == null)
+		{
+			return;
+		}
+		MatchManager.getInstance().TeamStopMatch(player.getMatchPlayer());
+		boolean ret = MatchManager.getInstance().removeMatchTeam(player.getMatchPlayer());
+		if (!ret)
+		{
+			log.error("移除匹配失败");
+			return ;
+		}
+		player.getBattleInfo().reset();
+	}
+	/**
 	 * 玩家请求移动
 	 * @param player
 	 * @param dir
@@ -183,8 +202,7 @@ public class BattleManager
 		List<RoomMemberData> listData = new ArrayList<>();
 		do 
 		{
-			List<BattleConfig> configs = new ArrayList<BattleConfig>();	
-			battle = new BattleContext(EBattleType.values()[matchType],battleId,configs);
+			battle = new BattleContext(EBattleType.values()[matchType],battleId);
 			//加载地图
 			//设置每个人的信息SSUser
 

@@ -19,7 +19,7 @@ public class ReqLoginCharacterToGameServerHandler extends Handler
 	@Override
 	public void action()
 	{
-		ReqLoginCharacterToGameServerMessage msg = (ReqLoginCharacterToGameServerMessage)this.getMessage();
+		ReqLoginCharacterToGameServerMessage msg = (ReqLoginCharacterToGameServerMessage)getMessage();
 		try {
 			Player player = null;
 			int serverId = GameServer.getInstance().getServer_id();
@@ -30,6 +30,7 @@ public class ReqLoginCharacterToGameServerHandler extends Handler
 				if (player == null)
 				{
 					//选择角色失败
+					log.error("载入角色失败");
 					return;
 				}
 			}
@@ -53,10 +54,8 @@ public class ReqLoginCharacterToGameServerHandler extends Handler
 			gate_msg.setRoleAllInfo(getRoleAllInfo(player));
 			MessageUtil.send_to_gate(msg.getGateId(), player.getId(), gate_msg);
 		} catch (Exception e) {
-			e.printStackTrace();
 			log.error(e);
-			//发送选择角色失败消息给网关
-			
+			//发送选择角色失败消息给网关		
 		}
 		
 	}

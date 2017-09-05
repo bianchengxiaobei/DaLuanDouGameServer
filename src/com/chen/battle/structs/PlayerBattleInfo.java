@@ -2,10 +2,10 @@ package com.chen.battle.structs;
 
 public class PlayerBattleInfo
 {
-	private EBattleType battleTyoe;
-	private EBattleState battleState;
-	private long battleId;
-	private int battleCampType;
+	public EBattleType battleTyoe;
+	public EBattleState battleState;
+	public long battleId;
+	public int battleCampType;
 	public int getBattleCampType() {
 		return battleCampType;
 	}

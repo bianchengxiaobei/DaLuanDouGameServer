@@ -107,6 +107,24 @@ public class MatchRoom_Normal
 //		}
 		return false;
 	}
+	public boolean removeOneTeam(MatchTeam team)
+	{
+		for (Vector<MatchTeam> t : this.teamMap.values())
+		{
+			if (t.contains(team))
+			{
+				t.remove(team);
+				userCount -= team.getPlayerCount();
+				if (userCount == 0)
+				{
+					isInvalid = true;
+				}
+				team.search(false);
+				return true;
+			}
+		}
+		return false;
+	}
 	public boolean update()
 	{
 		if (this.userCount == 0 || isInvalid)

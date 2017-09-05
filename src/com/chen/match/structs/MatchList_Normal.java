@@ -29,8 +29,13 @@ public class MatchList_Normal extends MatchList
 		return success;
 	}
 	@Override
-	public boolean removeOneTeam(MatchTeam team) {
-		// TODO Auto-generated method stub
+	public boolean removeOneTeam(MatchTeam team)
+	{
+		for (MatchRoom_Normal room_Normal : roomList.values())
+		{
+			room_Normal.removeOneTeam(team);
+			return true;
+		}
 		return false;
 	}
 	@Override

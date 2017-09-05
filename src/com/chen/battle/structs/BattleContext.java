@@ -73,9 +73,9 @@ public class BattleContext extends BattleServer
 	public void setM_battleUserInfo(BattleUserInfo[] m_battleUserInfo) {
 		this.m_battleUserInfo = m_battleUserInfo;
 	}
-	public BattleContext(EBattleType type, long battleId,List<BattleConfig> configs)
+	public BattleContext(EBattleType type, long battleId)
 	{
-		super("战斗-"+battleId,configs);
+		super("战斗-"+battleId);
 		this.battleId = battleId;
 		this.battleType = type;
 		this.moveManager = new SSMoveManager();
@@ -91,19 +91,18 @@ public class BattleContext extends BattleServer
 	@Override
 	public void run()
 	{
-		super.run();
-		while (true)
+		while (this.battleState != EBattleServerState.eSSBS_Finished)
 		{
 			this.battleHeartBeatTime = System.currentTimeMillis();
-			this.OnHeartBeat(BattleContext.this.battleHeartBeatTime, 100);
+			this.OnHeartBeat(BattleContext.this.battleHeartBeatTime, 50);
 			if (this.battleState == EBattleServerState.eSSBS_Finished)
 			{
-				this.stop(true);
+				log.debug("战斗结束");
 				BattleManager.getInstance().allBattleMap.remove(this.battleId);
-				BattleManager.getInstance().mServers.remove(this.battleId, this);
+				BattleManager.getInstance().mServers.remove(this.battleId, this);				
 			}
 			try {
-				Thread.sleep(100);
+				Thread.sleep(50);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -271,6 +270,7 @@ public class BattleContext extends BattleServer
 			this.lastCheckPlayTimeout = now;
 			return false;
 		}
+		//每隔10秒检测一次
 		if (now - this.lastCheckPlayTimeout < 10000)
 		{
 			return false;
@@ -297,7 +297,7 @@ public class BattleContext extends BattleServer
 		}
 		if (bAllUserOffline && this.battleFinishProtectTime == 0)
 		{
-			this.battleFinishProtectTime = now + 60000;
+			this.battleFinishProtectTime = now + 6000;
 		}
 		if (bAllUserOffline && now > this.battleFinishProtectTime)
 		{
@@ -613,6 +613,29 @@ public class BattleContext extends BattleServer
 			}
 		}
 	}
+	/**
+	 * 玩家离线
+	 * @param player
+	 */
+	public void OnUserOffline(Player player)
+	{
+		BattleUserInfo info = this.getUserBattleInfo(player);
+		if (info != null)
+		{
+			SSHero hero = info.sHero;
+			if (hero != null)
+			{
+				//移除消息通信
+				info.sPlayer.bIfConnect = false;
+				info.bIsLoadedComplete = false;
+				info.bReconnect = true;
+				if (battleState == EBattleServerState.eSSBS_Playing)
+				{
+					info.offlineTime = System.currentTimeMillis();
+				}
+			}
+		}
+	}
 	private void PostStartGameMsg()
 	{
 		for (int i=0; i<this.m_battleUserInfo.length; i++)
@@ -629,4 +652,5 @@ public class BattleContext extends BattleServer
 			//然后通知客户端加载模型
 		}
 	}
+	
 }

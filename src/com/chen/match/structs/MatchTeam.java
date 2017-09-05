@@ -11,6 +11,7 @@ import com.chen.data.manager.DataManager;
 import com.chen.match.message.res.ResMatchStartMessage;
 import com.chen.match.message.res.ResMatchTeamBaseInfoMessage;
 import com.chen.match.message.res.ResMatchTeamPlayerInfoMessage;
+import com.chen.player.structs.Player;
 import com.chen.utils.MessageUtil;
 
 public class MatchTeam 
@@ -131,6 +132,43 @@ public class MatchTeam
 		player.getPlayer().getBattleInfo().changeTypeWithState(EBattleType.eBattleType_Match, EBattleState.eBattleState_Wait);
 		return true;
 	}
+	public boolean RemoveOneUser(MatchPlayer player)
+	{
+		if (isInMatch)
+		{
+			return false;
+		}
+		Iterator<MatchPlayer> iterator = players.iterator();
+		int pos = 0;
+		while (iterator.hasNext())
+		{
+			System.out.println("fwefwefewfewf");
+			MatchPlayer player2 = iterator.next();
+			if (player2.equals(player))
+			{
+				ResMatchTeamBaseInfoMessage message = new ResMatchTeamBaseInfoMessage();
+				message.teamId = 0;
+				message.matchType = EBattleMatchType.MATCH_MODE_INVALID.getValue();
+				message.mapId = 0;
+				//MessageUtil.tell_player_message(player2.getPlayer(),message);
+				player2.setMatchTeamId(0);
+				System.out.println("yichu ");
+				iterator.remove();
+				ResMatchTeamPlayerInfoMessage message2 = new ResMatchTeamPlayerInfoMessage();
+				message2.pos = (byte)pos;
+				message2.nickName = player2.getPlayer().getUserName();
+				message2.icon = 0;
+				for (MatchPlayer player3 : players)
+				{
+					//MessageUtil.tell_player_message(player3.getPlayer(), message2);
+				}
+				player.getPlayer().getBattleInfo().reset();
+				this.stopedPlayers.remove(player.getPlayer().getId());
+				return true;
+			}
+		}
+		return false;
+	}
 	/**
 	 * 取得匹配队伍里面的玩家数量
 	 * @return
@@ -183,6 +221,8 @@ public class MatchTeam
 			current.setMatchTeamId(0);
 			current.setMonster(false);
 			current.setPunishLeftTime(0);
+			System.out.println("发送基础");
+			current.getPlayer().getBattleInfo().reset();
 			MessageUtil.tell_player_message(current.getPlayer(), message);
 			stopedPlayers.remove(current.getPlayer().getId());
 		}

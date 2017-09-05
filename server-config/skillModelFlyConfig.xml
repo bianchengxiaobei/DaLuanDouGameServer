@@ -15,12 +15,12 @@
 		<bIsCanBreak>true</bIsCanBreak>
 		<releaseTimeDelay>0</releaseTimeDelay>
 		<eSkillModelFlyType>1</eSkillModelFlyType>
-		<flySpeed>1000</flySpeed>
+		<flySpeed>2000</flySpeed>
 		<flyParam1>0</flyParam1>
 		<flyParam2>0</flyParam2>
 		<flyParam3>0</flyParam3>
 		<bIsPenetrate>true</bIsPenetrate>
-		<colliderRaius>0.6</colliderRaius>
+		<colliderRaius>0.2</colliderRaius>
 		<lifeTime>1500</lifeTime>
 		<num>1</num>
 		<angle>0</angle>

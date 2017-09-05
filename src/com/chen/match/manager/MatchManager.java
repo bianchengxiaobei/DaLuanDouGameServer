@@ -5,6 +5,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.chen.battle.structs.EBattleState;
+import com.chen.battle.structs.EBattleType;
 import com.chen.match.structs.EBattleMatchType;
 import com.chen.match.structs.MatchList;
 import com.chen.match.structs.MatchList_AI;
@@ -61,6 +64,14 @@ public class MatchManager
 	 */
 	public boolean removeMatchTeam(MatchPlayer player)
 	{
+		if (player.getPlayer().getBattleInfo().battleTyoe != EBattleType.eBattleType_Match)
+		{
+			return false;
+		}
+		if (player.getPlayer().getBattleInfo().battleState != EBattleState.eBattleState_Wait)
+		{
+			return false;
+		}
 		if (!allTeamMap.containsKey(player.getMatchTeamId()))
 		{
 			return false;
@@ -77,7 +88,7 @@ public class MatchManager
 			}
 		}
 		//如果不是房主
-		else
+		else if(team.RemoveOneUser(player))
 		{
 			return true;
 		}
@@ -137,6 +148,27 @@ public class MatchManager
 		}	
 		boolean success = list.addOneTeam(team);
 		return success?1:0;
+	}
+	public boolean TeamStopMatch(MatchPlayer player)
+	{
+		if (!this.allTeamMap.containsKey(player.getMatchTeamId()))
+		{
+			return false;
+		}
+		MatchTeam team = this.allTeamMap.get(player.getMatchTeamId());
+		if (team.isInMatch() == false)
+		{
+			return false;
+		}
+		MatchList list = this.allMatchList.get((int)(team.getMatchType().getValue())).get(team.getMapId());
+		if (list != null)
+		{
+			return list.removeOneTeam(team);
+		}
+		else
+		{
+			return false;
+		}
 	}
 	public void update()
 	{

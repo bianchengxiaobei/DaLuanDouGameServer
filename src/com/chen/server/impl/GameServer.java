@@ -42,7 +42,7 @@ public class GameServer extends ClientServer
 	private static final String defaultPublicServerConfig = "server-config/public-server-config.xml";
 	private OrderedQueuePoolExecutor decodeExecutor = new OrderedQueuePoolExecutor("网关消息解析队列",100,10000);
 	private NonOrderedQueuePoolExecutor commandExecutor = new NonOrderedQueuePoolExecutor(100);
-	private NonOrderedQueuePoolExecutor worldCommandExecutor = new NonOrderedQueuePoolExecutor(10);
+	private NonOrderedQueuePoolExecutor worldCommandExecutor = new NonOrderedQueuePoolExecutor(100);
 	
 	public static ConcurrentHashMap<String, Integer> delay = new ConcurrentHashMap<>();
 	private ThreadGroup thread_group;
@@ -125,7 +125,11 @@ public class GameServer extends ClientServer
 		new Timer("Match Update").schedule(new TimerTask() {		
 			@Override
 			public void run() {
-				MatchManager.getInstance().update();			
+				try {
+					MatchManager.getInstance().update();	
+				} catch (Exception e) {
+					log.error(e);
+				}	
 			}
 		},1000,1000);
 	}
@@ -178,6 +182,10 @@ public class GameServer extends ClientServer
 				msg.read(buf);
 				msg.setSession(iosession);
 				Handler handler = messagePool.getHandler(id);
+				if (handler == null)
+				{
+					log.error("收到消息没有Handler");
+				}
 				handler.setMessage(msg);
 				handler.setCreateTime(System.currentTimeMillis());
 				if ("Local".equalsIgnoreCase(msg.getQueue()))
@@ -196,6 +204,7 @@ public class GameServer extends ClientServer
 							return;
 						}
 						handler.setParameter(player);
+						worldCommandExecutor.execute(handler);
 					}
 				}
 				else
@@ -210,6 +219,7 @@ public class GameServer extends ClientServer
 							return;
 						}
 						handler.setParameter(player);
+						worldCommandExecutor.execute(handler);
 					}
 				}
 			}			
@@ -252,7 +262,6 @@ public class GameServer extends ClientServer
 	@Override
 	public void register(IoSession session, int type)
 	{
-		System.out.println("开始注册dwd网关服务器");
 		switch (type) {
 		case IServer.GATE_SERVER:
 			System.out.println("开始注册网关服务器");

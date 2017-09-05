@@ -6,6 +6,9 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.chen.battle.manager.BattleManager;
+import com.chen.battle.structs.BattleContext;
+import com.chen.battle.structs.EBattleState;
 import com.chen.battle.structs.PlayerBattleInfo;
 import com.chen.db.bean.Hero;
 import com.chen.db.dao.HeroDao;
@@ -232,5 +235,33 @@ public class Player
 	}
 	public void setHeroList(List<Hero> heroList) {
 		this.heroList = heroList;
+	}
+	
+	
+	public void Offline()
+	{
+		if (this.battleInfo.battleState.value < EBattleState.eBattleState_Async.value)
+		{
+			switch (this.battleInfo.battleTyoe) {
+			case eBattleType_Match:
+				BattleManager.getInstance().removeMatchUser(this);
+				break;
+			case eBattleType_Room:
+				
+				break;
+			}
+		}
+		else
+		{
+			BattleContext battleContext = BattleManager.getInstance().getBattleContext(this);
+			if (battleContext != null)
+			{
+				battleContext.OnUserOffline(this);
+			}
+			else
+			{
+				log.error("找不到战斗线程");
+			}
+		}
 	}
 }

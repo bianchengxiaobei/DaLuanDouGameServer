@@ -9,7 +9,10 @@ import com.chen.config.Config;
 import com.chen.db.bean.Role;
 import com.chen.db.dao.RoleDao;
 import com.chen.login.bean.RoleBasicInfo;
+import com.chen.login.message.res.ResRemoveCharacterToGateMessage;
 import com.chen.player.structs.Player;
+import com.chen.player.structs.PlayerState;
+import com.chen.utils.MessageUtil;
 
 public class PlayerManager 
 {
@@ -43,7 +46,13 @@ public class PlayerManager
 	 */
 	public Player getPlayer(long roleId)
 	{
-		return players.get(roleId);
+		try {
+			return players.get(roleId);
+		} catch (Exception e) {
+			log.error(e);
+			return null;
+		}
+		
 	}
 	/**
 	 * 注册玩家，加入到玩家Map
@@ -63,6 +72,36 @@ public class PlayerManager
 		player.setSex(sex);
 		player.setMoney(0);
 		return player;
+	}
+	/**
+	 * 退出流程
+	 * @param player
+	 * @param bForce
+	 */
+	public void quitting(Player player,int bForce)
+	{
+		log.debug("玩家:"+player.getUserName()+"开始退出游戏服务器");
+		player.Offline();
+		this.quit(player);
+	}
+	public void quit(Player player)
+	{
+		//player.setState(PlayerState.Quit.value);
+		//发送消息给网关移除角色
+		ResRemoveCharacterToGateMessage message = new ResRemoveCharacterToGateMessage();
+		message.playerId = player.getId();
+		MessageUtil.send_to_gate(player.getGateId(), player.getId(), message);
+		//好友下线通知
+		//同步玩家信息到数据库
+		removePlayer(player);
+	}
+	/**
+	 * 移除在线玩家
+	 * @param player
+	 */
+	public void removePlayer(Player player)
+	{
+		players.remove(player.getId());
 	}
 	/**
 	 * 加载玩家

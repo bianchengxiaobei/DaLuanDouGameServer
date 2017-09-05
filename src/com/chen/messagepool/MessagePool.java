@@ -11,8 +11,10 @@ import com.chen.battle.skill.message.req.ReqAskUseSkillMessage;
 import com.chen.command.Handler;
 import com.chen.login.handler.ReqCreateCharacterToGameServerHandler;
 import com.chen.login.handler.ReqLoginCharacterToGameServerHandler;
+import com.chen.login.handler.ReqQuitToGameServerHandler;
 import com.chen.login.message.req.ReqCreateCharacterToGameServerMessage;
 import com.chen.login.message.req.ReqLoginCharacterToGameServerMessage;
+import com.chen.login.message.req.ReqQuitToGameServerMessage;
 import com.chen.match.handler.ReqAutoMatchHandler;
 import com.chen.match.handler.ReqRemoveMatchHandler;
 import com.chen.match.handler.ReqStartMatchHandler;
@@ -36,7 +38,8 @@ public class MessagePool
 		register(10001, ReqLoginCharacterToGameServerMessage.class, ReqLoginCharacterToGameServerHandler.class);
 		register(10004, ResRegisterGateMessage.class, ResRegisterGateHandler.class);
 		register(10007, ReqCreateCharacterToGameServerMessage.class, ReqCreateCharacterToGameServerHandler.class);
-	
+		register(10035, ReqQuitToGameServerMessage.class, ReqQuitToGameServerHandler.class);
+		
 		register(1007, ReqAutoMatchMessage.class, ReqAutoMatchHandler.class);
 		register(1008, ReqStartMatchMessage.class, ReqStartMatchHandler.class);
 		register(1009, ReqRemoveMatchMessage.class, ReqRemoveMatchHandler.class);
