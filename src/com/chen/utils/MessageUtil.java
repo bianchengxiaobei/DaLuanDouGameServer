@@ -84,7 +84,6 @@ public class MessageUtil
 	{
 		if (player.getGateId() != 0)
 		{
-			System.out.println("发送消息给客户端"+player.getId());
 			message.getRoleId().add(player.getId());
 			send_to_gate(player.getGateId(), player.getId(), message);
 		}
@@ -102,13 +101,12 @@ public class MessageUtil
 	{
 		for (int i=0; i<battle.getM_battleUserInfo().length; i++)
 		{
-			if (battle.getM_battleUserInfo()[i] != null)
+			if (battle.getM_battleUserInfo()[i] != null && battle.getM_battleUserInfo()[i].sPlayer.bIfConnect)
 			{
 				message.getRoleId().add(battle.getM_battleUserInfo()[i].sPlayer.player.getId());
 			}
 		}
-		send_to_gate(message);
-		
+		send_to_gate(message);		
 	}
 	/**
 	 * 写入消息到游戏服务器缓存
