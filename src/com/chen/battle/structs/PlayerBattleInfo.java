@@ -42,6 +42,10 @@ public class PlayerBattleInfo
 		this.battleTyoe = battleType;
 		this.battleState = battleState;
 	}
+	public void changeState(EBattleState state)
+	{
+		this.battleState = state;
+	}
 	public void reset()
 	{
 		battleTyoe = EBattleType.eBattleType_Free;

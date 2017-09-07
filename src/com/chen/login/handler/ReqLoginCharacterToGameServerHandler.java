@@ -3,6 +3,7 @@ package com.chen.login.handler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.chen.battle.structs.EBattleState;
 import com.chen.command.Handler;
 import com.chen.login.bean.RoleAllInfo;
 import com.chen.login.message.req.ReqLoginCharacterToGameServerMessage;
@@ -45,6 +46,16 @@ public class ReqLoginCharacterToGameServerHandler extends Handler
 			player.setServerName(GameServer.getInstance().getServer_name());
 			player.setWebName(GameServer.getInstance().getServer_web());			
 			PlayerManager.getInstance().registerPlayer(player);
+			if (player.getBattleInfo().getBattleState().value < EBattleState.eBattleState_Async.value)
+			{
+				//发送进入大厅消息
+				
+			}
+			else
+			{
+				//玩家已经进入战斗
+				
+			}
 			//通知网关服务器玩家角色登录成功
 			ResLoginSuccessToGateMessage gate_msg = new ResLoginSuccessToGateMessage();
 			gate_msg.setServerId(serverId);

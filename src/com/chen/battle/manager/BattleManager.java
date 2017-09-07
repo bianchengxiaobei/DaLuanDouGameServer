@@ -248,6 +248,7 @@ public class BattleManager
 		{
 			Player player =  userMap.get(i);
 			player.getBattleInfo().setBattleId(battleId);
+			player.getBattleInfo().changeState(EBattleState.eBattleState_Async);
 			//data.canUseHeroList.addAll(battle.getM_battleUserInfo()[i].sPlayer.canUserHeroList);
 			msg.canUseHeroList.addAll(battle.getM_battleUserInfo()[i].sPlayer.canUserHeroList);
 			msg.m_oData = listData;
