@@ -6,6 +6,7 @@ import org.apache.mina.core.session.IoSession;
 
 import com.chen.login.bean.RoleAllInfo;
 import com.chen.login.message.req.ReqCreateCharacterToGameServerMessage;
+import com.chen.login.message.res.ResEnterLobbyMessage;
 import com.chen.login.message.res.ResLoginSuccessToGateMessage;
 import com.chen.player.manager.PlayerManager;
 import com.chen.player.structs.Player;
@@ -46,13 +47,15 @@ public class LoginManager
 			return;
 		}
 		int serverId = GameServer.getInstance().getServer_id();
+		ResEnterLobbyMessage message = new ResEnterLobbyMessage();
+		message.roleAllInfo = getRoleAllInfo(player);
+		MessageUtil.tell_player_message(player, message);
 		//通知网关服务器玩家登录成功
 		ResLoginSuccessToGateMessage gate_msg = new ResLoginSuccessToGateMessage();
 		gate_msg.setServerId(serverId);
 		gate_msg.setCreateServerId(player.getCreateServerId());
 		gate_msg.setUserId(msg.getUserId());
 		gate_msg.setPlayerId(player.getId());
-		gate_msg.setRoleAllInfo(getRoleAllInfo(player));
 		MessageUtil.send_to_gate(msg.getGateId(),player.getId(), gate_msg);
 	}	
 	/**

@@ -18,6 +18,7 @@ import com.chen.battle.manager.BattleManager;
 import com.chen.battle.message.res.ResBattleTipMessage;
 import com.chen.battle.message.res.ResEnterSceneMessage;
 import com.chen.battle.message.res.ResGamePrepareMessage;
+import com.chen.battle.message.res.ResReConnectMessage;
 import com.chen.battle.message.res.ResSceneLoadedMessage;
 import com.chen.battle.message.res.ResSelectHeroMessage;
 import com.chen.battle.skill.manager.SSEffectManager;
@@ -37,6 +38,7 @@ public class BattleContext extends BattleServer
 	private EBattleType battleType;
 	private EBattleServerState battleState = EBattleServerState.eSSBS_SelectHero;
 	private long battleId;
+	public int mapId;
 	private long battleStateTime;
 	public long battleHeartBeatTime;
 	private long lastCheckPlayTimeout;
@@ -73,10 +75,11 @@ public class BattleContext extends BattleServer
 	public void setM_battleUserInfo(BattleUserInfo[] m_battleUserInfo) {
 		this.m_battleUserInfo = m_battleUserInfo;
 	}
-	public BattleContext(EBattleType type, long battleId)
+	public BattleContext(EBattleType type, long battleId,int mapId)
 	{
 		super("战斗-"+battleId);
 		this.battleId = battleId;
+		this.mapId = mapId;
 		this.battleType = type;
 		this.moveManager = new SSMoveManager();
 		this.effectManager = new SSEffectManager();
@@ -170,6 +173,14 @@ public class BattleContext extends BattleServer
 		data.bIsLoadedComplete = true;
 		ResSceneLoadedMessage msg = new ResSceneLoadedMessage();
 		msg.m_playerId = player.getId();
+		//说明是重新连接进入的
+		if (this.battleState == EBattleServerState.eSSBS_Playing)
+		{
+			//更新客户端战斗时间
+			//显示其他玩家，更新自己的状态
+			data.sHero.SendAppearMessage();
+			SyncState(data.sHero);
+		}
 		MessageUtil.tell_battlePlayer_message(this, msg);
 	}
 	public void checkSelectHeroTimeout()
@@ -514,6 +525,14 @@ public class BattleContext extends BattleServer
 		{
 			return;
 		}
+		for (int i=0; i<this.m_battleUserInfo.length; i++)
+		{
+			if (this.m_battleUserInfo[i] == null)
+			{
+				continue;
+			}
+			this.m_battleUserInfo[i].sPlayer.player.getBattleInfo().reset();
+		}
 		//通知客户端战斗结束
 		setBattleState(EBattleServerState.eSSBS_Finished,true);
 		//通知客户端那方赢了
@@ -633,6 +652,75 @@ public class BattleContext extends BattleServer
 				{
 					info.offlineTime = System.currentTimeMillis();
 				}
+			}
+		}
+	}
+	/**
+	 * 玩家重新连接战斗
+	 * @param player
+	 */
+	public void OnEnterBattleState(Player player)
+	{
+		BattleUserInfo info = this.getUserBattleInfo(player);
+		if (info != null)
+		{
+			info.sPlayer.bIfConnect = true;
+			//需要重新连接
+			if (info.bReconnect == true)
+			{
+				//发送给客户端重新连接的消息
+				ResReConnectMessage message = new ResReConnectMessage();
+				message.battleState = this.battleState.getValue();
+				message.battleId = this.battleId;
+				message.mapId = this.mapId;
+				message.playerId = player.getId();
+				for (int i=0;i<this.m_battleUserInfo.length;i++)
+				{
+					if (this.m_battleUserInfo[i] == null)
+					{
+						continue;
+					}
+					ReConnectInfo info2 = new ReConnectInfo();
+					info2.playerId = this.m_battleUserInfo[i].sPlayer.player.getId();
+					info2.heroId = this.m_battleUserInfo[i].selectedHeroId;
+					info2.nickName = this.m_battleUserInfo[i].sPlayer.player.getName();
+					message.ReConnectInfo.add(info2);
+				}
+				MessageUtil.tell_player_message(player, message);
+			}
+			switch (battleState) {
+			case eSSBS_SelectHero:
+				//选定的英雄重新发送
+				for (int i=0;i<this.m_battleUserInfo.length;i++)
+				{
+					if (this.m_battleUserInfo[i] == null || this.m_battleUserInfo[i].selectedHeroId == 0)
+					{
+						continue;
+					}
+					if (this.m_battleUserInfo[i].bIsHeroChoosed)
+					{
+						//然后将选择该神兽的消息广播给其他玩家
+						ResSelectHeroMessage msg = new ResSelectHeroMessage();
+						msg.heroId = this.m_battleUserInfo[i].selectedHeroId;
+						msg.playerId = this.m_battleUserInfo[i].sPlayer.player.getId();
+						MessageUtil.tell_player_message(player, msg);
+					}
+				}
+				break;
+			case eSSBS_Prepare:				
+				break;
+			case eSSBS_Loading:
+				break;
+			case eSSBS_Playing:
+				SSHero hero = info.sHero;
+				info.offlineTime = 0;
+				if (hero != null)
+				{
+					hero.ResetAI();
+				}
+				break;
+			default:
+				break;
 			}
 		}
 	}

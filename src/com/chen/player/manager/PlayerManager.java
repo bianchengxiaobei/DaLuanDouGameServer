@@ -4,6 +4,7 @@ package com.chen.player.manager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.chen.battle.structs.EBattleState;
 import com.chen.cache.impl.MemoryCache;
 import com.chen.config.Config;
 import com.chen.db.bean.Role;
@@ -93,7 +94,10 @@ public class PlayerManager
 		MessageUtil.send_to_gate(player.getGateId(), player.getId(), message);
 		//好友下线通知
 		//同步玩家信息到数据库
-		removePlayer(player);
+		if (player.getBattleInfo().battleState.value < EBattleState.eBattleState_Async.value)
+		{
+			removePlayer(player);
+		}
 	}
 	/**
 	 * 移除在线玩家
