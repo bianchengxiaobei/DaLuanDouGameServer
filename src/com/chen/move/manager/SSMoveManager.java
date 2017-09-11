@@ -56,22 +56,18 @@ public class SSMoveManager
 	 */
 	public boolean AskMoveForced(SSMoveObject obj,ColVector dir,float speed, boolean bIfImpact)
 	{
-		if (AskStartMoveCheck(obj) == false)
+		if (AskStartForceMoveCheck(obj) == false)
 		{
 			return false;
 		}
-		if (obj.moveStatus == SSMoveObjectStatus.SSMoveObjectStatus_Stand)
-		{
-			obj.moveType = ESSMoveObjectMoveType.ForceMove;
-			long now = System.currentTimeMillis();
-			obj.SetDir(dir);
-			obj.startMoveTime = now;
-			obj.moveStatus = SSMoveObjectStatus.SSMoveObjectStatus_ForceMove;
-			obj.bIfForceMoveImapce = bIfImpact;
-			obj.forceMoveSpeed = speed;
-			return true;
-		}
-		return false;
+		obj.moveType = ESSMoveObjectMoveType.ForceMove;
+		long now = System.currentTimeMillis();
+		obj.SetDir(dir);
+		obj.startMoveTime = now;
+		obj.moveStatus = SSMoveObjectStatus.SSMoveObjectStatus_ForceMove;
+		obj.bIfForceMoveImapce = bIfImpact;
+		obj.forceMoveSpeed = speed;
+		return true;
 	}
 	public boolean AskStopMoveObject(SSMoveObject obj,EAskStopMoveType type)
 	{
@@ -209,6 +205,19 @@ public class SSMoveManager
 			return false;
 		}
 		if (obj.moveStatus == SSMoveObjectStatus.SSMoveObjectStatus_ForceMove)
+		{
+			return false;
+		}
+		if (obj.moveStatus == SSMoveObjectStatus.SSMoveObjectStatus_Move)
+		{
+			//先将上次移动终止
+			StopLastStep(obj, false);
+		}
+		return true;
+	}
+	private boolean AskStartForceMoveCheck(SSMoveObject obj)
+	{
+		if (!this.allMoveObjectSet.contains(obj))
 		{
 			return false;
 		}
