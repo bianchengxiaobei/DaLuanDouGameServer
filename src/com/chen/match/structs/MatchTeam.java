@@ -107,7 +107,7 @@ public class MatchTeam
 		ResMatchTeamPlayerInfoMessage msg2 = new ResMatchTeamPlayerInfoMessage();
 		msg2.pos = (byte)players.size();
 		msg2.icon = 0;
-		msg2.nickName = player.getPlayer().getUserName();
+		msg2.nickName = player.getPlayer().getName();
 		msg2.isInsert = 1;
 		byte pos = 0;
 		ResMatchTeamPlayerInfoMessage msg3 = new ResMatchTeamPlayerInfoMessage();

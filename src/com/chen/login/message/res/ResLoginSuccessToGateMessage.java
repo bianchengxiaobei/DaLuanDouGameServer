@@ -16,7 +16,6 @@ public class ResLoginSuccessToGateMessage extends Message
 	private int createServerId;
 	private String userId;
 	private long playerId;
-	public int isInbattle;
 	
 	@Override
 	public int getId() {
@@ -74,7 +73,6 @@ public class ResLoginSuccessToGateMessage extends Message
 		this.createServerId = readInt(buf);
 		this.userId = readString(buf);
 		this.playerId = readLong(buf);
-		this.isInbattle = readInt(buf);
 		return true;
 	}
 
@@ -84,7 +82,6 @@ public class ResLoginSuccessToGateMessage extends Message
 		writeInt(buf, createServerId);
 		writeString(buf, this.userId);
 		writeLong(buf, playerId);
-		writeInt(buf, isInbattle);
 		return true;
 	}
 }

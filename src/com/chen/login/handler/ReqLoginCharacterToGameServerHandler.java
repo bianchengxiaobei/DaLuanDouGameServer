@@ -57,7 +57,6 @@ public class ReqLoginCharacterToGameServerHandler extends Handler
 			gate_msg.setCreateServerId(player.getCreateServerId());
 			gate_msg.setUserId(msg.getUserId());
 			gate_msg.setPlayerId(player.getId());
-			gate_msg.isInbattle = isInBattle ? 1 : 0;
 			MessageUtil.send_to_gate(msg.getGateId(), player.getId(), gate_msg);
 			//发送进入大厅消息
 			ResEnterLobbyMessage enterLobbyMsg = new ResEnterLobbyMessage();

@@ -48,6 +48,7 @@ public class PlayerBattleInfo
 	}
 	public void reset()
 	{
+		System.err.println("Reset");
 		battleTyoe = EBattleType.eBattleType_Free;
 		battleState = EBattleState.eBattleState_Free;
 		battleId = 0L;

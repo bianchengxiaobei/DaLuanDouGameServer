@@ -47,9 +47,6 @@ public class LoginManager
 			return;
 		}
 		int serverId = GameServer.getInstance().getServer_id();
-		ResEnterLobbyMessage message = new ResEnterLobbyMessage();
-		message.roleAllInfo = getRoleAllInfo(player);
-		MessageUtil.tell_player_message(player, message);
 		//通知网关服务器玩家登录成功
 		ResLoginSuccessToGateMessage gate_msg = new ResLoginSuccessToGateMessage();
 		gate_msg.setServerId(serverId);
@@ -57,6 +54,13 @@ public class LoginManager
 		gate_msg.setUserId(msg.getUserId());
 		gate_msg.setPlayerId(player.getId());
 		MessageUtil.send_to_gate(msg.getGateId(),player.getId(), gate_msg);
+		//发送进入大厅消息
+		ResEnterLobbyMessage enterLobbyMsg = new ResEnterLobbyMessage();
+		enterLobbyMsg.roleAllInfo = getRoleAllInfo(player);
+		enterLobbyMsg.server = serverId;
+		enterLobbyMsg.userId = player.getUserId();
+		enterLobbyMsg.isInBattle = 0;
+		MessageUtil.send_to_gate(msg.getGateId(), player.getId(), enterLobbyMsg);
 	}	
 	/**
 	 * 创建角色

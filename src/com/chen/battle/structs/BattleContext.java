@@ -281,8 +281,8 @@ public class BattleContext extends BattleServer
 			this.lastCheckPlayTimeout = now;
 			return false;
 		}
-		//每隔10秒检测一次
-		if (now - this.lastCheckPlayTimeout < 10000)
+		//每隔5秒检测一次
+		if (now - this.lastCheckPlayTimeout < 5000)
 		{
 			return false;
 		}
@@ -308,7 +308,7 @@ public class BattleContext extends BattleServer
 		}
 		if (bAllUserOffline && this.battleFinishProtectTime == 0)
 		{
-			this.battleFinishProtectTime = now + 6000;
+			this.battleFinishProtectTime = now + 5000;
 		}
 		if (bAllUserOffline && now > this.battleFinishProtectTime)
 		{
