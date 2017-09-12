@@ -1,5 +1,8 @@
 package com.chen.battle.structs;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.chen.move.struct.ColSphere;
 import com.chen.move.struct.ColVector;
 import com.chen.move.struct.ESSMoveObjectMoveType;
@@ -7,6 +10,7 @@ import com.chen.move.struct.SSMoveObjectStatus;
 
 public abstract class SSMoveObject
 {
+	public Logger logger = LogManager.getLogger(SSMoveObject.class);
 	public SSMoveObjectStatus moveStatus;
 	public ESSMoveObjectMoveType moveType;
 	public long startMoveTime;//开始移动时间
@@ -63,6 +67,7 @@ public abstract class SSMoveObject
 		startMoveTime = now;
 		if (bIfSpeedChanged)
 		{
+			logger.debug("移动速度发生改变，通知客户端");
 			bIfSpeedChanged = false;
 			OnStartMove(dir);
 		}

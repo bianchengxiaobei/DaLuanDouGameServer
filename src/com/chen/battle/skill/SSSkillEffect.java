@@ -1,5 +1,8 @@
 package com.chen.battle.skill;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.chen.battle.skill.structs.ESkillEffectType;
 import com.chen.battle.skill.structs.SkillEffectBaseConfig;
 import com.chen.battle.structs.BattleContext;
@@ -8,6 +11,7 @@ import com.chen.battle.structs.SSGameUnit;
 
 public abstract class SSSkillEffect 
 {
+	public Logger logger = LogManager.getLogger(SSSkillEffect.class);
 	public ESkillEffectType skillEffectType;
 	public SSSkill skill;
 	public SkillEffectBaseConfig config;
@@ -54,6 +58,7 @@ public abstract class SSSkillEffect
 	 */
 	public void ForceStop()
 	{
+		logger.debug("强制停止技能："+this.skillEffectType.toString());
 		this.End();
 		IsForceStop = true;
 		id = 0;

@@ -164,15 +164,21 @@ public abstract class SSGameUnit extends SSMoveObject
 	}
 	/**
 	 * 设置移动效果，如果当前有移动先移除
-	 * @param moveEffectId
+	 * @param _moveEffectId
 	 * @param active
 	 */
-	public void SetMoveEffect(int moveEffectId,boolean active)
+	public void SetMoveEffect(int _moveEffectId,boolean active)
 	{
-		if (moveEffectId != 0)
+		if (this.moveEffectId != 0)
 		{
-			battle.effectManager.RemoveEffect(moveEffectId);
-			this.moveEffectId = moveEffectId;
+			logger.error("当前还有移动特效，移除现在");
+			battle.effectManager.RemoveEffect(this.moveEffectId);
+			this.moveEffectId = _moveEffectId;
+			bIfActiveMove = active;
+		}
+		else
+		{
+			this.moveEffectId = _moveEffectId;
 			bIfActiveMove = active;
 		}
 	}

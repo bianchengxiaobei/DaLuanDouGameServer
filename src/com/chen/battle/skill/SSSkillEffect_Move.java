@@ -128,10 +128,10 @@ public class SSSkillEffect_Move extends SSSkillEffect implements ISSMoveObjectHo
 				return false;
 			}
 			CVector3D cNowPos = theMoveOwner.GetCurPos();
-			if (cNowPos.IsZero())
-			{
-				return false;
-			}
+//			if (cNowPos.IsZero())
+//			{
+//				return false;
+//			}
 			if (moveConfig.eMoveToTargetType == ESkillEffectMoveToTargetType.Hit_Angle)
 			{
 				moveDir = dir;
@@ -144,11 +144,11 @@ public class SSSkillEffect_Move extends SSSkillEffect implements ISSMoveObjectHo
 			{
 				moveDir = theOwner.GetCurDir();
 			}
-			moveDir.RotateAngle(moveConfig.angle);
-			CVector3D targetPos = CVector3D.Add(cNowPos, CVector3D.Mul(moveDir, (float)(moveConfig.distance * 0.001)));
+			moveDir.RotateAngle(moveConfig.angle);			
 			if (moveConfig.speed <= 0)
 			{
 				//瞬移
+				CVector3D targetPos = CVector3D.Add(cNowPos, CVector3D.Mul(moveDir, (float)(moveConfig.distance * 0.001)));
 			}
 			else
 			{
@@ -333,6 +333,7 @@ public class SSSkillEffect_Move extends SSSkillEffect implements ISSMoveObjectHo
 	{
 		bIfStartForceMove = true;
 		lastMovePos = startPos;
+		//避免强制移动重叠
 		theMoveOwner.SetMoveEffect(id, true);
 		beginTime = System.currentTimeMillis();
 		float time = (float)moveConfig.distance / (float)moveConfig.speed;

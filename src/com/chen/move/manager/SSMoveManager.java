@@ -3,6 +3,9 @@ package com.chen.move.manager;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.chen.battle.structs.CVector3D;
 import com.chen.battle.structs.SSMoveObject;
 import com.chen.move.struct.ColSphere;
@@ -13,6 +16,7 @@ import com.chen.move.struct.SSMoveObjectStatus;
 
 public class SSMoveManager
 {
+	public Logger logger = LogManager.getLogger(SSMoveManager.class);
 	public Set<SSMoveObject> allMoveObjectSet = new HashSet<>();
 	private SSMoveObject[] heartBeatTempArray = new SSMoveObject[1024];
 	public void AddMoveObject(SSMoveObject object)
@@ -34,7 +38,7 @@ public class SSMoveManager
 			obj.moveType = ESSMoveObjectMoveType.Dir;
 			long now = System.currentTimeMillis();
 			obj.moveStatus = SSMoveObjectStatus.SSMoveObjectStatus_Move;
-			obj.askMoveDir = dir;
+			obj.askMoveDir = dir.Normalize();
 			obj.SetDir(dir);;
 			obj.startMoveTime = now;
 			//计算下一个100毫秒后的位置
@@ -116,6 +120,7 @@ public class SSMoveManager
 			}
 			if (object.moveType == ESSMoveObjectMoveType.Dir && object.dir.equals(object.askMoveDir) == false)
 			{
+				logger.error("移动方向改变，发送移动消息");
 				ColVector nowDir = object.dir;
 				object.SetDir(object.askMoveDir);
 				object.CalculateStepMoveTarget(now);
