@@ -58,6 +58,10 @@ public class SSHeroConfigXMLLoader
 									config.skillList[k] = Integer.parseInt(skillString[k]);
 								}
 							}
+							else if(("maxHp").equals(schilds.item(j).getNodeName()))
+							{
+								config.baseFp.maxHp = Integer.parseInt(schilds.item(j).getTextContent().trim());
+							}
 						}		
 						this.heroConfigMap.put(id, config);
 					}

@@ -1,5 +1,7 @@
 package com.chen.data.bean;
 
+import java.util.Vector;
+
 public class MapBean 
 {
 	//地图中文名
@@ -8,6 +10,9 @@ public class MapBean
 	private int m_nMapId;
 	//该地图最多玩家数量
 	private int maxCount;
+	//有多少个阵营
+	private String playerModel;
+	public Vector<Integer> playerModels = new Vector<>();
 	public String getM_strMapName() {
 		return m_strMapName;
 	}
@@ -25,5 +30,35 @@ public class MapBean
 	}
 	public void setMaxCount(int maxCount) {
 		this.maxCount = maxCount;
+	}
+	public String getPlayerModel() {
+		return playerModel;
+	}
+	public void setPlayerModel(String playerModel) {
+		this.playerModel = playerModel;
+	}
+	
+	public Vector<Integer> getPlayerModels()
+	{
+		if (this.playerModels.size() == 0)
+		{
+			if (this.playerModel.equals("") || this.playerModel == null)
+			{
+				System.err.println("地图加载Model错误");
+				return null;
+			}
+			String[] models = this.playerModel.split(",");
+			for (String num : models)
+			{
+				try {
+					this.playerModels.add(Integer.valueOf(num));
+				} catch (Exception e) {
+					e.printStackTrace();
+					return null;
+				}
+
+			}		
+		}
+		return this.playerModels;
 	}
 }

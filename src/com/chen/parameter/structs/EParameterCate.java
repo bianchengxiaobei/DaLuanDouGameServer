@@ -18,7 +18,13 @@ public enum EParameterCate
 	AttackDist(13),//射程
 	TrueHurt(14),
 	CooldownReduce(15),//冷却缩减
-	End(16);
+	MaxMp(16),
+	HpRecover(17),
+	MpRecover(18),
+	ReliveTime(19),
+	CriPersent(20),
+	CriHarm(21),
+	End(22);
 	public int value;
 	EParameterCate(int value)
 	{

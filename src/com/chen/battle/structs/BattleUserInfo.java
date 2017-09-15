@@ -9,4 +9,5 @@ public class BattleUserInfo
 	public SSPlayer sPlayer;
 	public SSHero sHero;
 	public long offlineTime;//如果掉线多少秒替换成机器人
+	public EGameObjectCamp camp;//阵营
 }

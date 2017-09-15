@@ -265,7 +265,7 @@ public class BattleContext extends BattleServer
 			CVector3D bornPos = new CVector3D(0, 0, 0);//这里需要通过配置文件加载
 			CVector3D dir = new CVector3D(0,0,0);
 			SSHero hero = null;
-			hero = AddHero(user.player.getId(), bornPos, dir, user, this.m_battleUserInfo[i].selectedHeroId);
+			hero = AddHero(user.player.getId(), bornPos, dir, user, this.m_battleUserInfo[i].selectedHeroId,this.m_battleUserInfo[i].camp);
 			this.m_battleUserInfo[i].sHero = hero;
 			//通知玩家游戏开始战斗倒计时
 			BoradTipsByType(EBattleTipType.eTips_ObjAppear, this.m_battleUserInfo[i].sPlayer.player);
@@ -476,7 +476,7 @@ public class BattleContext extends BattleServer
 	{
 		return effectId.incrementAndGet();
 	}
-	public SSHero AddHero(Long playerId,CVector3D pos,CVector3D dir,SSPlayer user,int heroId)
+	public SSHero AddHero(Long playerId,CVector3D pos,CVector3D dir,SSPlayer user,int heroId,EGameObjectCamp _camp)
 	{
 		//取得英雄配置表加载基础数据
 		SHeroConfig heroConfig = DataManager.getInstance().heroConfigXMLLoader.heroConfigMap.get(heroId);
@@ -486,7 +486,7 @@ public class BattleContext extends BattleServer
 			return null;
 		}
 		
-		SSHero hero = new SSHero(playerId,this);
+		SSHero hero = new SSHero(playerId,this,_camp);
 		hero.LoadHeroConfig(heroConfig);
 		//hero.LOadHeroConfig
 		user.sHero = hero;

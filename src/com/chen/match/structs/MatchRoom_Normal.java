@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.chen.battle.manager.BattleManager;
 import com.chen.data.bean.MapBean;
 import com.chen.data.manager.DataManager;
@@ -11,6 +14,7 @@ import com.chen.data.manager.DataManager;
 
 public class MatchRoom_Normal 
 {
+	public Logger logger = LogManager.getLogger(MatchRoom_Normal.class);
 	public MapBean getMapBean() {
 		return mapBean;
 	}
@@ -75,17 +79,20 @@ public class MatchRoom_Normal
 	public boolean addOneTeam(MatchTeam team)
 	{
 		if (isInvalid)
+		{
+			logger.error("无效匹配房间");
 			return false;
-//		for (int i=0; i<this.mapBean.getBattleModeString().size();i++)
-//		{
-		//暂时先一种模式
+		}
+		//分阵营
+		for (int i=1;i<=this.mapBean.getPlayerModels().size();i++)
+		{
 			int curTeamSize = 0;
-			Vector<MatchTeam> teams = this.teamMap.get(0);
+			Vector<MatchTeam> teams = this.teamMap.get(i);
 			if (teams == null)
 			{
 				Vector<MatchTeam> myTeam = new Vector<MatchTeam>();
 				myTeam.add(team);
-				this.teamMap.put(0, myTeam);
+				this.teamMap.put(i, myTeam);
 				this.userCount += team.getPlayerCount();
 				team.search(true);
 				return true;
@@ -95,7 +102,7 @@ public class MatchRoom_Normal
 				MatchTeam matchTeam = iter.next();
 				curTeamSize += matchTeam.getPlayerCount();
 			}
-			if (curTeamSize+team.getPlayerCount() <= mapBean.getMaxCount())
+			if (curTeamSize+team.getPlayerCount() <= mapBean.getPlayerModels().get(i-1))
 			{
 				teams.add(team);
 				this.userCount += team.getPlayerCount();
@@ -104,7 +111,7 @@ public class MatchRoom_Normal
 				//向客户端发送队友匹配数量变化的消息
 				return true;
 			}
-//		}
+		}
 		return false;
 	}
 	public boolean removeOneTeam(MatchTeam team)

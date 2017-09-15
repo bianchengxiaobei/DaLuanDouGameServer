@@ -166,11 +166,9 @@ public class SSSkill
 	 */
 	public void Start()
 	{
-		logger.debug("Start");
 		boolean value = IfSkillUsable();
 		if (value == false)
 		{
-			System.err.println("技能在cd中");
 			return;
 		}
 		eSkillState = ESkillState.Free;
@@ -247,7 +245,6 @@ public class SSSkill
 			//使用 状态
 			if (eSkillState == ESkillState.Using)
 			{
-				System.out.println("33333");
 				boolean bIfUsing = false;
 				//遍历所有的使用中的技能效果,看其是否依然在占用中
 				for (int i=0; i<32; i++)
@@ -280,7 +277,6 @@ public class SSSkill
 			//后摇状态
 			if (eSkillState == ESkillState.Lasting)
 			{
-				System.out.println("111111");
 				if (stateTime + skillConfig.lastTime > now)
 				{
 					rst = 1;
@@ -292,7 +288,6 @@ public class SSSkill
 			//结束状态
 			if (eSkillState == ESkillState.End)
 			{
-				System.out.println("222222");
 				rst = 3;
 				End();
 				break;
@@ -302,7 +297,6 @@ public class SSSkill
 		//如果状态改变了，则需要同步到对象身上
 		if (heartBeatStartState != eSkillState.value)
 		{
-			System.out.println("通知就开始");
 			if (eSkillState == ESkillState.Preparing)
 			{
 				theOwner.BeginActionPrepareSkill(this, dir, true);

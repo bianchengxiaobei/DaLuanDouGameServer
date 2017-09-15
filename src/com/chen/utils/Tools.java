@@ -8,4 +8,16 @@ public class Tools
 	{
 		return (int) (Math.atan2(dir.z, dir.x) * 10000);
 	}
+	public static boolean IfEnemy(int leftCamp,int rightCamp)
+	{
+		if (leftCamp == 0 || rightCamp == 0 || leftCamp == rightCamp)
+		{
+			return false;
+		}
+		if (leftCamp % 2 == rightCamp % 2)
+		{
+			return false;
+		}
+		return false;
+	}
 }

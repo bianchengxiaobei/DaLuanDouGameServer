@@ -12,10 +12,12 @@ import com.chen.battle.skill.message.res.ResLastingSkillStateMessage;
 import com.chen.battle.skill.message.res.ResPrepareSkillStateMessage;
 import com.chen.battle.skill.message.res.ResReleasingSkillStateMessage;
 import com.chen.battle.skill.message.res.ResUsingSkillStateMessage;
+import com.chen.battle.skill.structs.ESkillEffectType;
 import com.chen.battle.skill.structs.ISSMoveObjectHolder;
 import com.chen.message.Message;
 import com.chen.move.struct.ColSphere;
 import com.chen.move.struct.ColVector;
+import com.chen.parameter.manager.SSParameterManager;
 import com.chen.parameter.structs.EParameterCate;
 import com.chen.utils.MessageUtil;
 import com.chen.utils.Tools;
@@ -32,11 +34,16 @@ public abstract class SSGameUnit extends SSMoveObject
 	public SSSkill normalAttackSkill;
 	public int moveEffectId;//移动效果
 	public boolean bIfActiveMove;//是否激活移动
-	public SSGameUnit(long playerId,BattleContext battle)
+	public EGameObjectCamp camp;
+	public SSParameterManager fpManager;
+	public SSGameUnit(long playerId,BattleContext battle,EGameObjectCamp _camp)
 	{
 		this.id = playerId;
 		this.battle = battle;
+		this.camp = _camp;
 		this.curActionInfo = new SGOActionStateInfo();
+		this.fpManager = new SSParameterManager();
+		this.fpManager.SetOwner(this);
 	}
 	public void BeginActionIdle(boolean asyn)
 	{
@@ -258,6 +265,10 @@ public abstract class SSGameUnit extends SSMoveObject
 		message.hp = this.GetCurHp();
 		MessageUtil.tell_battlePlayer_message(this.battle, message);
 	}
+	public void FullHp()
+	{
+		this.ChangeCurHp(this, HPMPChangeReason.Recover, GetFPData(EParameterCate.MaxHp) - GetFPData(EParameterCate.CurHp), 0, EParameterCate.None);
+	}
 	@Override
 	public boolean IfCanImpact()
 	{
@@ -274,6 +285,10 @@ public abstract class SSGameUnit extends SSMoveObject
 	public boolean IsDead()
 	{
 		return this.curActionInfo.eOAS == EGOActionState.Dead || bExpire == true;
+	}
+	public int GetFPData(EParameterCate cate)
+	{
+		return this.fpManager.GetValue(cate.value);
 	}
 	@Override
 	public ColVector GetColVector()
@@ -308,11 +323,10 @@ public abstract class SSGameUnit extends SSMoveObject
 	{
 		return this.curActionInfo.pos;
 	}
-	public int GetFPData(EParameterCate cate)
-	{
-		return 3;
-	}
+	public abstract void BeginActionDead(SSGameUnit taret,boolean asyn);
 	public abstract float GetColliderRadius();
+	public abstract boolean IfHero();
+	public abstract void ChangeCurHp(SSGameUnit obj,HPMPChangeReason reason,int changeValue,int skillId,EParameterCate cate);
 	public abstract int OnHeartBeat(long now,long tick);
 	/*
 	 * 发送移动消息
@@ -391,5 +405,13 @@ public abstract class SSGameUnit extends SSMoveObject
 			battle.effectManager.RemoveEffect(effectId);
 			this.moveEffectId = 0;
 		}
+	}
+	public boolean IfEnemy(SSGameUnit obj)
+	{
+		if (obj == null)
+		{
+			return false;
+		}
+		return Tools.IfEnemy(this.camp.value, obj.camp.value);
 	}
 }

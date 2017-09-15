@@ -31,7 +31,7 @@ import com.chen.data.manager.DataManager;
 public class SSEffectManager
 {
 	public Logger logger = LogManager.getLogger(SSEffectManager.class);
-	public Map<Integer, SSSkillEffect> waittingEffectMap = new HashMap<Integer, SSSkillEffect>();
+	public ConcurrentHashMap<Integer, SSSkillEffect> waittingEffectMap = new ConcurrentHashMap<Integer, SSSkillEffect>();
 	//public Map<Integer, SSSkillEffect> updatingEffectMap = new HashMap<Integer, SSSkillEffect>();
 	public ConcurrentHashMap<Integer, SSSkillEffect> updatingEffectMap = new ConcurrentHashMap<Integer, SSSkillEffect>();
 	

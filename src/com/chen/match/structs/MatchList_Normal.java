@@ -18,10 +18,17 @@ public class MatchList_Normal extends MatchList
 		Iterator<MatchRoom_Normal> iter = roomList.values().iterator();
 		while (iter.hasNext()) {
 			MatchRoom_Normal matchRoom_Normal = iter.next();
-			if (matchRoom_Normal.addOneTeam(team))
+			if (matchRoom_Normal != null)
 			{
-				return true;
-			}			
+				if (matchRoom_Normal.addOneTeam(team))
+				{
+					return true;
+				}
+			}
+			else
+			{
+				System.err.println("Room == null");
+			}					
 		}
 		MatchRoom_Normal room = new MatchRoom_Normal(this.mapBean.getM_nMapId());
 		boolean success = room.addOneTeam(team);
@@ -48,6 +55,7 @@ public class MatchList_Normal extends MatchList
 			{
 				//MatchRoom_Normal match = roomList.remove(room.getRoomId());
 				//match = null;
+				System.out.println("移除匹配房间");
 				iter.remove();				
 			}
 		}

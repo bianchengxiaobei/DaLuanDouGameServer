@@ -168,7 +168,7 @@ public class SSSkillEffect_Emit extends SSSkillEffect
 							skill, System.currentTimeMillis(), null);
 					//技能命中目标
 					//OnSkillHitTarget(entity.pTarget);
-					logger.debug("技能命中目标");
+					logger.debug("Fly技能命中目标");
 				}
 				this.bulletHitTargetArrays.array.get(i).isVaild = false;
 				--this.bulletHitTargetArrays.curSize;

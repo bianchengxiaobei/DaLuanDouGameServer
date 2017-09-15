@@ -2,6 +2,7 @@ package com.chen.battle.impl;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -76,7 +77,12 @@ public class Battle
 		this.mapId = mapId;
 		this.mapBean = DataManager.getInstance().mapContainer.getMap().get(mapId);
 		log.info("开始创建战场："+this.battleId);
-		userMap = userList;				
+		userMap = userList;		
+		for (Map.Entry<Integer, Player> entry : userList.entrySet())
+		{
+			log.debug("hh肉f:"+entry.getKey());
+			entry.getValue().getBattleInfo().battleCampType = entry.getKey();
+		}
 	}
 	public void start()
 	{
