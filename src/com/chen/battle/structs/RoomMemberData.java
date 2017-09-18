@@ -12,6 +12,7 @@ public class RoomMemberData extends Bean
 	public String name;
 	public int icon;
 	public byte isReconnecting;
+	public int camp;
 	//public List<Integer> canUseHeroList = new ArrayList<>();
 	@Override
 	public boolean read(IoBuffer buf) {
@@ -27,6 +28,7 @@ public class RoomMemberData extends Bean
 		writeString(buf,this.name);
 		writeInt(buf, this.icon);
 		writeByte(buf, this.isReconnecting);
+		writeInt(buf, camp);
 		//writeIntList(buf, canUseHeroList);
 		return true;
 	}

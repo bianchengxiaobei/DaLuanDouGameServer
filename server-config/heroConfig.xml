@@ -5,28 +5,34 @@
 		<colliderRadius>0.2</colliderRadius>
 		<skillList>1,2</skillList>
 		<maxHp>100</maxHp>
+		<phyAttack>40</phyAttack>
 	</hero>
 	<hero>
 		<id>1</id>
 		<colliderRadius>0.2</colliderRadius>
 		<skillList>1000</skillList>
 		<maxHp>100</maxHp>
+		<phyAttack>40</phyAttack>
 	</hero>
 	<hero>
 		<id>3</id>
 		<colliderRadius>0.2</colliderRadius>
 		<skillList>1000</skillList>
 		<maxHp>100</maxHp>
+		<phyAttack>40</phyAttack>
 	</hero>
 	<hero>
 		<id>4</id>
 		<colliderRadius>1</colliderRadius>
 		<skillList>1000</skillList>
 		<maxHp>100</maxHp>
+		<phyAttack>40</phyAttack>
 	</hero>
 	<hero>
 		<id>5</id>
 		<colliderRadius>1</colliderRadius>
 		<skillList>1000</skillList>
+		<maxHp>100</maxHp>
+		<phyAttack>40</phyAttack>
 	</hero>
 </heros>

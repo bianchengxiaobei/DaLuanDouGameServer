@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import com.chen.battle.skill.config.SkillModelFlyConfig;
 import com.chen.battle.skill.message.res.ResSkillFlyEmitDestoryMessage;
 import com.chen.battle.skill.message.res.ResSkillFlyEmitMessage;
+import com.chen.battle.skill.structs.ESkillEffectType;
 import com.chen.battle.skill.structs.ElementArray;
 import com.chen.battle.structs.CVector3D;
 import com.chen.battle.structs.SSGameUnit;
@@ -63,6 +64,11 @@ public class SSSkillEffect_Emit extends SSSkillEffect
 	public ElementArray<SSBulletEntity> bulletEntityArrays = new ElementArray<>(16);
 	public ElementArray<SSEmitHitTargetInfo> bulletHitTargetArrays = new ElementArray<>(12);
 	public SkillModelFlyConfig flyConfig;
+	
+	public SSSkillEffect_Emit() 
+	{
+		this.skillEffectType = ESkillEffectType.Emit;
+	}
 	@Override
 	public boolean Begin() 
 	{

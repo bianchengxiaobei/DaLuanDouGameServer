@@ -7,7 +7,9 @@ import com.chen.battle.skill.structs.ESkillEffectType;
 import com.chen.battle.skill.structs.SkillEffectBaseConfig;
 import com.chen.battle.structs.BattleContext;
 import com.chen.battle.structs.CVector3D;
+import com.chen.battle.structs.EBattleServerState;
 import com.chen.battle.structs.SSGameUnit;
+import com.chen.utils.Tools;
 
 public abstract class SSSkillEffect 
 {
@@ -123,6 +125,41 @@ public abstract class SSSkillEffect
 			skill.DoCooldown();
 		}
 	}
+	/**
+	 * 检查战斗线程是否有效
+	 * @return
+	 */
+	public boolean CheckBattleInvaid()
+	{
+		return this.battle != null && this.battle.getBattleState() == EBattleServerState.eSSBS_Playing;
+	}
+	public boolean CheckHitCampType(SSGameUnit target)
+	{
+		if (target == null)
+		{
+			return false;
+		}
+		if (target.IsDead())
+		{
+			return false;
+		}
+		if (config == null)
+		{
+			logger.error("Config == null");
+		}
+		switch (this.config.eTargetType) 
+		{
+		case eSMTC_AllObject:
+			return true;
+		case eSMTC_Enemy:
+			return Tools.IfEnemy(theOwner.camp.value, target.camp.value);
+		case eSMTC_Self:
+			return Tools.IfEnemy(theOwner.camp.value, target.camp.value) == false;
+		default:
+			return false;
+		}
+	}
+
 	//---------------需要子类重写---------------//
 	public abstract boolean Begin();
 	public abstract boolean Update(long now,long tick);

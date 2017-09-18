@@ -21,6 +21,7 @@
 		<bIsCanMove>true</bIsCanMove>
 		<bIsCanBreak>true</bIsCanBreak>
 		<releaseTimeDelay>1000</releaseTimeDelay>
+		<eTargetType>2</eTargetType>	
 		<eSkillAOEType>1</eSkillAOEType>
 		<rangeIntervalTime>400</rangeIntervalTime>
 		<rangleTimes>1</rangleTimes>

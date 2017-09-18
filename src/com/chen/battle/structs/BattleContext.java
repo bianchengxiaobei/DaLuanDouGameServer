@@ -633,6 +633,16 @@ public class BattleContext extends BattleServer
 		}
 	}
 	/**
+	 * 是否能被攻击
+	 * @param beHitter
+	 * @param attacker
+	 * @return
+	 */
+	public boolean CheckObjCanBeHit(SSGameUnit beHitter,SSGameUnit attacker)
+	{
+		return true;
+	}
+	/**
 	 * 玩家离线
 	 * @param player
 	 */

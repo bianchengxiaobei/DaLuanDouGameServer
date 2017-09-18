@@ -4,6 +4,7 @@ public class SkillEffectBaseConfig
 {
 	public int skillModelId;
 	public ESkillEffectType eSkillEffectType;
+	public ESkillModelTargetType eTargetType;
 	public boolean bIsCooldown;
 	public boolean bIsCanMove;
 	public boolean bIsCanBreak;//是否能被打断

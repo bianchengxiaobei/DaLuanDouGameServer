@@ -3,6 +3,7 @@ package com.chen.battle.structs;
 
 
 import com.chen.battle.ai.SSAI;
+import com.chen.battle.message.res.ResDeadStateMessage;
 import com.chen.battle.message.res.ResGoAppearMessage;
 import com.chen.battle.message.res.ResIdleStateMessage;
 import com.chen.battle.message.res.ResRunningStateMessage;
@@ -160,14 +161,14 @@ public abstract class SSGameUnit extends SSMoveObject
 		if (this.curActionInfo.eOAS == EGOActionState.Controlled)
 		{
 			BeginActionIdle(asyn);
-			this.curActionInfo.time = System.currentTimeMillis();
+			this.curActionInfo.time = this.battle.battleHeartBeatTime;
 		}
 	}
 	
 	public void SetGOActionState(EGOActionState state)
 	{
 		this.curActionInfo.eOAS = state;
-		this.curActionInfo.time = System.currentTimeMillis();
+		this.curActionInfo.time = this.battle.battleHeartBeatTime;
 	}
 	/**
 	 * 设置移动效果，如果当前有移动先移除
@@ -246,11 +247,17 @@ public abstract class SSGameUnit extends SSMoveObject
 			lastingSkillStateMessage.playerId = this.id;
 			lastingSkillStateMessage.PosX = (int)(this.curActionInfo.pos.x * 1000);
 			lastingSkillStateMessage.PosZ = (int)(this.curActionInfo.pos.z * 1000);
-			System.out.println(this.curActionInfo.dir == null);
 			lastingSkillStateMessage.dirAngle = Tools.GetDirAngle(this.curActionInfo.dir);
 			lastingSkillStateMessage.targetId = this.curActionInfo.skillTargetId;
 			lastingSkillStateMessage.skillId = this.curActionInfo.skillId;
 			return lastingSkillStateMessage;
+		case Dead:
+			ResDeadStateMessage deadStateMessage = new ResDeadStateMessage();
+			deadStateMessage.playerId = this.id;
+			deadStateMessage.posX = (int)(this.curActionInfo.pos.x * 1000);
+			deadStateMessage.posZ = (int)(this.curActionInfo.pos.z * 1000);
+			deadStateMessage.angle = Tools.GetDirAngle(this.curActionInfo.dir);
+			return deadStateMessage;
 		}
 		return null;
 	}
@@ -289,6 +296,35 @@ public abstract class SSGameUnit extends SSMoveObject
 	public int GetFPData(EParameterCate cate)
 	{
 		return this.fpManager.GetValue(cate.value);
+	}
+	public void ChangeFPData(EParameterCate eEffectCate,int changeValue,int percent,boolean IfAdd)
+	{
+		if (changeValue == 0 && percent == 0)
+		{
+			return;
+		}
+		if (IfAdd)
+		{
+			if (changeValue != 0)
+			{
+				fpManager.AddBaseValue(eEffectCate.value, changeValue);
+			}
+			if (percent != 0)
+			{
+				fpManager.AddPercentValue(eEffectCate.value, percent);
+			}
+		}
+		else
+		{
+			if (changeValue != 0)
+			{
+				fpManager.RemoveBaseValue(eEffectCate.value, changeValue);
+			}
+			if (percent != 0)
+			{
+				fpManager.RemovePercentValue(eEffectCate.value, percent);
+			}
+		}
 	}
 	@Override
 	public ColVector GetColVector()
@@ -413,5 +449,81 @@ public abstract class SSGameUnit extends SSMoveObject
 			return false;
 		}
 		return Tools.IfEnemy(this.camp.value, obj.camp.value);
+	}
+	public int ApplyHurt(SSGameUnit enemyObj,int realHurt,EParameterCate hurtType,boolean IfNormalAttack,boolean bIfCrit)
+	{
+		if (IsDead() || GetFPData(EParameterCate.CurHp) <= 0)
+		{
+			return 0;
+		}
+		float fDef = 0;
+		float fDefPass = 0;
+		float fDefPassPercent = 0;
+		float fDmgReduce = 0;
+		float fDmgReducePercent = 0;
+		if (hurtType == EParameterCate.PhyHurt)
+		{
+			fDef = GetFPData(EParameterCate.PhyDefense);
+			fDefPass = GetFPData(EParameterCate.PhyPass);
+			fDefPassPercent = GetFPData(EParameterCate.PhyPassPercent);
+			fDmgReduce = GetFPData(EParameterCate.PhyDmgReduce);
+			fDmgReducePercent = GetFPData(EParameterCate.DmgReducePercent);
+		}
+		else if(hurtType == EParameterCate.MagicHurt)
+		{
+			fDef = GetFPData(EParameterCate.MagicDefense);
+			fDefPass = GetFPData(EParameterCate.MagicPass);
+			fDefPassPercent = GetFPData(EParameterCate.MagicPassPercent);
+			fDmgReduce = GetFPData(EParameterCate.MagicDmgReduce);
+			fDmgReducePercent = GetFPData(EParameterCate.DmgReducePercent);
+		}
+		if (fDef >= 0)
+		{
+			fDef = fDef * (1-fDefPassPercent*0.001f) - fDefPass;
+		}
+		else
+		{
+			fDef = fDef * (1+fDefPassPercent*0.001f) - fDefPass;
+		}
+		if (fDef >= 0)
+		{
+			fDef = 1 + fDef * 0.01f;
+		}else 
+		{
+			fDef = (100 - fDef) / (100 - fDef*2);
+		}
+		
+		int finalHurtValue = (int)(realHurt / fDef - fDmgReduce);
+		if (finalHurtValue <= 0)
+		{
+			finalHurtValue = 0;
+		}
+		else
+		{
+			finalHurtValue *= 1 - fDmgReducePercent * 0.001f;
+		}
+		if (finalHurtValue <= 0)
+		{
+			return 0;
+		}
+		HPMPChangeReason reason = HPMPChangeReason.SkillHurt;
+		if (IfNormalAttack)
+		{
+			if (bIfCrit)
+			{
+				reason = HPMPChangeReason.CritHurt;//暴击
+			}
+			else
+			{
+				reason = HPMPChangeReason.NormalHurt;
+			}
+		}
+		else
+		{
+			reason = HPMPChangeReason.SkillHurt;
+		}
+		this.ChangeCurHp(enemyObj, reason, -finalHurtValue, 0, EParameterCate.None);
+		//添加被动技能
+		return finalHurtValue;
 	}
 }

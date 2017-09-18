@@ -62,6 +62,10 @@ public class SSHeroConfigXMLLoader
 							{
 								config.baseFp.maxHp = Integer.parseInt(schilds.item(j).getTextContent().trim());
 							}
+							else if(("phyAttack").equals(schilds.item(j).getNodeName()))
+							{
+								config.baseFp.phyAttack = Integer.parseInt(schilds.item(j).getTextContent().trim());
+							}
 						}		
 						this.heroConfigMap.put(id, config);
 					}

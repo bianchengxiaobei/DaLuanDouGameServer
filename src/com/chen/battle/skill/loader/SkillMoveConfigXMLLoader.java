@@ -19,6 +19,7 @@ import com.chen.battle.skill.config.SkillModelMoveConfig;
 import com.chen.battle.skill.structs.ESkillEffectMoveToTargetType;
 import com.chen.battle.skill.structs.ESkillEffectMoveType;
 import com.chen.battle.skill.structs.ESkillEffectMovedTargetType;
+import com.chen.battle.skill.structs.ESkillModelTargetType;
 import com.chen.battle.skill.structs.NextSkillEffectConfig;
 
 
@@ -65,6 +66,10 @@ public class SkillMoveConfigXMLLoader
 							{
 								config.releaseTimeDelay = Integer.parseInt(schilds.item(j).getTextContent().trim());
 							}
+							else if("eTargetType".equals(schilds.item(j).getNodeName()))
+							{
+								config.eTargetType = ESkillModelTargetType.values()[Integer.parseInt(schilds.item(j).getTextContent().trim())];	
+							}
 							else if("bIsPenetrate".equals(schilds.item(j).getNodeName()))
 							{
 								config.bIsPenetrate = Boolean.parseBoolean(schilds.item(j).getTextContent().trim());
@@ -103,11 +108,11 @@ public class SkillMoveConfigXMLLoader
 							}
 							else if("eventId".equals(schilds.item(j).getNodeName()))
 							{
-								NextSkillEffectConfig eConfig = new NextSkillEffectConfig();
 								String content =  schilds.item(j).getTextContent().trim();
 								String[] nextConfigString = content.split(";");
 								for (String value : nextConfigString)
 								{
+									NextSkillEffectConfig eConfig = new NextSkillEffectConfig();
 									if (value.indexOf(":") == -1)
 									{
 										eConfig.skillEffectId = Integer.parseInt(value);
@@ -118,16 +123,17 @@ public class SkillMoveConfigXMLLoader
 										eConfig.skillEffectId = Integer.parseInt(vStrings[0]);
 										eConfig.delay = Integer.parseInt(vStrings[1]);
 									}
+									nextSkillEffectConfigs.add(eConfig);
 								}
-								nextSkillEffectConfigs.add(eConfig);
+
 							}
 							else if("impactEvents".equals(schilds.item(j).getNodeName()))
 							{
-								NextSkillEffectConfig eConfig = new NextSkillEffectConfig();
 								String content =  schilds.item(j).getTextContent().trim();
 								String[] nextConfigString = content.split(";");
 								for (String value : nextConfigString)
 								{
+									NextSkillEffectConfig eConfig = new NextSkillEffectConfig();
 									if (value.indexOf(":") == -1)
 									{
 										eConfig.skillEffectId = Integer.parseInt(value);
@@ -138,8 +144,9 @@ public class SkillMoveConfigXMLLoader
 										eConfig.skillEffectId = Integer.parseInt(vStrings[0]);
 										eConfig.delay = Integer.parseInt(vStrings[1]);
 									}
+									impactEvents.add(eConfig);
 								}
-								impactEvents.add(eConfig);
+								
 							}
 						}
 						for (int j=0;j<nextSkillEffectConfigs.size();j++)

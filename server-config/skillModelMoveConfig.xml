@@ -6,6 +6,7 @@
 		<bIsCanMove>true</bIsCanMove>
 		<bIsCanBreak>true</bIsCanBreak>
 		<releaseTimeDelay>0</releaseTimeDelay>
+		<eTargetType>2</eTargetType>	
 		<bIsPenetrate>true</bIsPenetrate>
 		<bIsImpact>true</bIsImpact>
 		<eMoveType>2</eMoveType>
@@ -14,7 +15,7 @@
 		<angle>0</angle>
 		<speed>1500</speed>
 		<distance>1000</distance>
-		<impactEvents>10002:0</impactEvents>
+		<impactEvents>10002:0;40001:0</impactEvents>
 		<eventId>0</eventId>
 	</skill>
 	<skill name="飞腿">
@@ -23,6 +24,7 @@
 		<bIsCanMove>true</bIsCanMove>
 		<bIsCanBreak>false</bIsCanBreak>
 		<releaseTimeDelay>0</releaseTimeDelay>
+		<eTargetType>2</eTargetType>	
 		<bIsPenetrate>false</bIsPenetrate>
 		<bIsImpact>false</bIsImpact>
 		<eMoveType>2</eMoveType>

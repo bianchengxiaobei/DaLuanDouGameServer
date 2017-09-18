@@ -24,7 +24,14 @@ public enum EParameterCate
 	ReliveTime(19),
 	CriPersent(20),
 	CriHarm(21),
-	End(22);
+	PhyPass(22),
+	PhyPassPercent(23),
+	MagicPass(24),
+	MagicPassPercent(25),
+	PhyDmgReduce(26),//(相当于物理护盾)
+	MagicDmgReduce(27),
+	DmgReducePercent(28),
+	End(29);
 	public int value;
 	EParameterCate(int value)
 	{

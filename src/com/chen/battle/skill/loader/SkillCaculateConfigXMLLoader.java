@@ -15,15 +15,16 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.chen.battle.skill.config.SkillModelFlyConfig;
-import com.chen.battle.skill.structs.ESkillModelFlyType;
+import com.chen.battle.skill.config.SkillModelCaculateConfig;
+import com.chen.battle.skill.structs.EEffectCaculateType;
 import com.chen.battle.skill.structs.ESkillModelTargetType;
 import com.chen.battle.skill.structs.NextSkillEffectConfig;
+import com.chen.parameter.structs.EParameterCate;
 
-public class SkillFlyConfigXMLLoader 
+public class SkillCaculateConfigXMLLoader
 {
-	private Logger log = LogManager.getLogger(SkillFlyConfigXMLLoader.class);
-	public Map<Integer, SkillModelFlyConfig> skillModelFlyConfig = new HashMap<>();
+	private Logger log = LogManager.getLogger(SkillCaculateConfigXMLLoader.class);
+	public Map<Integer, SkillModelCaculateConfig> skillModelCaculateConfig = new HashMap<>();
 	public void load(String file)
 	{
 		try 
@@ -42,7 +43,7 @@ public class SkillFlyConfigXMLLoader
 					if (("skill").equals(childs.item(i).getNodeName()))
 					{
 						NodeList schilds = childs.item(i).getChildNodes();
-						SkillModelFlyConfig config = new SkillModelFlyConfig();
+						SkillModelCaculateConfig config = new SkillModelCaculateConfig();
 						Vector<NextSkillEffectConfig> nextSkillEffectConfigs = new Vector<>();
 						for (int j=0;j<schilds.getLength();j++)
 						{
@@ -70,45 +71,43 @@ public class SkillFlyConfigXMLLoader
 							{
 								config.eTargetType = ESkillModelTargetType.values()[Integer.parseInt(schilds.item(j).getTextContent().trim())];	
 							}
-							else if("eSkillModelFlyType".equals(schilds.item(j).getNodeName()))
+							else if("eEffectCate".equals(schilds.item(j).getNodeName()))
 							{
-								config.eSkillModelFlyType = ESkillModelFlyType.values()[Integer.parseInt(schilds.item(j).getTextContent().trim())];
+								config.eEffectCate = EParameterCate.values()[Integer.parseInt(schilds.item(j).getTextContent().trim())];
 							}	
-							else if("flySpeed".equals(schilds.item(j).getNodeName()))
+							else if("EffectBaseValue".equals(schilds.item(j).getNodeName()))
 							{
-								config.flySpeed = Integer.parseInt(schilds.item(j).getTextContent().trim());
+								config.EffectBaseValue = Integer.parseInt(schilds.item(j).getTextContent().trim());
 							}
-							else if("flyParam1".equals(schilds.item(j).getNodeName()))
+							else if("EffectRate".equals(schilds.item(j).getNodeName()))
 							{
-								config.flyParam1 = Integer.parseInt(schilds.item(j).getTextContent().trim());
+								config.EffectRate = Integer.parseInt(schilds.item(j).getTextContent().trim());
 							}
-							else if("flyParam2".equals(schilds.item(j).getNodeName()))
+							else if("eEffectPlusRate".equals(schilds.item(j).getNodeName()))
 							{
-								config.flyParam2 = Integer.parseInt(schilds.item(j).getTextContent().trim());
+								if (!schilds.item(j).getTextContent().trim().equals("0"))
+								{
+									String[] vecs = schilds.item(j).getTextContent().trim().split(";");
+									for (int index=0; index<vecs.length; index++)
+									{
+										String[] vecs2 = vecs[index].split(":");
+										config.eEffectAddCacuType[index] = EEffectCaculateType.values()[Integer.parseInt(vecs2[0])];
+										config.eEffectAddCacuValue[index] = Integer.parseInt(vecs2[1]);
+									}
+								}
 							}
-							else if("flyParam3".equals(schilds.item(j).getNodeName()))
+							else if("eEffectMultiplyRate".equals(schilds.item(j).getNodeName()))
 							{
-								config.flyParam3 = Integer.parseInt(schilds.item(j).getTextContent().trim());
-							}
-							else if("lifeTime".equals(schilds.item(j).getNodeName()))
-							{
-								config.lifeTime = Integer.parseInt(schilds.item(j).getTextContent().trim());
-							}
-							else if("num".equals(schilds.item(j).getNodeName()))
-							{
-								config.num = Integer.parseInt(schilds.item(j).getTextContent().trim());
-							}
-							else if("angle".equals(schilds.item(j).getNodeName()))
-							{
-								config.angle = Integer.parseInt(schilds.item(j).getTextContent().trim());
-							}
-							else if("bIsPenetrate".equals(schilds.item(j).getNodeName()))
-							{
-								config.bIsPenetrate = Boolean.parseBoolean(schilds.item(j).getTextContent().trim());
-							}
-							else if("colliderRaius".equals(schilds.item(j).getNodeName()))
-							{
-								config.colliderRaius = Float.parseFloat(schilds.item(j).getTextContent().trim());
+								if (!schilds.item(j).getTextContent().trim().equals("0"))
+								{
+									String[] vecs = schilds.item(j).getTextContent().trim().split(";");
+									for (int index=0; index<vecs.length; index++)
+									{
+										String[] vecs2 = vecs[index].split(":");
+										config.eEffectMultCacuType[index] = EEffectCaculateType.values()[Integer.parseInt(vecs2[0])];
+										config.eEffectMultCacuValue[index] = Integer.parseInt(vecs2[1]);
+									}
+								}
 							}
 							else if("eventId".equals(schilds.item(j).getNodeName()))
 							{
@@ -135,7 +134,7 @@ public class SkillFlyConfigXMLLoader
 						{
 							config.skillModelList[j] = nextSkillEffectConfigs.get(j);
 						}
-						this.skillModelFlyConfig.put(config.skillModelId, config);
+						this.skillModelCaculateConfig.put(config.skillModelId, config);
 					}
 				}
 				in.close();

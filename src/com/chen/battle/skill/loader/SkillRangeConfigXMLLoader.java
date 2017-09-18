@@ -17,6 +17,7 @@ import org.w3c.dom.NodeList;
 
 import com.chen.battle.skill.config.SSkillModelRangleConfig;
 import com.chen.battle.skill.structs.ESkillAOEType;
+import com.chen.battle.skill.structs.ESkillModelTargetType;
 import com.chen.battle.skill.structs.ESkillRangeShapeType;
 import com.chen.battle.skill.structs.NextSkillEffectConfig;
 
@@ -66,6 +67,10 @@ public class SkillRangeConfigXMLLoader
 							{
 								config.releaseTimeDelay = Integer.parseInt(schilds.item(j).getTextContent().trim());
 							}
+							else if("eTargetType".equals(schilds.item(j).getNodeName()))
+							{
+								config.eTargetType = ESkillModelTargetType.values()[Integer.parseInt(schilds.item(j).getTextContent().trim())];	
+							}
 							else if("eSkillAOEType".equals(schilds.item(j).getNodeName()))
 							{
 								config.eSkillAOEType = ESkillAOEType.values()[Integer.parseInt(schilds.item(j).getTextContent().trim())];
@@ -104,11 +109,11 @@ public class SkillRangeConfigXMLLoader
 							}
 							else if("eventId".equals(schilds.item(j).getNodeName()))
 							{
-								NextSkillEffectConfig eConfig = new NextSkillEffectConfig();
 								String content =  schilds.item(j).getTextContent().trim();
 								String[] nextConfigString = content.split(";");
 								for (String value : nextConfigString)
 								{
+									NextSkillEffectConfig eConfig = new NextSkillEffectConfig();
 									if (value.indexOf(":") == -1)
 									{
 										eConfig.skillEffectId = Integer.parseInt(value);
@@ -119,8 +124,8 @@ public class SkillRangeConfigXMLLoader
 										eConfig.skillEffectId = Integer.parseInt(vStrings[0]);
 										eConfig.delay = Integer.parseInt(vStrings[1]);
 									}
+									nextSkillEffectConfigs.add(eConfig);
 								}
-								nextSkillEffectConfigs.add(eConfig);
 							}
 						}
 						for (int j=0;j<nextSkillEffectConfigs.size();j++)

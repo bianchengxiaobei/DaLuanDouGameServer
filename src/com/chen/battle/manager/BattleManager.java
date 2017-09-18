@@ -235,7 +235,7 @@ public class BattleManager
 					data.level = p.getLevel();
 					data.icon = p.getIcon();
 					data.isReconnecting = (byte)0;
-					listData.add(data);
+
 				 SSPlayer player = new SSPlayer(p);			 
 				 for (int j=0;j<p.getHeroList().size();j++)
 				 {
@@ -246,6 +246,8 @@ public class BattleManager
 				 info.sPlayer = player;
 				 info.camp = EGameObjectCamp.values()[p.getBattleInfo().battleCampType+1];
 				 log.debug("阵营："+info.camp.toString());
+				 data.camp = info.camp.value;
+					listData.add(data);
 				 battle.getM_battleUserInfo()[index++] = info;
 			}
 //			for (int i=0;i<userMap.size();i++)

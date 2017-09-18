@@ -15,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.chen.battle.skill.SSSkill;
 import com.chen.battle.skill.SSSkillEffect;
+import com.chen.battle.skill.SSSkillEffect_Caculate;
 import com.chen.battle.skill.SSSkillEffect_Emit;
 import com.chen.battle.skill.SSSkillEffect_Move;
 import com.chen.battle.skill.SSSkillEffect_Range;
@@ -189,6 +190,7 @@ public class SSEffectManager
 			config = DataManager.getInstance().skillModelMoveConfigLoader.skillModelMoveConfig.get(effectId);
 			if (config == null)
 			{
+				logger.error("ForceMoveConfig == null");
 				break;
 			}
 			effect = new SSSkillEffect_Move();
@@ -197,6 +199,7 @@ public class SSEffectManager
 			config = DataManager.getInstance().skillModelRangeConfigLoader.skillModelRangeConfig.get(effectId);
 			if (config == null)
 			{
+				logger.error("RangeConfig == null");
 				break;
 			}
 			effect = new SSSkillEffect_Range();
@@ -209,6 +212,14 @@ public class SSEffectManager
 				break;
 			}
 			effect = new SSSkillEffect_Emit();
+		case Caculate:
+			config = DataManager.getInstance().skillModelCacuConfigLoader.skillModelCaculateConfig.get(effectId);
+			if (config == null)
+			{
+				logger.error("CaculateConfig == null,skillId:"+effectId);
+				break;
+			}
+			effect = new SSSkillEffect_Caculate();
 		}
 		if (effect == null)
 		{

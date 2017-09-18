@@ -14,6 +14,7 @@
 		<bIsCanMove>true</bIsCanMove>
 		<bIsCanBreak>true</bIsCanBreak>
 		<releaseTimeDelay>0</releaseTimeDelay>
+		<eTargetType>2</eTargetType>	
 		<eSkillModelFlyType>1</eSkillModelFlyType>
 		<flySpeed>2000</flySpeed>
 		<flyParam1>0</flyParam1>

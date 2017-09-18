@@ -3,6 +3,7 @@ package com.chen.data.manager;
 
 
 import com.chen.battle.hero.loader.SSHeroConfigXMLLoader;
+import com.chen.battle.skill.loader.SkillCaculateConfigXMLLoader;
 import com.chen.battle.skill.loader.SkillConfigXMLLoader;
 import com.chen.battle.skill.loader.SkillEffectTypeConfigXmlLoader;
 import com.chen.battle.skill.loader.SkillFlyConfigXMLLoader;
@@ -36,6 +37,9 @@ public class DataManager
 	public SkillFlyConfigXMLLoader skillModelFlyConfigLoader = new SkillFlyConfigXMLLoader();
 	public static final String skillModelFlyConfigPath = "server-config/skillModelFlyConfig.xml";
 	
+	public SkillCaculateConfigXMLLoader skillModelCacuConfigLoader = new SkillCaculateConfigXMLLoader();
+	public static final String skillModelCaculateConfigPath = "server-config/skillModelCaculateConfig.xml";
+	
 	private static Object obj = new Object();
 	private static DataManager manager;
 	private DataManager()
@@ -47,6 +51,7 @@ public class DataManager
 		skillModelMoveConfigLoader.load(skillModelMoveConfigPath);
 		skillModelRangeConfigLoader.load(skillModelRangeConfigPath);
 		skillModelFlyConfigLoader.load(skillModelFlyConfigPath);
+		skillModelCacuConfigLoader.load(skillModelCaculateConfigPath);
 	}
 	public static DataManager getInstance()
 	{

@@ -17,6 +17,10 @@
 		<id>10001</id>
 		<type>6</type>		
 	</skill>
+	<skill name="飞腿">
+		<id>40001</id>
+		<type>1</type>
+	</skill>
 	<skill name="飞腿_击飞">
 		<id>10002</id>
 		<type>6</type>		
