@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.chen.battle.ai.SSAI_Hero;
 import com.chen.battle.hero.config.SHeroConfig;
+import com.chen.battle.message.res.ResHeroRebornTimeMessage;
 import com.chen.battle.skill.SSSkill;
 import com.chen.battle.skill.config.SSSkillConfig;
 import com.chen.battle.skill.message.res.ResSkillInfoChangeMessage;
@@ -335,6 +336,9 @@ public class SSHero extends SSGameUnit
 		{
 			this.lastHeroDeadTime = battle.battleHeartBeatTime;
 			//发送重生时间
+			ResHeroRebornTimeMessage message = new ResHeroRebornTimeMessage();
+			message.rebornTime = this.GetFPData(EParameterCate.ReliveTime);
+			MessageUtil.tell_player_message(this.player.player, message);
 		}
 		if (asyn)
 		{
