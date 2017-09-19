@@ -18,6 +18,7 @@ import com.chen.battle.manager.BattleManager;
 import com.chen.battle.message.res.ResBattleTipMessage;
 import com.chen.battle.message.res.ResEnterSceneMessage;
 import com.chen.battle.message.res.ResGamePrepareMessage;
+import com.chen.battle.message.res.ResHeroRebornMessage;
 import com.chen.battle.message.res.ResReConnectMessage;
 import com.chen.battle.message.res.ResSceneLoadedMessage;
 import com.chen.battle.message.res.ResSelectHeroMessage;
@@ -551,6 +552,20 @@ public class BattleContext extends BattleServer
 		}
 		Message message = obj.ConstructObjStateMessage();
 		MessageUtil.tell_battlePlayer_message(this, message);
+	}
+	public void AskRebornGameHero(SSHero obj)
+	{
+		Player player =  obj.player.player;
+		if (player != null)
+		{
+			ResHeroRebornMessage message = new ResHeroRebornMessage();
+			MessageUtil.tell_player_message(player, message);
+		}
+		obj.BeginActionIdle(false);
+		//重新设置到出生点
+		ResetPos(obj, obj.bornPos, false);
+		obj.FullHp();
+		SyncState(obj);
 	}
 	/**
 	 * 取得随机神兽

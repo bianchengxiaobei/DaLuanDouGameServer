@@ -6,6 +6,7 @@
 		<skillList>1,2</skillList>
 		<maxHp>100</maxHp>
 		<phyAttack>40</phyAttack>
+		<reliveTime>5000</reliveTime>
 	</hero>
 	<hero>
 		<id>1</id>
@@ -13,6 +14,7 @@
 		<skillList>1000</skillList>
 		<maxHp>100</maxHp>
 		<phyAttack>40</phyAttack>
+		<reliveTime>5000</reliveTime>
 	</hero>
 	<hero>
 		<id>3</id>
@@ -20,6 +22,7 @@
 		<skillList>1000</skillList>
 		<maxHp>100</maxHp>
 		<phyAttack>40</phyAttack>
+		<reliveTime>5000</reliveTime>
 	</hero>
 	<hero>
 		<id>4</id>
@@ -27,6 +30,7 @@
 		<skillList>1000</skillList>
 		<maxHp>100</maxHp>
 		<phyAttack>40</phyAttack>
+		<reliveTime>5000</reliveTime>
 	</hero>
 	<hero>
 		<id>5</id>
@@ -34,5 +38,6 @@
 		<skillList>1000</skillList>
 		<maxHp>100</maxHp>
 		<phyAttack>40</phyAttack>
+		<reliveTime>5000</reliveTime>
 	</hero>
 </heros>

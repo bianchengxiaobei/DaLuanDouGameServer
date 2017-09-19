@@ -66,6 +66,10 @@ public class SSHeroConfigXMLLoader
 							{
 								config.baseFp.phyAttack = Integer.parseInt(schilds.item(j).getTextContent().trim());
 							}
+							else if(("reliveTime").equals(schilds.item(j).getNodeName()))
+							{
+								config.baseFp.reliveSecond = Integer.parseInt(schilds.item(j).getTextContent().trim());
+							}
 						}		
 						this.heroConfigMap.put(id, config);
 					}

@@ -364,6 +364,7 @@ public abstract class SSGameUnit extends SSMoveObject
 	public abstract boolean IfHero();
 	public abstract void ChangeCurHp(SSGameUnit obj,HPMPChangeReason reason,int changeValue,int skillId,EParameterCate cate);
 	public abstract int OnHeartBeat(long now,long tick);
+	public abstract void CheckDeadStateToReborn();
 	/*
 	 * 发送移动消息
 	 * @see com.chen.battle.structs.SSMoveObject#OnStartMove(com.chen.move.struct.ColVector)

@@ -242,11 +242,19 @@ public class SSHero extends SSGameUnit
 	@Override
 	public int OnHeartBeat(long now, long tick)
 	{
+		if (IsDead())
+		{
+			
+		}
 		OnGameUnitHeartBeat(now, tick);
 		return 0;
 	}
 	public void OnGameUnitHeartBeat(long now,long tick)
 	{
+		if (IsDead())
+		{
+			CheckDeadStateToReborn();
+		}
 		if (ai != null)
 		{
 			ai.HeartBeat(now, tick);
@@ -331,6 +339,16 @@ public class SSHero extends SSGameUnit
 		if (asyn)
 		{
 			battle.SyncState(this);
+		}
+	}
+	@Override
+	public void CheckDeadStateToReborn()
+	{
+		long timeSpan = battle.battleHeartBeatTime - curActionInfo.time;	
+		if (timeSpan >= GetFPData(EParameterCate.ReliveTime))
+		{
+			log.debug("重生");
+			battle.AskRebornGameHero(this);
 		}
 	}	
 }
