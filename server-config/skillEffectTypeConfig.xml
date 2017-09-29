@@ -29,8 +29,12 @@
 		<id>20001</id>
 		<type>3</type>		
 	</skill>
-		<skill name="飞球">
+	<skill name="飞球">
 		<id>30001</id>
 		<type>2</type>		
+	</skill>
+	<skill name="飞球">
+		<id>40002</id>
+		<type>1</type>		
 	</skill>
 </skills>

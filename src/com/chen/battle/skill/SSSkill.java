@@ -190,6 +190,7 @@ public class SSSkill
 		{
 			if (CheckStatus() == false)
 			{
+				logger.error("状态不行");
 				rst = 0;
 				break;
 			}
@@ -245,6 +246,7 @@ public class SSSkill
 			//使用 状态
 			if (eSkillState == ESkillState.Using)
 			{
+				System.out.println("Using");
 				boolean bIfUsing = false;
 				//遍历所有的使用中的技能效果,看其是否依然在占用中
 				for (int i=0; i<32; i++)
@@ -277,6 +279,7 @@ public class SSSkill
 			//后摇状态
 			if (eSkillState == ESkillState.Lasting)
 			{
+				System.out.println("Lasting");
 				if (stateTime + skillConfig.lastTime > now)
 				{
 					rst = 1;

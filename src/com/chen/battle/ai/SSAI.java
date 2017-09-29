@@ -55,7 +55,7 @@ public class SSAI
 	{
 		if (theOwner.curActionInfo.eOAS.value < EGOActionState.PassiveState.value)
 		{
-			theOwner.BeginActionIdle(true);;
+			theOwner.BeginActionIdle(true);
 		}	
 	}
 	public void HeartBeat(long now,long tick)

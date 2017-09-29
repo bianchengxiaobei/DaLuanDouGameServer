@@ -185,7 +185,6 @@ public class SSAI_Hero extends SSAI
 		}
 		if (nowSkill != null)
 		{
-			System.out.println("NOwSkill");
 			UseSkillHeartBeat(now, tick);
 		}
 	}

@@ -111,21 +111,6 @@ public class BattleContext extends BattleServer
 				e.printStackTrace();
 			}
 		}
-//		new Timer("Time out").schedule(new TimerTask() {
-//			@Override
-//			public void run() 
-//			{			
-//				BattleContext.this.battleHeartBeatTime = System.currentTimeMillis();
-//				BattleContext.this.OnHeartBeat(BattleContext.this.battleHeartBeatTime, 100);
-//				if (BattleContext.this.battleState == EBattleServerState.eSSBS_Finished)
-//				{
-//					BattleContext.this.stop(true);
-//					BattleManager.getInstance().allBattleMap.remove(BattleContext.this.battleId);
-//					BattleManager.getInstance().mServers.remove(BattleContext.this.battleId, BattleContext.this);
-//				}
-//			}
-//		},100,100);
-		//((ServerThread)this.thread_pool.get(Server.DEFAULT_MAIN_THREAD)).addTimeEvent(event);
 	}
 	public void OnHeartBeat(long now,long tickSpan)
 	{
@@ -179,7 +164,14 @@ public class BattleContext extends BattleServer
 		{
 			//更新客户端战斗时间
 			//显示其他玩家，更新自己的状态
-			data.sHero.SendAppearMessage();
+			//data.sHero.SendAppearMessage();
+			for (BattleUserInfo other : this.m_battleUserInfo)
+			{
+				if (other != null)
+				{
+					other.sHero.SendToOhterAppearMessage(player);
+				}
+			}
 			SyncState(data.sHero);
 		}
 		MessageUtil.tell_battlePlayer_message(this, msg);

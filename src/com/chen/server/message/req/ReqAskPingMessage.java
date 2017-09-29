@@ -1,20 +1,15 @@
-package com.chen.battle.message.res;
+package com.chen.server.message.req;
 
 import org.apache.mina.core.buffer.IoBuffer;
 
 import com.chen.message.Message;
 
-public class ResGoAppearMessage extends Message
+public class ReqAskPingMessage extends Message
 {
-	public long playerId;
-	public int dirAngle;
-	public int posX;
-	public int posZ;
-	public int hp;
 	@Override
 	public int getId() {
 		// TODO Auto-generated method stub
-		return 1023;
+		return 1045;
 	}
 
 	@Override
@@ -30,18 +25,14 @@ public class ResGoAppearMessage extends Message
 	}
 
 	@Override
-	public boolean read(IoBuffer buffer) {
+	public boolean read(IoBuffer arg0) {
 		// TODO Auto-generated method stub
 		return true;
 	}
 
 	@Override
-	public boolean write(IoBuffer buffer) {
-		writeLong(buffer, playerId);
-		writeInt(buffer, posX);
-		writeInt(buffer, posZ);
-		writeInt(buffer, dirAngle);
-		writeInt(buffer, hp);
+	public boolean write(IoBuffer arg0) {
+		// TODO Auto-generated method stub
 		return true;
 	}
 

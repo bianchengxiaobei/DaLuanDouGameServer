@@ -25,6 +25,6 @@
 		<lifeTime>1500</lifeTime>
 		<num>1</num>
 		<angle>0</angle>
-		<eventId>10002:0</eventId>
+		<eventId>10002:0;40002:0</eventId>
 	</skill>
 </skillConfigs>

@@ -20,6 +20,7 @@ import com.chen.move.struct.ColSphere;
 import com.chen.move.struct.ColVector;
 import com.chen.parameter.manager.SSParameterManager;
 import com.chen.parameter.structs.EParameterCate;
+import com.chen.player.structs.Player;
 import com.chen.utils.MessageUtil;
 import com.chen.utils.Tools;
 
@@ -265,12 +266,22 @@ public abstract class SSGameUnit extends SSMoveObject
 	{
 		ResGoAppearMessage message = new ResGoAppearMessage();
 		message.playerId = this.id;
-		message.dirX = (int)this.GetCurDir().x;
-		message.dirY = (int)this.GetCurDir().y;
-		message.posX = (int)this.GetCurPos().x;
-		message.posY = (int)this.GetCurPos().y;
+		message.dirAngle = Tools.GetDirAngle(this.GetCurDir());
+		message.posX = (int)(this.GetCurPos().x * 1000);
+		message.posZ = (int)(this.GetCurPos().z * 1000);
+		message.hp = this.GetCurHp();
 		message.hp = this.GetCurHp();
 		MessageUtil.tell_battlePlayer_message(this.battle, message);
+	}
+	public void SendToOhterAppearMessage(Player player)
+	{
+		ResGoAppearMessage message = new ResGoAppearMessage();
+		message.playerId = this.id;
+		message.dirAngle = Tools.GetDirAngle(this.GetCurDir());
+		message.posX = (int)(this.GetCurPos().x * 1000);
+		message.posZ = (int)(this.GetCurPos().z * 1000);
+		message.hp = this.GetCurHp();
+		MessageUtil.tell_player_message(player, message);
 	}
 	public void FullHp()
 	{

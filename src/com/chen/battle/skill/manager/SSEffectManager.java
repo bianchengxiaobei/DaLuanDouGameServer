@@ -185,6 +185,10 @@ public class SSEffectManager
 		SkillEffectBaseConfig config = null;
 		SSSkillEffect effect = null;
 		ESkillEffectType effectType = DataManager.getInstance().skillTypeConfigLoader.skillEffectTypeMap.get(effectId);		
+		if (effectType == null)
+		{
+			logger.error("特效类型为空，请看配置文件.Id:"+effectId);
+		}
 		switch (effectType) {
 		case Move:
 			config = DataManager.getInstance().skillModelMoveConfigLoader.skillModelMoveConfig.get(effectId);
@@ -212,6 +216,7 @@ public class SSEffectManager
 				break;
 			}
 			effect = new SSSkillEffect_Emit();
+			break;
 		case Caculate:
 			config = DataManager.getInstance().skillModelCacuConfigLoader.skillModelCaculateConfig.get(effectId);
 			if (config == null)
@@ -220,6 +225,7 @@ public class SSEffectManager
 				break;
 			}
 			effect = new SSSkillEffect_Caculate();
+			break;
 		}
 		if (effect == null)
 		{

@@ -43,7 +43,7 @@
 		<prepareTime>0</prepareTime>
 		<cooldownTime>3000</cooldownTime>
 		<releaseTime>0</releaseTime>
-		<lastTime>1200</lastTime>
+		<lastTime>1500</lastTime>
 		<releaseDis>1200</releaseDis>
 		<bImpact>true</bImpact>
 		<eSkillTargetType>4</eSkillTargetType>

@@ -26,7 +26,9 @@ import com.chen.move.handler.ReqAskMoveHandler;
 import com.chen.move.handler.ReqAskStopMoveHandler;
 import com.chen.move.message.req.ReqAskMoveMessage;
 import com.chen.move.message.req.ReqAskStopMoveMessage;
+import com.chen.server.handler.ReqAskPingHandler;
 import com.chen.server.handler.ResRegisterGateHandler;
+import com.chen.server.message.req.ReqAskPingMessage;
 import com.chen.server.message.res.ResRegisterGateMessage;
 
 public class MessagePool 
@@ -48,6 +50,7 @@ public class MessagePool
 		register(1021, ReqAskMoveMessage.class , ReqAskMoveHandler.class);
 		register(1026, ReqAskStopMoveMessage.class , ReqAskStopMoveHandler.class);
 		register(1030, ReqAskUseSkillMessage.class, ReqAskUseSkillHandler.class);
+		register(1045, ReqAskPingMessage.class, ReqAskPingHandler.class);
 	}
 	private void register(int id,Class<?> messageClass,Class<?> handlerClass)
 	{

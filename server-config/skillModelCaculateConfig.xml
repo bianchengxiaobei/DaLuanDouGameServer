@@ -81,4 +81,18 @@
 		<eEffectMultiplyRate>0</eEffectMultiplyRate>
 		<eventId>0</eventId>
 	</skill>
+	<skill name="飞球">
+		<skillModelId>40002</skillModelId>
+		<bIsCooldown>false</bIsCooldown>
+		<bIsCanMove>false</bIsCanMove>
+		<bIsCanBreak>false</bIsCanBreak>
+		<releaseTimeDelay>0</releaseTimeDelay>
+		<eTargetType>2</eTargetType>					
+		<eEffectCate>1</eEffectCate>
+		<EffectBaseValue>30</EffectBaseValue>
+		<EffectRate>0</EffectRate>
+		<eEffectPlusRate>1:400</eEffectPlusRate>
+		<eEffectMultiplyRate>0</eEffectMultiplyRate>
+		<eventId>0</eventId>
+	</skill>
 </skillConfigs>
