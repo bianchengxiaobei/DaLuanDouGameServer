@@ -7,7 +7,9 @@ import org.apache.logging.log4j.Logger;
 import com.chen.battle.structs.EBattleState;
 import com.chen.cache.impl.MemoryCache;
 import com.chen.config.Config;
+import com.chen.db.bean.Hero;
 import com.chen.db.bean.Role;
+import com.chen.db.dao.HeroDao;
 import com.chen.db.dao.RoleDao;
 import com.chen.login.bean.RoleBasicInfo;
 import com.chen.login.message.res.ResRemoveCharacterToGateMessage;
@@ -25,6 +27,7 @@ public class PlayerManager
 	private static MemoryCache<Long, Player> players = new MemoryCache<Long, Player>();
 	//玩家数据库操作
 	private RoleDao dao = new RoleDao();
+	private HeroDao heroDao = new HeroDao();
 	private PlayerManager()
 	{
 		
@@ -156,6 +159,11 @@ public class PlayerManager
 		role.setOnlineTime(player.getOnlineTime());
 		role.setAddBlackCount(player.getAddBlackCount());
 		dao.insert(role);
+		Hero hero = new Hero();
+		hero.setRoleId(player.getId());
+		hero.setServer(player.getCreateServerId());
+		hero.setHeroId(0);
+		heroDao.insert(hero);
 	}
 	/**
 	 * 取得玩家基本信息
