@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.chen.battle.ball.Ball;
 import com.chen.battle.hero.config.SHeroConfig;
 import com.chen.battle.manager.BattleManager;
 import com.chen.battle.message.res.ResBattleTipMessage;
@@ -50,6 +51,7 @@ public class BattleContext extends BattleServer
 	public Set<EBattleTipType> tipSet = new HashSet<>();
 	public SSMoveManager moveManager;
 	public SSEffectManager effectManager;
+	public Ball ball;
 	public AtomicInteger effectId = new AtomicInteger(0);
 	public static final int maxMemberCount = 6; 
 	public static final int timeLimit = 200000;
@@ -84,6 +86,7 @@ public class BattleContext extends BattleServer
 		this.battleType = type;
 		this.moveManager = new SSMoveManager();
 		this.effectManager = new SSEffectManager();
+		this.ball = new Ball(this);
 		this.effectManager.battle = this;
 	}
 	
@@ -337,6 +340,7 @@ public class BattleContext extends BattleServer
 			}
 		}		
 		this.effectManager.OnHeartBeat(now, tick);
+		this.ball.OnHeartBeat(now, tick);
 	}
 	public void BoradTipsByType(EBattleTipType type,Player player)
 	{
@@ -640,6 +644,32 @@ public class BattleContext extends BattleServer
 		}
 	}
 	/**
+	 * 找到周围第一个物体
+	 * @param startPos
+	 * @param radius
+	 * @param objs
+	 */
+	public SSGameUnit FindAroundGo(CVector3D startPos,float radius)
+	{
+		float radiusSqrl = radius * radius;
+		for (SSGameUnit obj : this.gameObjectMap.values())
+		{
+			if(obj != null && obj.IsDead() == false)
+			{
+				CVector3D pos = obj.GetCurPos();
+				if (Math.abs(pos.x - startPos.x) > radius || Math.abs(pos.z - startPos.z) > radius)
+				{
+					continue;
+				}
+				if ((pos.x - startPos.x)*(pos.x-startPos.x) + (pos.z - startPos.z)*(pos.z - startPos.z) < radiusSqrl)
+				{
+					return obj;
+				}
+			}
+		}
+		return null;
+	}
+	/**
 	 * 是否能被攻击
 	 * @param beHitter
 	 * @param attacker
@@ -756,6 +786,7 @@ public class BattleContext extends BattleServer
 			//发送每个玩家的英雄信息
 			//然后通知客户端加载模型
 		}
+		ball.Start();
 	}
 	
 }

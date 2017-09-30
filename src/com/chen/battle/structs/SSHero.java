@@ -25,6 +25,7 @@ public class SSHero extends SSGameUnit
 	public SSSkill[] skillArray = new SSSkill[7];//最多7个技能
 	public long lockedTargetId;//技能锁定目标id
 	public long lastHeroDeadTime;
+	public int occupyPercent;//占领百分比
 	public SSHero(long playerId, BattleContext battle,EGameObjectCamp camp)
 	{
 		super(playerId, battle,camp);
