@@ -13,7 +13,7 @@ import com.chen.utils.Tools;
 
 public abstract class SSSkillEffect 
 {
-	public Logger logger = LogManager.getLogger(SSSkillEffect.class);
+	public static Logger logger = LogManager.getLogger(SSSkillEffect.class);
 	public ESkillEffectType skillEffectType;
 	public SSSkill skill;
 	public SkillEffectBaseConfig config;

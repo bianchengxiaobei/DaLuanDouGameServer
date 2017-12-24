@@ -139,7 +139,7 @@ public class GameServer extends ClientServer
 		try 
 		{
 			int id = buf.getInt();//消息id
-			System.out.println("游戏服务器收到消息id"+id);
+			//System.out.println("游戏服务器收到消息id"+id);
 			long sessionId = buf.getLong();//客户端通信id号
 			if (sessionId > 0)
 			{

@@ -10,33 +10,8 @@ import com.chen.message.Message;
  */
 public class ReqAutoMatchMessage extends Message
 {
-	private int m_nMapId;
-	private byte m_btMatchType;
-	private byte m_btAIDifficulty;
-	public int getM_nMapId() {
-		return m_nMapId;
-	}
-
-	public void setM_nMapId(int m_nMapId) {
-		this.m_nMapId = m_nMapId;
-	}
-
-	public byte getM_btMatchType() {
-		return m_btMatchType;
-	}
-
-	public void setM_btMatchType(byte m_btMatchType) {
-		this.m_btMatchType = m_btMatchType;
-	}
-
-	public byte getM_btAIDifficulty() {
-		return m_btAIDifficulty;
-	}
-
-	public void setM_btAIDifficulty(byte m_btAIDifficulty) {
-		this.m_btAIDifficulty = m_btAIDifficulty;
-	}
-
+	public int m_nMapId;
+	public byte m_btGameMode;
 	@Override
 	public int getId() {
 		// TODO Auto-generated method stub
@@ -58,16 +33,14 @@ public class ReqAutoMatchMessage extends Message
 	@Override
 	public boolean read(IoBuffer buf) {
 		this.m_nMapId = readInt(buf);
-		this.m_btMatchType = readByte(buf);
-		this.m_btAIDifficulty = readByte(buf);
+		this.m_btGameMode = readByte(buf);
 		return true;
 	}
 
 	@Override
 	public boolean write(IoBuffer buf) {
 		writeInt(buf, m_nMapId);
-		writeByte(buf, m_btMatchType);
-		writeByte(buf, m_btAIDifficulty);
+		writeByte(buf, m_btGameMode);
 		return true;
 	}
 	

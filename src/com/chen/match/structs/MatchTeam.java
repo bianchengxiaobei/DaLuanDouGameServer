@@ -21,11 +21,11 @@ public class MatchTeam
 	private Vector<MatchPlayer> players = new Vector<MatchPlayer>();
 	private int mapId;
 	private int teamId;
-	private EBattleMatchType matchType;
+	private EBattleModeType matchType;
 	private boolean isInMatch;
 	private HashMap<Long, Boolean> stopedPlayers = new HashMap<Long, Boolean>();
 	
-	public MatchTeam(EBattleMatchType matchType,int mapId)
+	public MatchTeam(EBattleModeType matchType,int mapId)
 	{
 		this.teamId = ++TeamId;
 		this.matchType = matchType;
@@ -66,11 +66,11 @@ public class MatchTeam
 		this.teamId = teamId;
 	}
 
-	public EBattleMatchType getMatchType() {
+	public EBattleModeType getMatchType() {
 		return matchType;
 	}
 
-	public void setMatchType(EBattleMatchType matchType) {
+	public void setMatchType(EBattleModeType matchType) {
 		this.matchType = matchType;
 	}
 
@@ -142,17 +142,15 @@ public class MatchTeam
 		int pos = 0;
 		while (iterator.hasNext())
 		{
-			System.out.println("fwefwefewfewf");
 			MatchPlayer player2 = iterator.next();
 			if (player2.equals(player))
 			{
 				ResMatchTeamBaseInfoMessage message = new ResMatchTeamBaseInfoMessage();
 				message.teamId = 0;
-				message.matchType = EBattleMatchType.MATCH_MODE_INVALID.getValue();
+				message.matchType = EBattleModeType.Game_Mode_INVALID.getValue();
 				message.mapId = 0;
 				//MessageUtil.tell_player_message(player2.getPlayer(),message);
 				player2.setMatchTeamId(0);
-				System.out.println("yichu ");
 				iterator.remove();
 				ResMatchTeamPlayerInfoMessage message2 = new ResMatchTeamPlayerInfoMessage();
 				message2.pos = (byte)pos;
@@ -213,7 +211,7 @@ public class MatchTeam
 		ResMatchTeamBaseInfoMessage message = new ResMatchTeamBaseInfoMessage();
 		message.teamId = 0;
 		message.mapId = 0;
-		message.matchType = EBattleMatchType.MATCH_MODE_INVALID.getValue();
+		message.matchType = EBattleModeType.Game_Mode_INVALID.getValue();
 		Iterator<MatchPlayer> iterator = players.iterator();
 		while (iterator.hasNext())
 		{

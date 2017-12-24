@@ -10,6 +10,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.swing.DebugGraphics;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,6 +19,7 @@ import com.chen.battle.ball.Ball;
 import com.chen.battle.hero.config.SHeroConfig;
 import com.chen.battle.manager.BattleManager;
 import com.chen.battle.message.res.ResBattleTipMessage;
+import com.chen.battle.message.res.ResEnterRoomMessage;
 import com.chen.battle.message.res.ResEnterSceneMessage;
 import com.chen.battle.message.res.ResGamePrepareMessage;
 import com.chen.battle.message.res.ResHeroRebornMessage;
@@ -25,6 +28,7 @@ import com.chen.battle.message.res.ResSceneLoadedMessage;
 import com.chen.battle.message.res.ResSelectHeroMessage;
 import com.chen.battle.skill.manager.SSEffectManager;
 import com.chen.data.manager.DataManager;
+import com.chen.match.structs.EBattleModeType;
 import com.chen.message.Message;
 import com.chen.move.manager.SSMoveManager;
 import com.chen.move.struct.ColVector;
@@ -37,7 +41,7 @@ import com.chen.utils.MessageUtil;
 public class BattleContext extends BattleServer
 {
 	private Logger log = LogManager.getLogger(BattleContext.class);
-	private EBattleType battleType;
+	public EBattleModeType battleType;
 	private EBattleServerState battleState = EBattleServerState.eSSBS_SelectHero;
 	private long battleId;
 	public int mapId;
@@ -51,18 +55,12 @@ public class BattleContext extends BattleServer
 	public Set<EBattleTipType> tipSet = new HashSet<>();
 	public SSMoveManager moveManager;
 	public SSEffectManager effectManager;
-	public Ball ball;
+	public IBattleContextMode gameMode;
 	public AtomicInteger effectId = new AtomicInteger(0);
 	public static final int maxMemberCount = 6; 
 	public static final int timeLimit = 200000;
 	public static final int prepareTimeLimit = 5000;
 	public static final int loadTimeLimit = 100000;
-	public EBattleType getBattleType() {
-		return battleType;
-	}
-	public void setBattleType(EBattleType battleType) {
-		this.battleType = battleType;
-	}
 	public long getBattleId() {
 		return battleId;
 	}
@@ -78,7 +76,7 @@ public class BattleContext extends BattleServer
 	public void setM_battleUserInfo(BattleUserInfo[] m_battleUserInfo) {
 		this.m_battleUserInfo = m_battleUserInfo;
 	}
-	public BattleContext(EBattleType type, long battleId,int mapId)
+	public BattleContext(EBattleModeType type, long battleId,int mapId)
 	{
 		super("战斗-"+battleId);
 		this.battleId = battleId;
@@ -86,7 +84,6 @@ public class BattleContext extends BattleServer
 		this.battleType = type;
 		this.moveManager = new SSMoveManager();
 		this.effectManager = new SSEffectManager();
-		this.ball = new Ball(this);
 		this.effectManager.battle = this;
 	}
 	
@@ -167,7 +164,6 @@ public class BattleContext extends BattleServer
 		{
 			//更新客户端战斗时间
 			//显示其他玩家，更新自己的状态
-			//data.sHero.SendAppearMessage();
 			for (BattleUserInfo other : this.m_battleUserInfo)
 			{
 				if (other != null)
@@ -175,7 +171,14 @@ public class BattleContext extends BattleServer
 					other.sHero.SendToOhterAppearMessage(player);
 				}
 			}
+			//更新英雄信息
 			SyncState(data.sHero);
+			//更新球的信息
+			if (gameMode != null)
+			{
+				gameMode.SyncState();
+				gameMode.SyncScoreState();
+			}
 		}
 		MessageUtil.tell_battlePlayer_message(this, msg);
 	}
@@ -340,7 +343,7 @@ public class BattleContext extends BattleServer
 			}
 		}		
 		this.effectManager.OnHeartBeat(now, tick);
-		this.ball.OnHeartBeat(now, tick);
+		this.gameMode.OnHeartBeat(now, tick);
 	}
 	public void BoradTipsByType(EBattleTipType type,Player player)
 	{
@@ -731,6 +734,7 @@ public class BattleContext extends BattleServer
 					info2.playerId = this.m_battleUserInfo[i].sPlayer.player.getId();
 					info2.heroId = this.m_battleUserInfo[i].selectedHeroId;
 					info2.nickName = this.m_battleUserInfo[i].sPlayer.player.getName();
+					info2.campId = this.m_battleUserInfo[i].camp.value;
 					message.ReConnectInfo.add(info2);
 				}
 				MessageUtil.tell_player_message(player, message);
@@ -786,7 +790,7 @@ public class BattleContext extends BattleServer
 			//发送每个玩家的英雄信息
 			//然后通知客户端加载模型
 		}
-		ball.Start();
+		gameMode.Start();
 	}
 	
 }

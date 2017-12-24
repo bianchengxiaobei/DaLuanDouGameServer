@@ -46,6 +46,7 @@ public class LoginManager
 		{
 			return;
 		}
+		player.initHero();
 		int serverId = GameServer.getInstance().getServer_id();
 		//通知网关服务器玩家登录成功
 		ResLoginSuccessToGateMessage gate_msg = new ResLoginSuccessToGateMessage();

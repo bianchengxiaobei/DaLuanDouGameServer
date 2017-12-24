@@ -22,7 +22,7 @@ public class ReqAutoMatchHandler extends Handler
 			{
 				log.error("玩家"+msg.getSession()+"没有注册该角色");
 			}
-			BattleManager.getInstance().askCreateMatchTeam(player, msg.getM_nMapId(), msg.getM_btMatchType());
+			BattleManager.getInstance().askCreateMatchTeam(player, msg.m_nMapId, msg.m_btGameMode);
 		} catch (Exception e) {
 			log.error(e,e);
 		}		

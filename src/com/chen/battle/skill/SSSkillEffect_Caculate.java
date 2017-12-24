@@ -2,6 +2,7 @@ package com.chen.battle.skill;
 
 import com.chen.battle.skill.config.SkillModelCaculateConfig;
 import com.chen.battle.skill.message.res.ResSkillHitTargetMessage;
+import com.chen.battle.skill.structs.BuffEffectInfo;
 import com.chen.battle.skill.structs.EEffectCaculateType;
 import com.chen.battle.skill.structs.ESkillEffectType;
 import com.chen.battle.structs.SSGameUnit;
@@ -28,7 +29,7 @@ public class SSSkillEffect_Caculate extends SSSkillEffect
 		SkillModelCaculateConfig caculateConfig = (SkillModelCaculateConfig)this.config;
 		boolean bIfNormalAttack = false;
 		
-		boolean ret = this.CaculateSkillEffectOnce(theOwner, target, caculateConfig, skill == null ? 0 : skill.skillConfig.skillId, bIfNormalAttack, true);
+		boolean ret = this.CaculateSkillEffectOnce(theOwner, target, caculateConfig.buffEffectInfo, skill == null ? 0 : skill.skillConfig.skillId, bIfNormalAttack, true);
 		
 		this.NotifySkillModelHitObj();
 		return false;
@@ -45,46 +46,46 @@ public class SSSkillEffect_Caculate extends SSSkillEffect
 	{
 			
 	}
-	private boolean CaculateSkillEffectOnce(SSGameUnit theOwner,SSGameUnit target,SkillModelCaculateConfig config,int skillId,boolean bIfNormalAttack,boolean IfAdd)
+	public static boolean CaculateSkillEffectOnce(SSGameUnit theOwner,SSGameUnit target,BuffEffectInfo skillInfo,int skillId,boolean bIfNormalAttack,boolean IfAdd)
 	{
 		if (target == null)
 		{
 			return false;
 		}
-		if (config == null)
+		if (skillInfo == null)
 		{
-			logger.error("CacuConfig == null");
+			logger.error("SkillInfo == null");
 			return false;
 		}
-		if (!this.battle.CheckObjCanBeHit(target, theOwner) && config.eEffectCate.value <= EParameterCate.CurHp.value)
+		if (!theOwner.battle.CheckObjCanBeHit(target, theOwner) && skillInfo.eParamType.value <= EParameterCate.CurHp.value)
 		{
 			return false;
 		}
-		float value = config.EffectBaseValue;
+		float value = skillInfo.effectBaseValue;
 		for (int i=0; i<16; i++)
 		{
-			if (config.eEffectAddCacuType[i] == EEffectCaculateType.None)
+			if (skillInfo.eEffectAddCaculType[i] == EEffectCaculateType.None)
 			{
 				continue;
 			}
-			switch (config.eEffectAddCacuType[i]) 
+			switch (skillInfo.eEffectAddCaculType[i]) 
 			{
 			case SelfPhyAttack:
-				value += (float)theOwner.GetFPData(EParameterCate.PhyAttack) * config.eEffectAddCacuValue[i] * 0.001f;
+				value += (float)theOwner.GetFPData(EParameterCate.PhyAttack) * skillInfo.effectAddCaculValue[i] * 0.001f;
 				break;
 			case SelfPhyDefence:
-				value += (float)theOwner.GetFPData(EParameterCate.PhyDefense) * config.eEffectAddCacuValue[i] * 0.001f;
+				value += (float)theOwner.GetFPData(EParameterCate.PhyDefense) * skillInfo.effectAddCaculValue[i] * 0.001f;
 			default:
 				break;
 			}
 		}
 		boolean bIsCrit = false;
-		switch (config.eEffectCate) 
+		switch (skillInfo.eParamType) 
 		{
 		case PhyHurt:
 		case MagicHurt:
 		case TrueHurt:
-			int hurtValue = target.ApplyHurt(theOwner, (int)value, config.eEffectCate, bIfNormalAttack, bIsCrit);
+			int hurtValue = target.ApplyHurt(theOwner, (int)value, skillInfo.eParamType, bIfNormalAttack, bIsCrit);
 			if (hurtValue == 0)
 			{
 				return false;
@@ -98,7 +99,7 @@ public class SSSkillEffect_Caculate extends SSSkillEffect
 		{
 			return false;
 		}
-		target.ChangeFPData(config.eEffectCate, config.EffectBaseValue, config.EffectRate, IfAdd);
+		target.ChangeFPData(skillInfo.eParamType, skillInfo.effectBaseValue, skillInfo.effectRate, IfAdd);
 		return true;
 	}
 	private void NotifySkillModelHitObj()

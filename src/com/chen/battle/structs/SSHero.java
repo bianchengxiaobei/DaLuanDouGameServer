@@ -18,14 +18,14 @@ import com.chen.utils.MessageUtil;
 public class SSHero extends SSGameUnit
 {
 	private Logger log = LogManager.getLogger(SSHero.class);
-	SSPlayer player;
+	public SSPlayer player;
 	public SHeroConfig config;
 	public CVector3D bornPos;
 	public float colliderRadius;
 	public SSSkill[] skillArray = new SSSkill[7];//最多7个技能
 	public long lockedTargetId;//技能锁定目标id
 	public long lastHeroDeadTime;
-	public int occupyPercent;//占领百分比
+	public long occupyTime;//占领百分比
 	public SSHero(long playerId, BattleContext battle,EGameObjectCamp camp)
 	{
 		super(playerId, battle,camp);

@@ -1,16 +1,17 @@
-package com.chen.match.message.req;
+package com.chen.battle.ball.message.res;
 
 import org.apache.mina.core.buffer.IoBuffer;
 
 import com.chen.message.Message;
 
-public class ReqRemoveMatchMessage extends Message
+public class ResBattleBallSorceChangeMessage extends Message
 {
-	public byte stopFlag;
+	public int teamId;
+	public int time;
 	@Override
 	public int getId() {
 		// TODO Auto-generated method stub
-		return 1009;
+		return 1050;
 	}
 
 	@Override
@@ -26,14 +27,16 @@ public class ReqRemoveMatchMessage extends Message
 	}
 
 	@Override
-	public boolean read(IoBuffer buf) {
-		this.stopFlag = readByte(buf);
+	public boolean read(IoBuffer buffer) {
+		
 		return true;
 	}
 
 	@Override
-	public boolean write(IoBuffer arg0) {
-		// TODO Auto-generated method stub
+	public boolean write(IoBuffer buffer) 
+	{
+		writeInt(buffer, teamId);
+		writeInt(buffer, time);
 		return true;
 	}
 	

@@ -39,6 +39,7 @@ public class ReqLoginCharacterToGameServerHandler extends Handler
 					return;
 				}
 			}
+			player.initHero();
 			player.setGateId(msg.getGateId());
 			if (msg.getLoginIp() == null || msg.getLoginIp().length() == 0)
 			{

@@ -138,7 +138,7 @@ public class MatchRoom_Normal
 			return true;
 		if (userCount == mapBean.getMaxCount())
 		{
-			BattleManager.getInstance().onBattleMached(EBattleMatchType.MATCH_MODE_NORMAL, mapBean.getM_nMapId(), teamMap);
+			BattleManager.getInstance().onBattleMached(EBattleModeType.Game_Mode_Ball, mapBean.getM_nMapId(), teamMap);
 			return true;
 		}
 		return false;

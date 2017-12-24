@@ -14,6 +14,7 @@ import com.chen.battle.skill.message.res.ResPrepareSkillStateMessage;
 import com.chen.battle.skill.message.res.ResReleasingSkillStateMessage;
 import com.chen.battle.skill.message.res.ResUsingSkillStateMessage;
 import com.chen.battle.skill.structs.ESkillEffectType;
+import com.chen.battle.skill.structs.ElementArray;
 import com.chen.battle.skill.structs.ISSMoveObjectHolder;
 import com.chen.message.Message;
 import com.chen.move.struct.ColSphere;
@@ -37,12 +38,14 @@ public abstract class SSGameUnit extends SSMoveObject
 	public int moveEffectId;//移动效果
 	public boolean bIfActiveMove;//是否激活移动
 	public EGameObjectCamp camp;
+	public ElementArray<Integer> bufferArray;
 	public SSParameterManager fpManager;
 	public SSGameUnit(long playerId,BattleContext battle,EGameObjectCamp _camp)
 	{
 		this.id = playerId;
 		this.battle = battle;
 		this.camp = _camp;
+		this.bufferArray = new ElementArray<>(16);
 		this.curActionInfo = new SGOActionStateInfo();
 		this.fpManager = new SSParameterManager();
 		this.fpManager.SetOwner(this);
@@ -362,6 +365,10 @@ public abstract class SSGameUnit extends SSMoveObject
 	{
 		return this.curActionInfo.dir;
 	}
+	public CVector3D GetCurSkillDir()
+	{
+		return this.curActionInfo.skillDir;
+	}
 	public int GetCurHp()
 	{
 		return 100;
@@ -461,6 +468,28 @@ public abstract class SSGameUnit extends SSMoveObject
 			return false;
 		}
 		return Tools.IfEnemy(this.camp.value, obj.camp.value);
+	}
+	/**
+	 * 该角色是否能再添加Buff
+	 * @return
+	 */
+	public boolean CanAddBuff()
+	{
+		return this.bufferArray.curSize < this.bufferArray.GetMaxSize();
+	}
+	/**
+	 * 缓存Buff到角色
+	 * @param buffId
+	 * @return
+	 */
+	public boolean AddBuffEffect(int buffId)
+	{
+		if (buffId == 0)
+		{
+			return false;
+		}
+		this.bufferArray.AddElement(buffId);
+		return true;
 	}
 	public int ApplyHurt(SSGameUnit enemyObj,int realHurt,EParameterCate hurtType,boolean IfNormalAttack,boolean bIfCrit)
 	{

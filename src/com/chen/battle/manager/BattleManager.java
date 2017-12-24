@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.chen.battle.impl.Battle;
 import com.chen.battle.message.res.ResEnterRoomMessage;
+import com.chen.battle.structs.BattleBallContext;
 import com.chen.battle.structs.BattleContext;
 import com.chen.battle.structs.BattleUserInfo;
 import com.chen.battle.structs.CVector3D;
@@ -24,7 +25,7 @@ import com.chen.battle.structs.RoomMemberData;
 import com.chen.battle.structs.SSHero;
 import com.chen.battle.structs.SSPlayer;
 import com.chen.match.manager.MatchManager;
-import com.chen.match.structs.EBattleMatchType;
+import com.chen.match.structs.EBattleModeType;
 import com.chen.match.structs.MatchPlayer;
 import com.chen.match.structs.MatchTeam;
 import com.chen.player.structs.Player;
@@ -69,7 +70,7 @@ public class BattleManager
 	 */
 	public void askCreateMatchTeam(Player player,int mapId,byte matchType)
 	{
-		MatchTeam team = MatchManager.getInstance().UserCreateTeam(player.getMatchPlayer(),EBattleMatchType.values()[matchType], mapId);
+		MatchTeam team = MatchManager.getInstance().UserCreateTeam(player.getMatchPlayer(),EBattleModeType.values()[matchType], mapId);
 //		MapBean bean = DataManager.getInstance().mapContainer.getMap().get(mapId);
 //		if (bean == null)
 //		{
@@ -158,7 +159,7 @@ public class BattleManager
 	 * @param mapId
 	 * @param teamList
 	 */
-	public void onBattleMached(EBattleMatchType type,int mapId,HashMap<Integer, Vector<MatchTeam>> teamList)
+	public void onBattleMached(EBattleModeType type,int mapId,HashMap<Integer, Vector<MatchTeam>> teamList)
 	{
 		try {
 			HashMap<Integer, Player> userListMap = new HashMap<Integer, Player>();
@@ -199,7 +200,7 @@ public class BattleManager
 		}
 
 	}
-	public void onBattleMached(HashMap<Integer, Player> listMap,int mapId,EBattleMatchType type)
+	public void onBattleMached(HashMap<Integer, Player> listMap,int mapId,EBattleModeType type)
 	{
 		Battle battle = new Battle(type,EBattleType.eBattleType_Match,this.generateBattleId(),mapId,listMap);
 		allBattleMap.put(battle.getBattleId(), battle);
@@ -222,7 +223,12 @@ public class BattleManager
 		List<RoomMemberData> listData = new ArrayList<>();
 		do 
 		{
-			battle = new BattleContext(EBattleType.values()[matchType],battleId,mapId);
+			if (matchType == EBattleModeType.Game_Mode_Ball.getValue())
+			{
+				battle = new BattleBallContext(EBattleModeType.Game_Mode_Ball, battleId, mapId);
+			}
+			else 
+				battle = new BattleContext(EBattleModeType.values()[matchType],battleId,mapId);
 			//加载地图
 			//设置每个人的信息SSUser
 			int index = 0;
@@ -239,6 +245,7 @@ public class BattleManager
 				 SSPlayer player = new SSPlayer(p);			 
 				 for (int j=0;j<p.getHeroList().size();j++)
 				 {
+					 log.debug("HeroId:"+p.getHeroList().get(j).getHeroId());
 					 player.addCanUseHero(p.getHeroList().get(j).getHeroId());
 				 }
 				 player.bIfConnect = true;
@@ -250,28 +257,6 @@ public class BattleManager
 					listData.add(data);
 				 battle.getM_battleUserInfo()[index++] = info;
 			}
-//			for (int i=0;i<userMap.size();i++)
-//			{
-//				 BattleUserInfo info = new BattleUserInfo();
-//				 Player p = userMap.get(i);	
-//					RoomMemberData data = new RoomMemberData();
-//					data.playerId = p.getId();
-//					data.name = p.getName();
-//					data.level = p.getLevel();
-//					data.icon = p.getIcon();
-//					data.isReconnecting = (byte)0;
-//					listData.add(data);
-//				 SSPlayer player = new SSPlayer(p);			 
-//				 for (int j=0;j<p.getHeroList().size();j++)
-//				 {
-//					 player.addCanUseHero(p.getHeroList().get(j).getHeroId());
-//				 }
-//				 player.bIfConnect = true;
-//				 player.battleId = battleId;
-//				 info.sPlayer = player;
-//				 info.camp = EGameObjectCamp.values()[p.getBattleInfo().battleCampType];
-//				 battle.getM_battleUserInfo()[i] = info;
-//			}
 			mServers.put(battle.getBattleId(),battle);
 			isCreateSucc = true;
 		}while(false);
@@ -300,17 +285,6 @@ public class BattleManager
 			MessageUtil.tell_player_message(player, msg);
 			msg.canUseHeroList.clear();
 		}
-//		for (int i=0; i<userMap.size(); i++)
-//		{
-//			Player player =  userMap.get(i);
-//			player.getBattleInfo().setBattleId(battleId);
-//			//player.getBattleInfo().changeState(EBattleState.eBattleState_Async);
-//			//data.canUseHeroList.addAll(battle.getM_battleUserInfo()[i].sPlayer.canUserHeroList);
-//			msg.canUseHeroList.addAll(battle.getM_battleUserInfo()[i].sPlayer.canUserHeroList);
-//			msg.m_oData = listData;
-//			MessageUtil.tell_player_message(player, msg);
-//			msg.canUseHeroList.clear();
-//		}
 		battle.setBattleState(EBattleServerState.eSSBS_SelectHero, false);
 		new Thread(battle).start();
 	}

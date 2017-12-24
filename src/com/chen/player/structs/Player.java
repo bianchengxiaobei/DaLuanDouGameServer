@@ -228,7 +228,10 @@ public class Player
 	public void initHero()
 	{
 		if (this.id != 0)
-			this.setHeroList(new HeroDao().selectById(this.id));
+		{
+			this.getHeroList().clear();
+			this.getHeroList().addAll(new HeroDao().selectById(this.id));
+		}	
 	}
 	public List<Hero> getHeroList() {
 		return heroList;

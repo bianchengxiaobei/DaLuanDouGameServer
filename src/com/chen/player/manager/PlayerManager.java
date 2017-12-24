@@ -131,7 +131,6 @@ public class PlayerManager
 			player.setLevel(role.getLevel());
 			player.setIcon(role.getIcon());
 			player.setMoney(role.getMoney());
-			player.initHero();
 			return player;
 		} catch (Exception e) {
 			e.printStackTrace();

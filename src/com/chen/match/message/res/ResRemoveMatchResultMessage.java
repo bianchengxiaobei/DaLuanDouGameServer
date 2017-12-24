@@ -10,7 +10,7 @@ public class ResRemoveMatchResultMessage extends Message
 	@Override
 	public int getId() {
 		// TODO Auto-generated method stub
-		return 1011;
+		return 1010;
 	}
 
 	@Override

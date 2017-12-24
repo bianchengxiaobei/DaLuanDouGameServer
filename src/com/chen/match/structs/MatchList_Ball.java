@@ -4,10 +4,10 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class MatchList_Normal extends MatchList
+public class MatchList_Ball extends MatchList
 {
 	private ConcurrentHashMap<Integer, MatchRoom_Normal> roomList;
-	public MatchList_Normal(int mapId)
+	public MatchList_Ball(int mapId)
 	{
 		super(mapId);
 		roomList = new ConcurrentHashMap<Integer, MatchRoom_Normal>();

@@ -73,15 +73,15 @@ public class SkillCaculateConfigXMLLoader
 							}
 							else if("eEffectCate".equals(schilds.item(j).getNodeName()))
 							{
-								config.eEffectCate = EParameterCate.values()[Integer.parseInt(schilds.item(j).getTextContent().trim())];
+								config.buffEffectInfo.eParamType = EParameterCate.values()[Integer.parseInt(schilds.item(j).getTextContent().trim())];
 							}	
 							else if("EffectBaseValue".equals(schilds.item(j).getNodeName()))
 							{
-								config.EffectBaseValue = Integer.parseInt(schilds.item(j).getTextContent().trim());
+								config.buffEffectInfo.effectBaseValue = Integer.parseInt(schilds.item(j).getTextContent().trim());
 							}
 							else if("EffectRate".equals(schilds.item(j).getNodeName()))
 							{
-								config.EffectRate = Integer.parseInt(schilds.item(j).getTextContent().trim());
+								config.buffEffectInfo.effectRate = Integer.parseInt(schilds.item(j).getTextContent().trim());
 							}
 							else if("eEffectPlusRate".equals(schilds.item(j).getNodeName()))
 							{
@@ -91,8 +91,8 @@ public class SkillCaculateConfigXMLLoader
 									for (int index=0; index<vecs.length; index++)
 									{
 										String[] vecs2 = vecs[index].split(":");
-										config.eEffectAddCacuType[index] = EEffectCaculateType.values()[Integer.parseInt(vecs2[0])];
-										config.eEffectAddCacuValue[index] = Integer.parseInt(vecs2[1]);
+										config.buffEffectInfo.eEffectAddCaculType[index] = EEffectCaculateType.values()[Integer.parseInt(vecs2[0])];
+										config.buffEffectInfo.effectAddCaculValue[index] = Integer.parseInt(vecs2[1]);
 									}
 								}
 							}
@@ -104,8 +104,8 @@ public class SkillCaculateConfigXMLLoader
 									for (int index=0; index<vecs.length; index++)
 									{
 										String[] vecs2 = vecs[index].split(":");
-										config.eEffectMultCacuType[index] = EEffectCaculateType.values()[Integer.parseInt(vecs2[0])];
-										config.eEffectMultCacuValue[index] = Integer.parseInt(vecs2[1]);
+										config.buffEffectInfo.eEffectMultCaculType[index] = EEffectCaculateType.values()[Integer.parseInt(vecs2[0])];
+										config.buffEffectInfo.effectMultCaculValue[index] = Integer.parseInt(vecs2[1]);
 									}
 								}
 							}

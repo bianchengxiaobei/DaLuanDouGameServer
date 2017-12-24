@@ -18,9 +18,15 @@ public class HeroDao
 	{
 		SqlSession session = sqlMapper.openSession();
 		try {
+			long start = System.currentTimeMillis();
 			int rows = session.insert("game_hero.insert",hero);
 			session.commit();
+			long end = System.currentTimeMillis();
+			logger.debug("插入英雄数据消耗的时间："+(end - start));
 			return rows;
+		}catch (Exception e) {
+			logger.error(e,e);
+			return -1;
 		}finally{
 			session.close();
 		}	

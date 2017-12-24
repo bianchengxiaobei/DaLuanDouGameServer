@@ -12,7 +12,7 @@ import com.chen.battle.structs.EBattleState;
 import com.chen.battle.structs.EBattleType;
 import com.chen.data.bean.MapBean;
 import com.chen.data.manager.DataManager;
-import com.chen.match.structs.EBattleMatchType;
+import com.chen.match.structs.EBattleModeType;
 import com.chen.player.structs.Player;
 
 public class Battle 
@@ -22,7 +22,7 @@ public class Battle
 	private int serverId;
 	private int mapId;
 	private EBattleType battleType;
-	private EBattleMatchType matchType;
+	private EBattleModeType matchType;
 	private HashMap<Integer, Player> userMap;
 	private MapBean mapBean;
 	public long getBattleId() {
@@ -49,10 +49,10 @@ public class Battle
 	public void setBattleType(EBattleType battleType) {
 		this.battleType = battleType;
 	}
-	public EBattleMatchType getMatchType() {
+	public EBattleModeType getMatchType() {
 		return matchType;
 	}
-	public void setMatchType(EBattleMatchType matchType) {
+	public void setMatchType(EBattleModeType matchType) {
 		this.matchType = matchType;
 	}
 	public HashMap<Integer, Player> getUserMap() {
@@ -68,7 +68,7 @@ public class Battle
 		this.mapBean = mapBean;
 	}
 	
-	public Battle(EBattleMatchType match_type,EBattleType type,
+	public Battle(EBattleModeType match_type,EBattleType type,
 			long battleId,int mapId,HashMap<Integer, Player> userList)
 	{
 		this.matchType = match_type;
@@ -80,7 +80,6 @@ public class Battle
 		userMap = userList;		
 		for (Map.Entry<Integer, Player> entry : userList.entrySet())
 		{
-			log.debug("hh肉f:"+entry.getKey());
 			entry.getValue().getBattleInfo().battleCampType = entry.getKey();
 		}
 	}

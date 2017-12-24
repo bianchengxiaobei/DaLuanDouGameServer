@@ -25,7 +25,11 @@ public class ReqRemoveMatchHandler extends Handler
 			{
 				log.error("玩家"+msg.getSession()+"没有注册该角色");
 			}
-			boolean isOK = MatchManager.getInstance().removeMatchTeam(player.getMatchPlayer());
+			boolean isOK = false;
+			if (msg.stopFlag == 1)
+				isOK = MatchManager.getInstance().TeamStopMatch(player.getMatchPlayer());
+			else if(msg.stopFlag == 0)
+				isOK = MatchManager.getInstance().removeMatchTeam(player.getMatchPlayer());
 			if (isOK)
 			{
 				ResRemoveMatchResultMessage message = new ResRemoveMatchResultMessage();

@@ -132,7 +132,10 @@ public class ElementArray<T>
 		}
 		return null;
 	}
-
+	public T End()
+	{
+		return null;
+	}
 	public T GetElementByIndex(int index)
 	{
 		if (index < 0 || index > maxSize - 1 || !this.array.get(index).isVaild )

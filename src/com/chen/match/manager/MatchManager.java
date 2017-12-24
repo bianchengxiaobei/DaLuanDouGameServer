@@ -8,11 +8,11 @@ import org.apache.logging.log4j.Logger;
 
 import com.chen.battle.structs.EBattleState;
 import com.chen.battle.structs.EBattleType;
-import com.chen.match.structs.EBattleMatchType;
+import com.chen.match.structs.EBattleModeType;
 import com.chen.match.structs.MatchList;
 import com.chen.match.structs.MatchList_AI;
 import com.chen.match.structs.MatchList_Ladder;
-import com.chen.match.structs.MatchList_Normal;
+import com.chen.match.structs.MatchList_Ball;
 import com.chen.match.structs.MatchPlayer;
 import com.chen.match.structs.MatchTeam;
 
@@ -46,7 +46,7 @@ public class MatchManager
 	 * @param mapId
 	 * @return
 	 */
-	public MatchTeam UserCreateTeam(MatchPlayer player,EBattleMatchType matchType,int mapId)
+	public MatchTeam UserCreateTeam(MatchPlayer player,EBattleModeType matchType,int mapId)
 	{
 		MatchTeam team = new MatchTeam(matchType, mapId);
 		allTeamMap.put(team.getTeamId(), team);
@@ -130,13 +130,13 @@ public class MatchManager
 		{
 			switch (team.getMatchType())
 			{
-				case MATCH_MODE_NORMAL:
-					list = new MatchList_Normal(team.getMapId());			
+				case Game_Mode_Ball:
+					list = new MatchList_Ball(team.getMapId());			
 					break;
 				case MATCH_MODE_QUICK_AI:
 					list = new MatchList_AI(team.getMapId());
 					break;
-				case MATCH_MODE_LADDER:
+				case Game_Mode_Flag:
 					list = new MatchList_Ladder(team.getMapId());
 					break;
 				default:
@@ -172,7 +172,7 @@ public class MatchManager
 	}
 	public void update()
 	{
-		for (int i=0; i<EBattleMatchType.MATCH_MODE_TOTAL.getValue(); i++)
+		for (int i=0; i<EBattleModeType.MATCH_MODE_TOTAL.getValue(); i++)
 		{
 			ConcurrentHashMap<Integer, MatchList> listMap = allMatchList.get(i);
 			if (listMap == null)
