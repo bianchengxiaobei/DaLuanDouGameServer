@@ -146,7 +146,7 @@ public class PassiveSkill
 		{
 			if (this.keepedEffects[i] == null)
 			{
-				this.keepedEffects[id] = effect;
+				this.keepedEffects[i] = effect;
 				break;
 			}
 		}
