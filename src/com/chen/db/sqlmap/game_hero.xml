@@ -3,17 +3,17 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="game_hero"> 
-  <resultMap id="hero_brief" type="com.chen.db.bean.Hero" >
-    <id column="heroId" property="heroId" jdbcType="INTEGER" />
-    <result column="roleId" property="roleId" jdbcType="BIGINT" />
-   	<result column="server" property="server" jdbcType="INTEGER"/>
+  <resultMap id="hero_brief" type="com.chen.db.bean.Hero">
+    <id column="roleId" property="roleId" jdbcType="BIGINT" />
+    <result column="heroId" property="heroId" jdbcType="INTEGER" />
+   	<result column="server" property="server" jdbcType="INTEGER" />
   </resultMap>
   <insert id="insert" parameterType="com.chen.db.bean.Hero">
   	insert into hero (roleId,heroId,server)
   	values(#{roleId},#{heroId},#{server})
   </insert>
  
-  <select id="selectHerosById" parameterType="long" resultMap="hero_brief">
-  	select roleId, heroId, server from hero where roleId = #{roleId,jdbcType=BIGINT};
+  <select id="selectHerosById" parameterType="java.lang.Long" resultMap="hero_brief">
+  	select * from hero where roleId = #{roleId,jdbcType=BIGINT}
   </select>
 </mapper>

@@ -2,6 +2,11 @@ package com.chen.battle.structs;
 
 
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.chen.battle.ai.SSAI;
 import com.chen.battle.message.res.ResDeadStateMessage;
 import com.chen.battle.message.res.ResGoAppearMessage;
@@ -13,12 +18,14 @@ import com.chen.battle.skill.message.res.ResLastingSkillStateMessage;
 import com.chen.battle.skill.message.res.ResPrepareSkillStateMessage;
 import com.chen.battle.skill.message.res.ResReleasingSkillStateMessage;
 import com.chen.battle.skill.message.res.ResUsingSkillStateMessage;
+import com.chen.battle.skill.passiveSkill.EPassiveSkillTriggerType;
 import com.chen.battle.skill.structs.ESkillEffectType;
 import com.chen.battle.skill.structs.ElementArray;
 import com.chen.battle.skill.structs.ISSMoveObjectHolder;
 import com.chen.message.Message;
 import com.chen.move.struct.ColSphere;
 import com.chen.move.struct.ColVector;
+import com.chen.move.struct.SSMoveObject;
 import com.chen.parameter.manager.SSParameterManager;
 import com.chen.parameter.structs.EParameterCate;
 import com.chen.player.structs.Player;
@@ -39,6 +46,7 @@ public abstract class SSGameUnit extends SSMoveObject
 	public boolean bIfActiveMove;//是否激活移动
 	public EGameObjectCamp camp;
 	public ElementArray<Integer> bufferArray;
+	public Map<EPassiveSkillTriggerType, List<Integer>> passiveSkillArray;
 	public SSParameterManager fpManager;
 	public SSGameUnit(long playerId,BattleContext battle,EGameObjectCamp _camp)
 	{
@@ -46,6 +54,7 @@ public abstract class SSGameUnit extends SSMoveObject
 		this.battle = battle;
 		this.camp = _camp;
 		this.bufferArray = new ElementArray<>(16);
+		this.passiveSkillArray = new HashMap<EPassiveSkillTriggerType, List<Integer>>();
 		this.curActionInfo = new SGOActionStateInfo();
 		this.fpManager = new SSParameterManager();
 		this.fpManager.SetOwner(this);
@@ -255,13 +264,6 @@ public abstract class SSGameUnit extends SSMoveObject
 			lastingSkillStateMessage.targetId = this.curActionInfo.skillTargetId;
 			lastingSkillStateMessage.skillId = this.curActionInfo.skillId;
 			return lastingSkillStateMessage;
-		case Dead:
-			ResDeadStateMessage deadStateMessage = new ResDeadStateMessage();
-			deadStateMessage.playerId = this.id;
-			deadStateMessage.posX = (int)(this.curActionInfo.pos.x * 1000);
-			deadStateMessage.posZ = (int)(this.curActionInfo.pos.z * 1000);
-			deadStateMessage.angle = Tools.GetDirAngle(this.curActionInfo.dir);
-			return deadStateMessage;
 		}
 		return null;
 	}
@@ -377,12 +379,19 @@ public abstract class SSGameUnit extends SSMoveObject
 	{
 		return this.curActionInfo.pos;
 	}
-	public abstract void BeginActionDead(SSGameUnit taret,boolean asyn);
+	public abstract void BeginActionDead(long skillerId,boolean asyn);
 	public abstract float GetColliderRadius();
 	public abstract boolean IfHero();
 	public abstract void ChangeCurHp(SSGameUnit obj,HPMPChangeReason reason,int changeValue,int skillId,EParameterCate cate);
 	public abstract int OnHeartBeat(long now,long tick);
 	public abstract void CheckDeadStateToReborn();
+	public void OnDizziness()
+	{
+		if (curActionInfo.eOAS.value < EGOActionState.PassiveState.value)
+		{
+			BeginActionIdle(true);
+		}
+	}
 	/*
 	 * 发送移动消息
 	 * @see com.chen.battle.structs.SSMoveObject#OnStartMove(com.chen.move.struct.ColVector)
@@ -418,8 +427,10 @@ public abstract class SSGameUnit extends SSMoveObject
 			this.CheckBeginActionFree(true);
 		}
 		//技能停止移动
-//		if(m_moveHolder != NULL){
-//			m_moveHolder->OnStopMove();
+		if(this.moveHolder != null)
+		{
+			this.moveHolder.OnStopMove();
+		}
 		this.ai.OnMoveBlock();
 	}
 	public void OnTeleport()
@@ -444,10 +455,13 @@ public abstract class SSGameUnit extends SSMoveObject
 		{
 			if (config.bIsNormalAttack)
 			{
-				return false;
+				//普攻有
+				return GetCurPos().CanWatch(
+						GetFPData(EParameterCate.AttackDist) * 0.001f + target.GetColliderRadius() + addDist, target.GetCurPos());
 			}
 			else
 			{
+				//技能没有包围合一说
 				return GetCurPos().CanWatch(config.releaseDis + addDist, target.GetCurPos());
 			}
 		}
@@ -470,7 +484,7 @@ public abstract class SSGameUnit extends SSMoveObject
 		return Tools.IfEnemy(this.camp.value, obj.camp.value);
 	}
 	/**
-	 * 该角色是否能再添加Buff
+	 * 该角色是否能再添加Buff，默认16个
 	 * @return
 	 */
 	public boolean CanAddBuff()
@@ -491,6 +505,43 @@ public abstract class SSGameUnit extends SSMoveObject
 		this.bufferArray.AddElement(buffId);
 		return true;
 	}
+	/**
+	 * 移除buff
+	 * @param buffId
+	 */
+	public void RemoveBuffEffect(int buffId)
+	{
+		if (buffId == 0)
+		{
+			return;
+		}
+		this.bufferArray.RemoveElement(buffId);
+	}
+	public void AddPassiveSkill(EPassiveSkillTriggerType type, int id)
+	{
+		if (this.passiveSkillArray.containsKey(type))
+		{
+			this.passiveSkillArray.get(type).add(id);
+		}
+		else
+		{
+			List<Integer> ids = new ArrayList<>();
+			ids.add(id);
+			this.passiveSkillArray.put(type, ids);			
+		}
+	}
+	public void RemovePassiveSkill(EPassiveSkillTriggerType type,int id)
+	{
+		this.passiveSkillArray.remove(type);
+	}
+	public List<Integer> GetPassiveSkill(EPassiveSkillTriggerType type)
+	{
+		if (this.passiveSkillArray.containsKey(type))
+		{
+			return this.passiveSkillArray.get(type);
+		}
+		return null;
+	}
 	public int ApplyHurt(SSGameUnit enemyObj,int realHurt,EParameterCate hurtType,boolean IfNormalAttack,boolean bIfCrit)
 	{
 		if (IsDead() || GetFPData(EParameterCate.CurHp) <= 0)
@@ -505,8 +556,8 @@ public abstract class SSGameUnit extends SSMoveObject
 		if (hurtType == EParameterCate.PhyHurt)
 		{
 			fDef = GetFPData(EParameterCate.PhyDefense);
-			fDefPass = GetFPData(EParameterCate.PhyPass);
-			fDefPassPercent = GetFPData(EParameterCate.PhyPassPercent);
+			fDefPass = enemyObj.GetFPData(EParameterCate.PhyPass);
+			fDefPassPercent = enemyObj.GetFPData(EParameterCate.PhyPassPercent);
 			fDmgReduce = GetFPData(EParameterCate.PhyDmgReduce);
 			fDmgReducePercent = GetFPData(EParameterCate.DmgReducePercent);
 		}
@@ -518,30 +569,20 @@ public abstract class SSGameUnit extends SSMoveObject
 			fDmgReduce = GetFPData(EParameterCate.MagicDmgReduce);
 			fDmgReducePercent = GetFPData(EParameterCate.DmgReducePercent);
 		}
-		if (fDef >= 0)
-		{
-			fDef = fDef * (1-fDefPassPercent*0.001f) - fDefPass;
-		}
-		else
-		{
-			fDef = fDef * (1+fDefPassPercent*0.001f) - fDefPass;
-		}
-		if (fDef >= 0)
-		{
-			fDef = 1 + fDef * 0.01f;
-		}else 
-		{
-			fDef = (100 - fDef) / (100 - fDef*2);
-		}
 		
-		int finalHurtValue = (int)(realHurt / fDef - fDmgReduce);
+		fDef = (fDef - fDefPass) * (1-fDefPassPercent*0.01f);
+
+		fDef = 100 / (100 + fDef);
+		
+		int finalHurtValue = (int)(realHurt * fDef - fDmgReduce);
+		
 		if (finalHurtValue <= 0)
 		{
 			finalHurtValue = 0;
 		}
 		else
 		{
-			finalHurtValue *= 1 - fDmgReducePercent * 0.001f;
+			finalHurtValue *= 1 - fDmgReducePercent * 0.01f;
 		}
 		if (finalHurtValue <= 0)
 		{

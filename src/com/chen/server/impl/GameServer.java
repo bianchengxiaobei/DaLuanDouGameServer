@@ -13,10 +13,15 @@ import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
+
+import com.chen.battle.manager.BattleManager;
+import com.chen.battle.structs.BattleContext;
 import com.chen.cache.executor.NonOrderedQueuePoolExecutor;
 import com.chen.cache.executor.OrderedQueuePoolExecutor;
+import com.chen.cache.impl.MemoryCache;
 import com.chen.cache.structs.AbstractWork;
 import com.chen.command.Handler;
+import com.chen.data.manager.DataManager;
 import com.chen.match.manager.MatchManager;
 import com.chen.message.Message;
 import com.chen.messagepool.MessagePool;
@@ -27,6 +32,7 @@ import com.chen.player.structs.Player;
 import com.chen.server.config.GameConfig;
 import com.chen.server.loader.GameConfigXmlLoader;
 import com.chen.server.message.req.ReqRegisterGateMessage;
+import com.chen.server.thread.SaveMailThread;
 import com.chen.server.thread.SchedularThread;
 import com.chen.server.thread.ServerThread;
 
@@ -45,9 +51,10 @@ public class GameServer extends ClientServer
 	private NonOrderedQueuePoolExecutor worldCommandExecutor = new NonOrderedQueuePoolExecutor(100);
 	
 	public static ConcurrentHashMap<String, Integer> delay = new ConcurrentHashMap<>();
-	private ThreadGroup thread_group;
-	private ServerThread wServerThread;
-	private SchedularThread wSchedularThread;
+//	private ThreadGroup thread_group;
+//	private ServerThread wServerThread;
+	public SaveMailThread wMailThread;
+//	private SchedularThread wSchedularThread;
 	private boolean connectSuccess = true;
 	public GameServer(String serverConfig)
 	{
@@ -72,8 +79,9 @@ public class GameServer extends ClientServer
 	@Override
 	protected void init() 
 	{
-		super.init();
-		//是否开启跨服
+		super.init();		
+		DataManager.getInstance().Init();
+		wMailThread = new SaveMailThread("Save-Mail-Thread");
 	}
 	@Override
 	public void run() 
@@ -145,6 +153,10 @@ public class GameServer extends ClientServer
 			{
 				decodeExecutor.addTask(sessionId, new Work(id, session, buf));
 			}
+			else
+			{
+				System.err.println("SessIonId<=0:"+sessionId+"消息Id:"+id);
+			}
 		} 
 		catch (Exception e) 
 		{
@@ -179,7 +191,7 @@ public class GameServer extends ClientServer
 				{
 					msg.getRoleId().add(buf.getLong());//取得用户所有角色的id，设置到消息中
 				}
-				msg.read(buf);
+				msg.read(buf.buf());
 				msg.setSession(iosession);
 				Handler handler = messagePool.getHandler(id);
 				if (handler == null)
@@ -236,9 +248,15 @@ public class GameServer extends ClientServer
 		
 	}
 	@Override
-	public void sessionClosed(IoSession arg0) {
-		// TODO Auto-generated method stub
-		
+	public void sessionClosed(IoSession session)
+	{
+		log.error(session+"关闭");
+		//发生错误关闭连接
+		int id = (Integer)session.getAttribute("connect-server-id");
+		if (id != 0)
+		{
+			removeSession(session, id, GATE_SERVER);
+		}
 	}
 	@Override
 	public void sessionCreate(IoSession arg0) {
@@ -275,7 +293,38 @@ public class GameServer extends ClientServer
 		}
 	}
 	@Override
-	protected void stop() {
-				
+	protected void stop()
+	{
+		BattleContext[] battleServer = BattleManager.getInstance().mServers.values().toArray(new BattleContext[0]);
+		for (int i=0;i<battleServer.length;i++)
+		{
+			battleServer[i].Stop();
+		}
+		wMailThread.stop(true);
+		try{
+			Thread.sleep(10000);
+		}catch (Exception e) {
+			log.error(e, e);
+		}
+		//保存玩家数据
+		MemoryCache<Long, Player> players = PlayerManager.getInstance().getPlayers();
+		//事件迭代器
+		Player[] saveplayers = players.getCache().values().toArray(new Player[0]);
+		
+		log.error("保存玩家开始，保存数量：" + saveplayers);
+		int count = 0;
+		//派发事件
+		for (Player player : saveplayers) {
+			//Player player = saves.get(i);
+			count++;
+			try{
+				PlayerManager.getInstance().quit(player);
+				PlayerManager.getInstance().UpdatePlayer(player);
+			}catch(Exception ex){
+				log.error(ex, ex);
+			}
+			if(count % 100 == 0) log.error("已经保存数量：" + count);
+		}
+		log.error("游戏服务器" + server_id + "停止成功！");
 	}
 }

@@ -1,5 +1,7 @@
 package com.chen.match.message.res;
 
+import java.nio.ByteBuffer;
+
 import org.apache.mina.core.buffer.IoBuffer;
 
 import com.chen.message.Message;
@@ -26,16 +28,17 @@ public class ResRemoveMatchResultMessage extends Message
 	}
 
 	@Override
-	public boolean read(IoBuffer buffer) {
-		this.errorCode = readInt(buffer);
-		return true;
+	public void read(ByteBuffer buffer)
+	{
+		super.read(buffer);
+		this.errorCode = readInt(this.messageUnpacker);
 	}
 
 	@Override
-	public boolean write(IoBuffer buffer) {
-		// TODO Auto-generated method stub
-		writeInt(buffer, errorCode);
-		return true;
+	public void write(IoBuffer buffer)
+	{		
+		writeInt(this.messagePack, errorCode);
+		super.write(buffer);
 	}
 	
 }

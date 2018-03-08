@@ -144,6 +144,10 @@ public class SSSkillEffect_Move extends SSSkillEffect implements ISSMoveObjectHo
 			{
 				moveDir = theOwner.GetCurDir();
 			}
+			else if(moveConfig.eMoveToTargetType == ESkillEffectMoveToTargetType.SkillTarget)
+			{
+				moveDir = theOwner.curActionInfo.skillParams;
+			}
 			moveDir.RotateAngle(moveConfig.angle);			
 			if (moveConfig.speed <= 0)
 			{
@@ -159,7 +163,7 @@ public class SSSkillEffect_Move extends SSSkillEffect implements ISSMoveObjectHo
 		if (bIfEnd)
 		{
 			battle.effectManager.AddEffectsFromConfig(this.config.skillModelList,
-					theMoveOwner, target, theMoveOwner.GetCurPos(), theMoveOwner.GetCurDir(), skill, System.currentTimeMillis(), null);
+					theMoveOwner, target, theMoveOwner.GetCurPos(), theMoveOwner.GetCurDir(), skill, theMoveOwner.battle.battleHeartBeatTime, null);
 			return false;
 		}
 		else
@@ -231,7 +235,7 @@ public class SSSkillEffect_Move extends SSSkillEffect implements ISSMoveObjectHo
 						if (unit.IsDead() == false && unit.bExpire == false)
 						{
 							System.out.println("开始碰到敌人");
-							battle.effectManager.AddEffectsFromConfig(moveConfig.impactEvents, theMoveOwner, unit, unit.GetCurPos(), moveDir, skill, System.currentTimeMillis(), null);
+							battle.effectManager.AddEffectsFromConfig(moveConfig.impactEvents, theMoveOwner, unit, unit.GetCurPos(), moveDir, skill, theMoveOwner.battle.battleHeartBeatTime, null);
 							//触发技能命中的被动技能
 						}
 						entry.setValue(true);
@@ -320,7 +324,7 @@ public class SSSkillEffect_Move extends SSSkillEffect implements ISSMoveObjectHo
 			theMoveOwner.EndActionController(true);
 			if (bIfEnd)
 			{
-				theMoveOwner.battle.effectManager.AddEffectsFromConfig(this.moveConfig.skillModelList, theMoveOwner, target, theMoveOwner.GetCurPos(), theMoveOwner.GetCurDir(), skill, System.currentTimeMillis(), null);
+				theMoveOwner.battle.effectManager.AddEffectsFromConfig(this.moveConfig.skillModelList, theMoveOwner, target, theMoveOwner.GetCurPos(), theMoveOwner.GetCurDir(), skill, battle.battleHeartBeatTime, null);
 			}
 			bIfEnd = false;
 		}
@@ -335,13 +339,13 @@ public class SSSkillEffect_Move extends SSSkillEffect implements ISSMoveObjectHo
 		lastMovePos = startPos;
 		//避免强制移动重叠
 		theMoveOwner.SetMoveEffect(id, true);
-		beginTime = System.currentTimeMillis();
+		beginTime = theMoveOwner.battle.battleHeartBeatTime;
 		float time = (float)moveConfig.distance / (float)moveConfig.speed;
 		endTime = beginTime + (long)(time*1000);
 		lastMoveTime = beginTime;
 		theMoveOwner.BeginActionControled();
 		theMoveOwner.moveHolder = this;
-		theMoveOwner.battle.AskStartMoveForced(theMoveOwner, moveDir, (float)(this.moveConfig.speed * 0.001),this.moveConfig.eMoveType == ESkillEffectMoveType.Opposite);
+		theMoveOwner.battle.AskStartMoveForced(theMoveOwner, moveDir, (float)(this.moveConfig.speed * 0.001),this.moveConfig.eMoveType == ESkillEffectMoveType.Opposite,endTime);
 		//通知客户端开始技能强制移动
 		this.NotifyStartMove(theMoveOwner, startPos, moveDir, this.moveConfig.speed);
 	}
@@ -363,7 +367,7 @@ public class SSSkillEffect_Move extends SSSkillEffect implements ISSMoveObjectHo
 	}
 	private void NotifyStopMove(SSGameUnit obj, CVector3D pos)
 	{
-		System.out.println("NOtify StopMove");
+		//System.out.println("NOtify StopMove");
 		if (obj == null)
 		{
 			return ;

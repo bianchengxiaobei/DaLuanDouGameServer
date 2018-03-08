@@ -8,6 +8,7 @@ public class BattleBallContext extends BattleContext
 	public BattleBallContext(EBattleModeType type, long battleId, int mapId)
 	{
 		super(type, battleId, mapId);
+		this.battleAllTime = 60 * 1000 * 2;
 		this.gameMode = new Ball(this);
 	}
 }

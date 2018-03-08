@@ -60,7 +60,7 @@ public abstract class SSSkillEffect
 	 */
 	public void ForceStop()
 	{
-		logger.debug("强制停止技能："+this.skillEffectType.toString());
+		//logger.debug("强制停止技能："+this.skillEffectType.toString());
 		this.End();
 		IsForceStop = true;
 		id = 0;
@@ -154,7 +154,8 @@ public abstract class SSSkillEffect
 		case eSMTC_Enemy:
 			return Tools.IfEnemy(theOwner.camp.value, target.camp.value);
 		case eSMTC_Self:
-			return Tools.IfEnemy(theOwner.camp.value, target.camp.value) == false;
+			return theOwner == target;
+			//return Tools.IfEnemy(theOwner.camp.value, target.camp.value) == false;
 		default:
 			return false;
 		}
@@ -167,5 +168,13 @@ public abstract class SSSkillEffect
 	public boolean IsUsingSkill()
 	{
 		return false;
+	}
+	/**
+	 * 该技能是否能移动（比如引导技能就可能不能）
+	 * @return
+	 */
+	public boolean IfCanMove()
+	{
+		return true;
 	}
 }

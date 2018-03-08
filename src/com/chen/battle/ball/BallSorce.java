@@ -1,13 +1,12 @@
 package com.chen.battle.ball;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-import com.chen.battle.structs.SSHero;
 
 public class BallSorce 
 {
-	public List<SSHero> thePlayers = new ArrayList<>();
+	public Map<Long, Sorce> thePlayers = new HashMap<>();
 	public long allTheTime;
 	public long notifyTime;
 }

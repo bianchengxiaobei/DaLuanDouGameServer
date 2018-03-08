@@ -16,6 +16,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.chen.battle.skill.config.SkillModelFlyConfig;
+import com.chen.battle.skill.structs.ESkillEmitToTargetType;
 import com.chen.battle.skill.structs.ESkillModelFlyType;
 import com.chen.battle.skill.structs.ESkillModelTargetType;
 import com.chen.battle.skill.structs.NextSkillEffectConfig;
@@ -73,6 +74,10 @@ public class SkillFlyConfigXMLLoader
 							else if("eSkillModelFlyType".equals(schilds.item(j).getNodeName()))
 							{
 								config.eSkillModelFlyType = ESkillModelFlyType.values()[Integer.parseInt(schilds.item(j).getTextContent().trim())];
+							}	
+							else if("eSkillEmitToTargetType".equals(schilds.item(j).getNodeName()))
+							{
+								config.eSkillEmitToTargetType = ESkillEmitToTargetType.values()[Integer.parseInt(schilds.item(j).getTextContent().trim())];
 							}	
 							else if("flySpeed".equals(schilds.item(j).getNodeName()))
 							{

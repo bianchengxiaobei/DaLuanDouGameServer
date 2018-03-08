@@ -6,12 +6,29 @@ import org.apache.logging.log4j.Logger;
 
 import com.chen.battle.structs.EBattleState;
 import com.chen.cache.impl.MemoryCache;
+import com.chen.collection.config.DailySignConfig;
+import com.chen.collection.manager.CollectionManager;
+import com.chen.collection.message.res.ResDailySignResultMessage;
+import com.chen.collection.structs.CollectionItem;
 import com.chen.config.Config;
+import com.chen.data.manager.DataManager;
+import com.chen.db.bean.Friend;
 import com.chen.db.bean.Hero;
+import com.chen.db.bean.Mail;
 import com.chen.db.bean.Role;
+import com.chen.db.dao.CollectionDao;
+import com.chen.db.dao.FriendDao;
 import com.chen.db.dao.HeroDao;
 import com.chen.db.dao.RoleDao;
+import com.chen.login.bean.CollectionInfo;
+import com.chen.login.bean.DailySignInfo;
+import com.chen.login.bean.EmailInfo;
+import com.chen.login.bean.FriendData;
+import com.chen.login.bean.FriendListInfo;
+import com.chen.login.bean.HeroData;
+import com.chen.login.bean.HeroInfo;
 import com.chen.login.bean.RoleBasicInfo;
+import com.chen.login.manager.LoginManager;
 import com.chen.login.message.res.ResRemoveCharacterToGateMessage;
 import com.chen.player.structs.Player;
 import com.chen.player.structs.PlayerState;
@@ -26,8 +43,10 @@ public class PlayerManager
 	//玩家数据缓存
 	private static MemoryCache<Long, Player> players = new MemoryCache<Long, Player>();
 	//玩家数据库操作
-	private RoleDao dao = new RoleDao();
-	private HeroDao heroDao = new HeroDao();
+	public RoleDao dao = new RoleDao();
+	public HeroDao heroDao = new HeroDao();
+	public FriendDao friendDao = new FriendDao();
+	public CollectionDao collectionDao = new CollectionDao();
 	private PlayerManager()
 	{
 		
@@ -59,6 +78,14 @@ public class PlayerManager
 		
 	}
 	/**
+	 *取得缓存中所有的玩家
+	 * @return
+	 */
+	public MemoryCache<Long, Player> getPlayers()
+	{
+		return players;
+	}
+	/**
 	 * 注册玩家，加入到玩家Map
 	 * @param player
 	 */
@@ -74,7 +101,10 @@ public class PlayerManager
 		player.setLevel(1);
 		player.setIcon(icon);
 		player.setSex(sex);
-		player.setMoney(0);
+		player.setMoney(2000);
+		player.setTicket(50);
+		player.setDailyCount(1);
+		player.setDailyTime(0);
 		return player;
 	}
 	/**
@@ -97,6 +127,7 @@ public class PlayerManager
 		MessageUtil.send_to_gate(player.getGateId(), player.getId(), message);
 		//好友下线通知
 		//同步玩家信息到数据库
+		this.UpdatePlayer(player);
 		if (player.getBattleInfo().battleState.value < EBattleState.eBattleState_Async.value)
 		{
 			removePlayer(player);
@@ -131,6 +162,12 @@ public class PlayerManager
 			player.setLevel(role.getLevel());
 			player.setIcon(role.getIcon());
 			player.setMoney(role.getMoney());
+			player.setTicket(role.getTicket());
+			player.setExp(role.getExp());
+			player.setFinishedGuideStep(role.getFinishedGuideStep());
+			player.setDailyCount(role.getDailyCount());
+			player.setDailyTime(role.getDailyTime());
+			player.setRank(role.getRank());
 			return player;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -154,25 +191,43 @@ public class PlayerManager
 		role.setMoney(player.getMoney());
 		role.setTicket(player.getTicket());
 		role.setIcon(player.getIcon());
-		role.setLoginIp(player.getLoginIp());
-		role.setOnlineTime(player.getOnlineTime());
-		role.setAddBlackCount(player.getAddBlackCount());
+		role.setLoginip(player.getLoginIp());
+		role.setOnlinetime(player.getOnlineTime());
+		role.setAddblackcount(player.getAddBlackCount());
+		role.setFinishedGuideStep(player.getFinishedGuideStep());
+		role.setDailyCount(player.getDailyCount());
+		role.setDailyTime(player.getDailyTime());
+		role.setRank(player.getRank());
 		dao.insert(role);
-		Hero hero = new Hero();
-		hero.setRoleId(player.getId());
-		hero.setServer(player.getCreateServerId());
-		hero.setHeroId(0);
-		heroDao.insert(hero);
+	}
+	/**
+	 * 更新玩家数据库
+	 */
+	public void UpdatePlayer(Player player)
+	{
+		Role role = new Role();
+		role.setRoleId(player.getId());
+		role.setLevel(player.getLevel());
+		role.setExp(player.getExp());
+		role.setRank(player.getRank());
+		role.setMoney(player.getMoney());
+		role.setTicket(player.getTicket());
+		role.setLoginip(player.getLoginIp());
+		role.setOnlinetime(player.getOnlineTime());
+		role.setFinishedGuideStep(player.getFinishedGuideStep());
+		role.setDailyCount(player.getDailyCount());
+		role.setDailyTime(player.getDailyTime());
+		dao.update(role);
 	}
 	/**
 	 * 取得玩家基本信息
 	 * @param player
 	 * @return
 	 */
-	public RoleBasicInfo getPlayerBasicInfo(Player player)
-	{
+	public RoleBasicInfo getPlayerBasicInfo(Player player) {
 		RoleBasicInfo basicInfo = new RoleBasicInfo();
-		basicInfo.m_dwExp = (int)player.getExp();
+		basicInfo.m_dwExp = player.getExp();
+		basicInfo.m_dwNeedExp = DataManager.getInstance().playerExpConfigXMLLoader.levelToExpConfig.levelToExp.get(player.getLevel());
 		basicInfo.m_dwId = player.getId();
 		basicInfo.m_dwLevel = player.getLevel();
 		basicInfo.m_dwLoginTime = player.getLoginTime();
@@ -182,6 +237,128 @@ public class PlayerManager
 		basicInfo.m_strAccount = player.getUserName();
 		basicInfo.m_strIcon = player.getIcon();
 		basicInfo.m_strName = player.getName();
+		basicInfo.m_dwRank = player.getRank();
 		return basicInfo;
+	}
+	public HeroInfo GetPlayerHeroInfo(Player player)
+	{
+		HeroInfo heroInfo = new HeroInfo();
+		for (Hero hero : player.getHeroList())
+		{
+			HeroData data = new HeroData();
+			data.heroId = hero.getHeroId();
+			heroInfo.heros.put(hero.getHeroId(), data);
+		}
+		return heroInfo;
+	}
+	public FriendListInfo GetPlayerFriendInfo(Player player)
+	{
+		FriendListInfo info = new FriendListInfo();
+		for (Friend friend : player.friendList.values())
+		{
+			FriendData data = new FriendData();
+			data.playerId = friend.getFriendId();
+			data.icon = friend.getIcon();
+			data.name = friend.getName();
+			data.status = this.GetPlayerStatus(friend.getFriendId());
+			info.dicFriendList.put(friend.getFriendId(), data);
+		}
+		return info;
+	}
+	public DailySignInfo GetPlayerSignInfo(Player player)
+	{
+		DailySignInfo info = new DailySignInfo();
+		info.dailyCount = player.getDailyCount();
+		if (player.getDailyTime() == 0)
+		{
+			info.leftTime = 0;
+		}
+		else
+		{
+			long time = 86400000 - (System.currentTimeMillis() - player.getDailyTime());
+			if (time < 0)
+			{
+				time = 0;
+			}
+			info.leftTime = time;
+		}
+		return info;
+	}
+	public EmailInfo GetPlayerEmailInfo(Player player)
+	{
+		EmailInfo emailInfo = new EmailInfo();
+		emailInfo.mails = new Mail[player.mailList.size()];
+		emailInfo.mails = player.mailList.values().toArray(emailInfo.mails);
+		return emailInfo;
+	}
+	public CollectionInfo GetPlayerCollectionInfo(Player player)
+	{
+		try
+		{
+			CollectionInfo info = new CollectionInfo();
+			if(info.collectionItems == null)
+			{
+				System.err.println(player.collectionManager.collectionItems.values() == null);
+				info.collectionItems = new CollectionItem[player.collectionManager.collectionItems.values().size()];
+				info.collectionItems = player.collectionManager.collectionItems.values().toArray(info.collectionItems);
+			}			
+			return info;
+		} 
+		catch (Exception e) 
+		{
+			log.error(e);
+			return null;
+		}
+
+	}
+	public void AskDailySign(long playerId)
+	{
+		Player player = this.getPlayer(playerId);
+		ResDailySignResultMessage message = new ResDailySignResultMessage();
+		if (player != null)
+		{
+			//判断是否在时间范围内
+			long curTime = System.currentTimeMillis();
+			if (curTime - player.getDailyTime() >= 86400000)
+			{
+				boolean success = player.collectionManager.UpdateDaliyAward();
+				if (success)
+				{
+					//取出配置表，增加奖励
+					player.setDailyTime(curTime);
+					player.setDailyCount(player.getDailyCount() + 1); 
+					message.errorCode = 1;
+				}
+				else
+				{
+					message.errorCode = 0;
+				}
+			}
+			else
+			{
+				message.errorCode = 2;			
+			}
+		}
+		MessageUtil.tell_player_message(player, message);
+	}
+	public byte GetPlayerStatus(long playerId)
+	{
+		Player player = this.getPlayer(playerId);
+		if (player == null)
+		{
+			return 0;//离线
+		}
+		else
+		{
+			boolean isInBattle = player.getBattleInfo().getBattleState().value < EBattleState.eBattleState_Async.value ? false : true;
+			if (isInBattle)
+			{
+				return 2;//在线战斗中
+			}
+			else
+			{
+				return 1;//普通在线
+			}
+		}
 	}
 }

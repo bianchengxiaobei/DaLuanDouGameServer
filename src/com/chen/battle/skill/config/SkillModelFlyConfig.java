@@ -1,11 +1,13 @@
 package com.chen.battle.skill.config;
 
+import com.chen.battle.skill.structs.ESkillEmitToTargetType;
 import com.chen.battle.skill.structs.ESkillModelFlyType;
 import com.chen.battle.skill.structs.SkillEffectBaseConfig;
 
 public class SkillModelFlyConfig extends SkillEffectBaseConfig
 {
 	public ESkillModelFlyType eSkillModelFlyType;
+	public ESkillEmitToTargetType eSkillEmitToTargetType;
 	public int flySpeed;
 	public int flyParam1;
 	public int flyParam2;

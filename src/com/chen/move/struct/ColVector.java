@@ -69,4 +69,12 @@ public class ColVector
 		temp.z = o1.z - o2.z;
 		return temp;
 	}
+	@Override
+	public String toString()
+	{
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("x:"+x);
+		stringBuilder.append(",z:"+z);
+		return stringBuilder.toString();
+	}
 }

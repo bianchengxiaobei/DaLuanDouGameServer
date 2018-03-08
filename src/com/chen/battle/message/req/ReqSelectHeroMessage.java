@@ -1,5 +1,7 @@
 package com.chen.battle.message.req;
 
+import java.nio.ByteBuffer;
+
 import org.apache.mina.core.buffer.IoBuffer;
 
 import com.chen.message.Message;
@@ -31,14 +33,15 @@ public class ReqSelectHeroMessage extends Message
 	}
 
 	@Override
-	public boolean read(IoBuffer buf) {
-		this.heroId = readInt(buf);
-		return true;
+	public void read(ByteBuffer buf) 
+	{
+		super.read(buf);
+		this.heroId = readInt(this.messageUnpacker);
 	}
 
 	@Override
-	public boolean write(IoBuffer arg0) {
-		// TODO Auto-generated method stub
-		return true;
+	public void write(IoBuffer arg0)
+	{
+		
 	}	
 }

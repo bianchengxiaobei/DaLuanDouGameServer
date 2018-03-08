@@ -10,8 +10,9 @@ public enum EGOActionState
 	LastingSkill(5),
 	PassiveState(6),
 	Controlled(7),
-	Dead(8),
-	End(9);
+	Reliving(8),
+	Dead(9),
+	End(10);
 	public int value;
 	private EGOActionState(int value) 
 	{

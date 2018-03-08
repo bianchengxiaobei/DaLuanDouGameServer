@@ -1,20 +1,40 @@
 package com.chen.messagepool;
-
 import java.util.HashMap;
-
+import com.chen.battle.handler.ReqAskBuyGoodHandler;
+import com.chen.battle.handler.ReqAskCreateGuideBattleHandler;
+import com.chen.battle.handler.ReqAskGuideBattleTimeHandler;
+import com.chen.battle.handler.ReqAskGuideStepCompHandler;
+import com.chen.battle.handler.ReqAskLockTargetHanlder;
 import com.chen.battle.handler.ReqEnterSceneHandler;
 import com.chen.battle.handler.ReqSelectHeroHandler;
+import com.chen.battle.message.req.ReqAskBuyGoodMessage;
+import com.chen.battle.message.req.ReqAskCreateGudieBattleMessage;
+import com.chen.battle.message.req.ReqAskGuideBattleTimeMessage;
+import com.chen.battle.message.req.ReqAskGuideStepCompMessage;
+import com.chen.battle.message.req.ReqAskLockTargetMessage;
 import com.chen.battle.message.req.ReqEnterSceneMessage;
 import com.chen.battle.message.req.ReqSelectHeroMessage;
 import com.chen.battle.skill.handler.ReqAskUseSkillHandler;
 import com.chen.battle.skill.message.req.ReqAskUseSkillMessage;
+import com.chen.collection.handler.ReqAskDailySignHandler;
+import com.chen.collection.message.req.ReqAskDailySignMessage;
 import com.chen.command.Handler;
+import com.chen.friend.handler.ReqAddFriendByIdHandler;
+import com.chen.friend.handler.ReqAskDelFriendHandler;
+import com.chen.friend.handler.ReqRepalyBeFriendHandler;
+import com.chen.friend.message.req.ReqAddFriendByIdMessage;
+import com.chen.friend.message.req.ReqAskDelFriendMessage;
+import com.chen.friend.message.req.ReqRepalyBeFriendMessage;
 import com.chen.login.handler.ReqCreateCharacterToGameServerHandler;
+import com.chen.login.handler.ReqGuideModuleCompHandler;
 import com.chen.login.handler.ReqLoginCharacterToGameServerHandler;
 import com.chen.login.handler.ReqQuitToGameServerHandler;
+import com.chen.login.handler.ResRegisterSuccessIfInBattleHandler;
 import com.chen.login.message.req.ReqCreateCharacterToGameServerMessage;
+import com.chen.login.message.req.ReqGuideModuleCompMessage;
 import com.chen.login.message.req.ReqLoginCharacterToGameServerMessage;
 import com.chen.login.message.req.ReqQuitToGameServerMessage;
+import com.chen.login.message.res.ResRegisterSuccessIfInBattleMessage;
 import com.chen.match.handler.ReqAutoMatchHandler;
 import com.chen.match.handler.ReqRemoveMatchHandler;
 import com.chen.match.handler.ReqStartMatchHandler;
@@ -41,6 +61,7 @@ public class MessagePool
 		register(10004, ResRegisterGateMessage.class, ResRegisterGateHandler.class);
 		register(10007, ReqCreateCharacterToGameServerMessage.class, ReqCreateCharacterToGameServerHandler.class);
 		register(10035, ReqQuitToGameServerMessage.class, ReqQuitToGameServerHandler.class);
+		register(10050, ResRegisterSuccessIfInBattleMessage.class, ResRegisterSuccessIfInBattleHandler.class);
 		
 		register(1007, ReqAutoMatchMessage.class, ReqAutoMatchHandler.class);
 		register(1008, ReqStartMatchMessage.class, ReqStartMatchHandler.class);
@@ -51,6 +72,16 @@ public class MessagePool
 		register(1026, ReqAskStopMoveMessage.class , ReqAskStopMoveHandler.class);
 		register(1030, ReqAskUseSkillMessage.class, ReqAskUseSkillHandler.class);
 		register(1045, ReqAskPingMessage.class, ReqAskPingHandler.class);
+		register(1052, ReqAskCreateGudieBattleMessage.class, ReqAskCreateGuideBattleHandler.class);
+		register(1053, ReqAskGuideStepCompMessage.class, ReqAskGuideStepCompHandler.class);
+		register(1055, ReqGuideModuleCompMessage.class, ReqGuideModuleCompHandler.class);
+		register(1056, ReqAskBuyGoodMessage.class, ReqAskBuyGoodHandler.class);
+		register(1059, ReqAskGuideBattleTimeMessage.class, ReqAskGuideBattleTimeHandler.class);
+		register(1060, ReqAskLockTargetMessage.class, ReqAskLockTargetHanlder.class);
+		register(1061, ReqAddFriendByIdMessage.class, ReqAddFriendByIdHandler.class);
+		register(1064, ReqAskDailySignMessage.class, ReqAskDailySignHandler.class);
+		register(1066, ReqRepalyBeFriendMessage.class, ReqRepalyBeFriendHandler.class);
+		register(1067, ReqAskDelFriendMessage.class, ReqAskDelFriendHandler.class);
 	}
 	private void register(int id,Class<?> messageClass,Class<?> handlerClass)
 	{

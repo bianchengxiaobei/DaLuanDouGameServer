@@ -3,19 +3,32 @@
 	Follow(0),
 	Direct(1),
 	AutoFind(2);
+	
+	eTargetTtpe
+	
+	eSMTC_None(0),
+	eSMTC_Self(1),//自己
+	eSMTC_Enemy(2),//敌人
+	eSMTC_AllObject(3);//所有单位
+	
+	public enum ESkillEmitToTargetType 
+{
+	Self(0),
+	Custom(1);
  -->
   <!--
   注意lifeTime要加上 releaseTimeDelay的时间
    -->
 <skillConfigs>
 	<skill name="飞球">
-		<skillModelId>30001</skillModelId>
+		<skillModelId>20001</skillModelId>
 		<bIsCooldown>true</bIsCooldown>
 		<bIsCanMove>true</bIsCanMove>
 		<bIsCanBreak>true</bIsCanBreak>
 		<releaseTimeDelay>0</releaseTimeDelay>
 		<eTargetType>2</eTargetType>	
 		<eSkillModelFlyType>1</eSkillModelFlyType>
+		<eSkillEmitToTargetType>1</eSkillEmitToTargetType>
 		<flySpeed>2000</flySpeed>
 		<flyParam1>0</flyParam1>
 		<flyParam2>0</flyParam2>
@@ -25,6 +38,46 @@
 		<lifeTime>1500</lifeTime>
 		<num>1</num>
 		<angle>0</angle>
-		<eventId>10002:0;40002:0</eventId>
+		<eventId>10002:0</eventId>
+	</skill>
+	<skill name="运动男_普攻">
+		<skillModelId>20002</skillModelId>
+		<bIsCooldown>true</bIsCooldown>
+		<bIsCanMove>true</bIsCanMove>
+		<bIsCanBreak>true</bIsCanBreak>
+		<releaseTimeDelay>0</releaseTimeDelay>
+		<eTargetType>2</eTargetType>	
+		<eSkillModelFlyType>2</eSkillModelFlyType>
+		<eSkillEmitToTargetType>0</eSkillEmitToTargetType>
+		<flySpeed>3000</flySpeed>
+		<flyParam1>0</flyParam1>
+		<flyParam2>0</flyParam2>
+		<flyParam3>0</flyParam3>
+		<bIsPenetrate>false</bIsPenetrate>
+		<colliderRaius>0.2</colliderRaius>
+		<lifeTime>3000</lifeTime>
+		<num>1</num>
+		<angle>0</angle>
+		<eventId>10003:0</eventId>
+	</skill>
+	<skill name="火男_普攻">
+		<skillModelId>20003</skillModelId>
+		<bIsCooldown>true</bIsCooldown>
+		<bIsCanMove>true</bIsCanMove>
+		<bIsCanBreak>true</bIsCanBreak>
+		<releaseTimeDelay>0</releaseTimeDelay>
+		<eTargetType>2</eTargetType>	
+		<eSkillModelFlyType>2</eSkillModelFlyType>
+		<eSkillEmitToTargetType>0</eSkillEmitToTargetType>
+		<flySpeed>3000</flySpeed>
+		<flyParam1>0</flyParam1>
+		<flyParam2>0</flyParam2>
+		<flyParam3>0</flyParam3>
+		<bIsPenetrate>false</bIsPenetrate>
+		<colliderRaius>0.2</colliderRaius>
+		<lifeTime>3000</lifeTime>
+		<num>1</num>
+		<angle>0</angle>
+		<eventId>10006:0</eventId>
 	</skill>
 </skillConfigs>

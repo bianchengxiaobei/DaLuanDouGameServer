@@ -1,5 +1,7 @@
 package com.chen.battle.ball.message.res;
 
+import java.nio.ByteBuffer;
+
 import org.apache.mina.core.buffer.IoBuffer;
 
 import com.chen.message.Message;
@@ -27,17 +29,17 @@ public class ResBattleBallSorceChangeMessage extends Message
 	}
 
 	@Override
-	public boolean read(IoBuffer buffer) {
+	public void read(ByteBuffer buffer)
+	{
 		
-		return true;
 	}
 
 	@Override
-	public boolean write(IoBuffer buffer) 
+	public void write(IoBuffer buffer) 
 	{
-		writeInt(buffer, teamId);
-		writeInt(buffer, time);
-		return true;
+		writeInt(this.messagePack, teamId);
+		writeInt(this.messagePack, time);
+		super.write(buffer);
 	}
 	
 }

@@ -1,5 +1,7 @@
 package com.chen.battle.message.req;
 
+import java.nio.ByteBuffer;
+
 import org.apache.mina.core.buffer.IoBuffer;
 
 import com.chen.message.Message;
@@ -26,15 +28,15 @@ public class ReqEnterSceneMessage extends Message
 	}
 
 	@Override
-	public boolean read(IoBuffer buffer) {
-		// TODO Auto-generated method stub
-		return true;
+	public void read(ByteBuffer buffer)
+	{
+		super.read(buffer);
 	}
 
 	@Override
-	public boolean write(IoBuffer buffer) {
-		// TODO Auto-generated method stub
-		return true;
+	public void write(IoBuffer buffer)
+	{
+		
 	}
 
 }

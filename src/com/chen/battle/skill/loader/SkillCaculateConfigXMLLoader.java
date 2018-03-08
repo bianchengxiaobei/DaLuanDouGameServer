@@ -88,7 +88,10 @@ public class SkillCaculateConfigXMLLoader
 								if (!schilds.item(j).getTextContent().trim().equals("0"))
 								{
 									String[] vecs = schilds.item(j).getTextContent().trim().split(";");
-									for (int index=0; index<vecs.length; index++)
+									int size = vecs.length;
+									config.buffEffectInfo.eEffectAddCaculType = new EEffectCaculateType[size];
+									config.buffEffectInfo.effectAddCaculValue = new int[size];
+									for (int index=0; index<size; index++)
 									{
 										String[] vecs2 = vecs[index].split(":");
 										config.buffEffectInfo.eEffectAddCaculType[index] = EEffectCaculateType.values()[Integer.parseInt(vecs2[0])];
@@ -101,7 +104,10 @@ public class SkillCaculateConfigXMLLoader
 								if (!schilds.item(j).getTextContent().trim().equals("0"))
 								{
 									String[] vecs = schilds.item(j).getTextContent().trim().split(";");
-									for (int index=0; index<vecs.length; index++)
+									int size = vecs.length;
+									config.buffEffectInfo.eEffectMultCaculType = new EEffectCaculateType[size];
+									config.buffEffectInfo.effectMultCaculValue = new int[size];
+									for (int index=0; index<size; index++)
 									{
 										String[] vecs2 = vecs[index].split(":");
 										config.buffEffectInfo.eEffectMultCaculType[index] = EEffectCaculateType.values()[Integer.parseInt(vecs2[0])];

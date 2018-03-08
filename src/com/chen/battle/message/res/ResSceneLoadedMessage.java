@@ -1,5 +1,7 @@
 package com.chen.battle.message.res;
 
+import java.nio.ByteBuffer;
+
 import org.apache.mina.core.buffer.IoBuffer;
 
 import com.chen.message.Message;
@@ -26,14 +28,15 @@ public class ResSceneLoadedMessage extends Message
 	}
 
 	@Override
-	public boolean read(IoBuffer buffer) {
-		this.m_playerId = readLong(buffer);
-		return true;
+	public void read(ByteBuffer buffer) 
+	{
+		super.read(buffer);
+		this.m_playerId = readLong(this.messageUnpacker);		
 	}
 
 	@Override
-	public boolean write(IoBuffer buffer) {
-		writeLong(buffer, m_playerId);
-		return true;
+	public void write(IoBuffer buffer) {
+		writeLong(this.messagePack, m_playerId);
+		super.write(buffer);
 	}
 }

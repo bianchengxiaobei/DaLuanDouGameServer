@@ -1,19 +1,22 @@
 package com.chen.battle.impl;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.chen.battle.manager.BattleManager;
+import com.chen.battle.message.res.ResBattleFinishedAwardMessage;
 import com.chen.battle.structs.EBattleState;
 import com.chen.battle.structs.EBattleType;
 import com.chen.data.bean.MapBean;
 import com.chen.data.manager.DataManager;
+import com.chen.match.manager.MatchManager;
 import com.chen.match.structs.EBattleModeType;
 import com.chen.player.structs.Player;
+import com.chen.utils.MessageUtil;
 
 public class Battle 
 {
@@ -23,7 +26,7 @@ public class Battle
 	private int mapId;
 	private EBattleType battleType;
 	private EBattleModeType matchType;
-	private HashMap<Integer, Player> userMap;
+	protected Map<Integer, Player> userMap;
 	private MapBean mapBean;
 	public long getBattleId() {
 		return battleId;
@@ -55,10 +58,10 @@ public class Battle
 	public void setMatchType(EBattleModeType matchType) {
 		this.matchType = matchType;
 	}
-	public HashMap<Integer, Player> getUserMap() {
+	public Map<Integer, Player> getUserMap() {
 		return userMap;
 	}
-	public void setUserMap(HashMap<Integer, Player> userMap) {
+	public void setUserMap(Map<Integer, Player> userMap) {
 		this.userMap = userMap;
 	}
 	public MapBean getMapBean() {
@@ -69,7 +72,7 @@ public class Battle
 	}
 	
 	public Battle(EBattleModeType match_type,EBattleType type,
-			long battleId,int mapId,HashMap<Integer, Player> userList)
+			long battleId,int mapId,Map<Integer, Player> userList)
 	{
 		this.matchType = match_type;
 		this.battleType = type;
@@ -85,7 +88,6 @@ public class Battle
 	}
 	public void start()
 	{
-		System.out.println("Battle Start");
 		if (battleType != EBattleType.eBattleType_Room)
 		{			
 			BattleManager.getInstance().createBattle(this.userMap,this.battleId,this.matchType.getValue(),this.mapId);
@@ -98,5 +100,99 @@ public class Battle
 			Player player = iter.next();
 			player.getBattleInfo().setBattleState(EBattleState.eBattleState_Play);
 		}
+	}
+	public void CaculateResult(int winCampId,Map<Long, Integer> sorce)
+	{
+		int gold = 0;
+		int exp = 0;
+		int rankSorce = 0;
+		for (Entry<Integer, Player> usEntry : this.userMap.entrySet())
+		{
+			boolean win;
+			Player player = usEntry.getValue();
+			if (player.getBattleInfo().battleCampType == winCampId)
+			{
+				win = true;
+				exp = this.caculateExp(win);
+				//这里首胜什么的暂时不做
+				gold = this.caculateGold(win);
+			}
+			else
+			{
+				win = false;
+				exp = this.caculateExp(win);
+				gold = this.caculateGold(win);
+			}
+			rankSorce = sorce.get(usEntry.getValue().getId());
+			player.setRank(player.getRank() + rankSorce);
+			//改变数据库,先改缓存等一起写进去
+			player.setMoney(player.getMoney() + gold);
+			player.SyncCurGold();
+			int needExp = DataManager.getInstance().playerExpConfigXMLLoader.levelToExpConfig.levelToExp.get(player.getLevel());
+			int curNeedExp = player.CheckUpgrade(exp,needExp);
+			ResBattleFinishedAwardMessage message = new ResBattleFinishedAwardMessage();
+			message.curExp = player.getExp();
+			message.curLevel = player.getLevel();
+			message.getExp = exp;
+			message.getGold = gold;
+			message.curNeedExp = curNeedExp;
+			message.needExp = needExp;
+			message.rank = rankSorce;
+			MessageUtil.tell_player_message(player, message);
+		}
+		sorce = null;
+	}
+	public void OnFinish(int winCampId,Map<Long, Integer> sorce)
+	{
+		if (sorce != null)
+		{
+			this.CaculateResult(winCampId,sorce);
+		}
+		for (Entry<Integer, Player> usEntry : this.userMap.entrySet())
+		{
+			//这里还要判断是否是离线
+			usEntry.getValue().getBattleInfo().reset();
+		}
+		this.ReCreateMatch();
+	}
+	public void ReCreateMatch()
+	{
+		if (battleType == EBattleType.eBattleType_Match)
+		{
+			for (Entry<Integer, Player> usEntry : this.userMap.entrySet())
+			{
+				//这里还要判断是否是离线
+				MatchManager.getInstance().UserStopTeam(usEntry.getValue().getMatchPlayer());
+				usEntry.getValue().getBattleInfo().changeTypeWithState(EBattleType.eBattleType_Match, EBattleState.eBattleState_Wait);
+			}
+		}
+	}
+	private int caculateExp(boolean win)
+	{
+		int exp = 0;
+		if(win)
+		{
+			exp = 60;
+		}
+		else
+		{
+			exp = 40;
+		}
+		return exp;
+		//这里还要判断是否有经验加成什么的道具
+	}
+	private int caculateGold(boolean win)
+	{
+		int gold = 0;
+		if(win)
+		{
+			gold = 60;
+		}
+		else
+		{
+			gold = 40;
+		}
+		return gold;
+		//这里还要判断是否有经验加成什么的道具
 	}
 }

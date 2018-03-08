@@ -1,5 +1,7 @@
 package com.chen.battle.message.res;
 
+import java.nio.ByteBuffer;
+
 import org.apache.mina.core.buffer.IoBuffer;
 
 import com.chen.message.Message;
@@ -7,6 +9,7 @@ import com.chen.message.Message;
 public class ResBattleTipMessage extends Message
 {
 	public int tipCode;
+	public long battleAllTime;
 	@Override
 	public int getId() {
 		// TODO Auto-generated method stub
@@ -26,17 +29,17 @@ public class ResBattleTipMessage extends Message
 	}
 
 	@Override
-	public boolean read(IoBuffer buffer)
+	public void read(ByteBuffer buffer)
 	{
-		
-		return true;
+
 	}
 
 	@Override
-	public boolean write(IoBuffer buffer) 
+	public void write(IoBuffer buffer) 
 	{
-		writeInt(buffer, tipCode);
-		return true;
+		writeInt(this.messagePack, tipCode);
+		writeLong(this.messagePack, battleAllTime);
+		super.write(buffer);
 	}
 
 }

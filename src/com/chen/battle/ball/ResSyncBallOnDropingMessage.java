@@ -1,5 +1,7 @@
 package com.chen.battle.ball;
 
+import java.nio.ByteBuffer;
+
 import org.apache.mina.core.buffer.IoBuffer;
 
 import com.chen.message.Message;
@@ -27,18 +29,17 @@ public class ResSyncBallOnDropingMessage extends Message
 	}
 
 	@Override
-	public boolean read(IoBuffer buffer) 
+	public void read(ByteBuffer buffer) 
 	{
-		// TODO Auto-generated method stub
-		return true;
+		
 	}
 
 	@Override
-	public boolean write(IoBuffer buffer) 
+	public void write(IoBuffer buffer) 
 	{
-		writeInt(buffer, PosX);
-		writeInt(buffer, PosZ);
-		return true;
+		writeInt(this.messagePack, PosX);
+		writeInt(this.messagePack, PosZ);
+		super.write(buffer);
 	}
 
 }

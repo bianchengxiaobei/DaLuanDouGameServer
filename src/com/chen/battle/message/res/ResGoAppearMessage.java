@@ -1,5 +1,7 @@
 package com.chen.battle.message.res;
 
+import java.nio.ByteBuffer;
+
 import org.apache.mina.core.buffer.IoBuffer;
 
 import com.chen.message.Message;
@@ -30,19 +32,18 @@ public class ResGoAppearMessage extends Message
 	}
 
 	@Override
-	public boolean read(IoBuffer buffer) {
-		// TODO Auto-generated method stub
-		return true;
+	public void read(ByteBuffer buffer) {
+		
 	}
 
 	@Override
-	public boolean write(IoBuffer buffer) {
-		writeLong(buffer, playerId);
-		writeInt(buffer, posX);
-		writeInt(buffer, posZ);
-		writeInt(buffer, dirAngle);
-		writeInt(buffer, hp);
-		return true;
+	public void write(IoBuffer buffer) {
+		writeLong(this.messagePack, playerId);
+		writeInt(this.messagePack, posX);
+		writeInt(this.messagePack, posZ);
+		writeInt(this.messagePack, dirAngle);
+		writeInt(this.messagePack, hp);
+		super.write(buffer);
 	}
 
 }

@@ -1,9 +1,8 @@
 package com.chen.battle.manager;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,10 +16,10 @@ import com.chen.battle.structs.BattleBallContext;
 import com.chen.battle.structs.BattleContext;
 import com.chen.battle.structs.BattleUserInfo;
 import com.chen.battle.structs.CVector3D;
-import com.chen.battle.structs.EBattleServerState;
 import com.chen.battle.structs.EBattleState;
 import com.chen.battle.structs.EBattleType;
 import com.chen.battle.structs.EGameObjectCamp;
+import com.chen.battle.structs.GuideBattleContext;
 import com.chen.battle.structs.RoomMemberData;
 import com.chen.battle.structs.SSHero;
 import com.chen.battle.structs.SSPlayer;
@@ -30,8 +29,8 @@ import com.chen.match.structs.MatchPlayer;
 import com.chen.match.structs.MatchTeam;
 import com.chen.player.structs.Player;
 import com.chen.server.BattleServer;
-import com.chen.server.config.BattleConfig;
 import com.chen.utils.MessageUtil;
+import com.chen.utils.Tools;
 
 /**
  * 战斗管理器
@@ -162,7 +161,7 @@ public class BattleManager
 	public void onBattleMached(EBattleModeType type,int mapId,HashMap<Integer, Vector<MatchTeam>> teamList)
 	{
 		try {
-			HashMap<Integer, Player> userListMap = new HashMap<Integer, Player>();
+			Map<Integer, Player> userListMap = new IdentityHashMap<Integer, Player>();
 			MatchTeam team = null;
 			MatchPlayer player = null;
 			for (Map.Entry<Integer, Vector<MatchTeam>> enset : teamList.entrySet())
@@ -174,8 +173,9 @@ public class BattleManager
 					team.search(false);
 					Iterator<MatchPlayer> iterator = team.getPlayers().iterator();
 					while (iterator.hasNext()) {
-						player = iterator.next();
-						userListMap.put(enset.getKey(), player.getPlayer());
+						player = iterator.next();	
+						Integer campId = new Integer(enset.getKey()); 
+						userListMap.put(campId, player.getPlayer());
 					}
 				}
 			}
@@ -200,7 +200,7 @@ public class BattleManager
 		}
 
 	}
-	public void onBattleMached(HashMap<Integer, Player> listMap,int mapId,EBattleModeType type)
+	public void onBattleMached(Map<Integer, Player> listMap,int mapId,EBattleModeType type)
 	{
 		Battle battle = new Battle(type,EBattleType.eBattleType_Match,this.generateBattleId(),mapId,listMap);
 		allBattleMap.put(battle.getBattleId(), battle);
@@ -220,18 +220,30 @@ public class BattleManager
 			log.error("已经存在该战斗，不需要重新创建");
 			return ;
 		}
-		List<RoomMemberData> listData = new ArrayList<>();
+		RoomMemberData[] listData = new RoomMemberData[userMap.size()];
 		do 
 		{
 			if (matchType == EBattleModeType.Game_Mode_Ball.getValue())
 			{
 				battle = new BattleBallContext(EBattleModeType.Game_Mode_Ball, battleId, mapId);
 			}
-			else 
+			else if(matchType == EBattleModeType.Game_Mode_Guide.getValue())
+			{
+				battle = new GuideBattleContext(EBattleModeType.Game_Mode_Guide, battleId, mapId);
+			}
+			else
+			{
 				battle = new BattleContext(EBattleModeType.values()[matchType],battleId,mapId);
+			}				
 			//加载地图
+			if (!battle.LoadMapData(1001))
+			{
+				log.error("加载地图配置出错:"+mapId);
+				break;
+			}
 			//设置每个人的信息SSUser
 			int index = 0;
+			battle.m_battleUserInfo = new BattleUserInfo[userMap.values().size()];
 			for (Player p : userMap.values())
 			{
 				BattleUserInfo info = new BattleUserInfo();
@@ -240,23 +252,24 @@ public class BattleManager
 					data.name = p.getName();
 					data.level = p.getLevel();
 					data.icon = p.getIcon();
-					data.isReconnecting = (byte)0;
+					data.isReconnecting = false;
 
 				 SSPlayer player = new SSPlayer(p);			 
-				 for (int j=0;j<p.getHeroList().size();j++)
-				 {
-					 log.debug("HeroId:"+p.getHeroList().get(j).getHeroId());
-					 player.addCanUseHero(p.getHeroList().get(j).getHeroId());
-				 }
+//				 for (int j=0;j<p.getHeroList().size();j++)
+//				 {
+//					 log.debug("HeroId:"+p.getHeroList().get(j).getHeroId());
+//					 player.addCanUseHero(p.getHeroList().get(j).getHeroId());
+//				 }
 				 player.bIfConnect = true;
 				 player.battleId = battleId;
 				 info.sPlayer = player;
 				 info.camp = EGameObjectCamp.values()[p.getBattleInfo().battleCampType+1];
-				 log.debug("阵营："+info.camp.toString());
+				 //log.debug("阵营："+info.camp.toString());
 				 data.camp = info.camp.value;
-					listData.add(data);
-				 battle.getM_battleUserInfo()[index++] = info;
+					listData[index] = data;
+				 battle.m_battleUserInfo[index++] = info;
 			}
+			battle.memberCount = index;
 			mServers.put(battle.getBattleId(),battle);
 			isCreateSucc = true;
 		}while(false);
@@ -277,18 +290,15 @@ public class BattleManager
 		int index = 0;
 		for (Player player : userMap.values())
 		{
-			player.getBattleInfo().setBattleId(battleId);
-			//player.getBattleInfo().changeState(EBattleState.eBattleState_Async);
-			//data.canUseHeroList.addAll(battle.getM_battleUserInfo()[i].sPlayer.canUserHeroList);
-			msg.canUseHeroList.addAll(battle.getM_battleUserInfo()[index++].sPlayer.canUserHeroList);
+			player.getBattleInfo().setBattleId(battleId);			
+//			msg.canUseHeroList = Tools.ConvertIntSetToArray(battle.m_battleUserInfo[index++].sPlayer.canUserHeroList);			
 			msg.m_oData = listData;
 			MessageUtil.tell_player_message(player, msg);
-			msg.canUseHeroList.clear();
 		}
-		battle.setBattleState(EBattleServerState.eSSBS_SelectHero, false);
-		new Thread(battle).start();
+		battle.OnChangeBattleState();
+		battle.Start();
 	}
-	private long generateBattleId()
+	public long generateBattleId()
 	{
 		return ++battleId;		
 	}

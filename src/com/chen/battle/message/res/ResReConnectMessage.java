@@ -1,5 +1,6 @@
 package com.chen.battle.message.res;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,9 +13,12 @@ public class ResReConnectMessage extends Message
 {
 	public int battleState;
 	public long battleId;
+	public byte gameType;
 	public int mapId;
 	public long playerId;
-	public List<ReConnectInfo> ReConnectInfo = new ArrayList<>();
+	public long battleTime;
+	public int timeLimit;
+	public ReConnectInfo[] ReConnectInfo;
 	@Override
 	public int getId() 
 	{
@@ -36,25 +40,23 @@ public class ResReConnectMessage extends Message
 	}
 
 	@Override
-	public boolean read(IoBuffer buffer)
+	public void read(ByteBuffer buffer)
 	{
 		
-		return true;
 	}
 
 	@Override
-	public boolean write(IoBuffer buffer)
+	public void write(IoBuffer buffer)
 	{
-		writeInt(buffer, battleState);
-		writeLong(buffer, battleId);
-		writeInt(buffer, mapId);
-		writeLong(buffer, playerId);
-		writeInt(buffer, this.ReConnectInfo.size());
-		for (int i=0;i<this.ReConnectInfo.size();i++)
-		{
-			writeBean(buffer, this.ReConnectInfo.get(i));
-		}
-		return true;
+		writeInt(this.messagePack, battleState);
+		writeLong(this.messagePack, battleId);
+		writeByte(messagePack, gameType);
+		writeInt(this.messagePack, mapId);
+		writeLong(this.messagePack, playerId);
+		writeLong(this.messagePack, battleTime);
+		writeInt(messagePack, timeLimit);
+		writeArray(this.messagePack,this.ReConnectInfo);
+		super.write(buffer);
 	}
 
 }

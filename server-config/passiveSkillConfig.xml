@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+public enum EPassiveSkillTargetType 
+{
+	EPassiveSkillTargetType_Self(0),
+	EPassiveSkillTargetType_Trigger(1),
+	EPassiveSkillTargetType_Both(2); 
+	
+	
+	passiveEffectArray:
+	public enum EPassiveLongTimeSkillType 
+{
+	BallPassive(0);
+	
+	passiveSkillTriggerType:
+	public enum EPassiveSkillTriggerType 
+{
+	EPassiveSkillTriggerType_None(0),
+	EPassiveSkillTriggerType_HeartBeat(1),
+	EPassiveSkillTriggerType_Attack(2),
+	EPassiveSkillTriggerType_Attacked(3),
+	EPassiveSkillTriggerType_Hurted(4),
+	EPassiveSkillTriggerType_Die(5),
+	EPassiveSkillTriggerType_SkillAttack(6),
+	EPassiveSkillTriggerType_UseSkill(7),
+	EPassiveSkillTriggerType_TargetDie(8),
+	EPassiveSkillTriggerType_NormalAttackCaculate_Before(9),
+	EPassiveSkillTriggerType_NormalAttackCaculate_After(10),
+	EPassiveSkillTriggerType_NormalAttackHurt(11),
+	EPassiveSkillTriggerType_SkillHurt(12),
+	EPassiveSkillTriggerType_Move(13),
+	EPassiveSkillTriggerType_Ball(14),
+	EPassiveSkillTriggerType_Max(15);
+ -->
+<passiveSkillConfigs>
+    <passiveSkill>
+        <passiveSkillId>1</passiveSkillId>
+        <Cooldown>0</Cooldown>
+        <bIfClearWhenDead>true</bIfClearWhenDead>
+        <passiveSkillTargetType>0</passiveSkillTargetType>
+        <passiveEffectArray>0</passiveEffectArray>
+        <passiveSkillTriggerType>14</passiveSkillTriggerType>
+        <startEventId>0</startEventId>
+		<intervalEventId>0</intervalEventId>	
+		<endEventId>0</endEventId>
+    </passiveSkill>
+</passiveSkillConfigs>

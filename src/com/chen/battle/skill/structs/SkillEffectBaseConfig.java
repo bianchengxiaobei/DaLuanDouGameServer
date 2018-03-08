@@ -9,7 +9,7 @@ public class SkillEffectBaseConfig
 	public boolean bIsCanMove;
 	public boolean bIsCanBreak;//是否能被打断
 	public int releaseTimeDelay;
-	public NextSkillEffectConfig skillModelList[] = new NextSkillEffectConfig[16];//下一步技能配置
+	public NextSkillEffectConfig skillModelList[] = new NextSkillEffectConfig[6];//下一步技能配置
 	public SkillEffectBaseConfig()
 	{
 		bIsCanMove = true;

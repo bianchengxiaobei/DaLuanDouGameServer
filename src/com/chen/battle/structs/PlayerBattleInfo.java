@@ -2,8 +2,8 @@ package com.chen.battle.structs;
 
 public class PlayerBattleInfo
 {
-	public EBattleType battleTyoe;
-	public EBattleState battleState;
+	public transient EBattleType battleTyoe;
+	public transient EBattleState battleState;
 	public long battleId;
 	public int battleCampType;
 	public int getBattleCampType() {
@@ -51,6 +51,7 @@ public class PlayerBattleInfo
 		System.err.println("Reset");
 		battleTyoe = EBattleType.eBattleType_Free;
 		battleState = EBattleState.eBattleState_Free;
+		battleCampType = 0;
 		battleId = 0L;
 	}
 }

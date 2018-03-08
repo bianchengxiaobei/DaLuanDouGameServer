@@ -1,28 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <heros>
-	<hero>
-		<id>0</id>
-		<colliderRadius>0.2</colliderRadius>
-		<skillList>1,2</skillList>
-		<maxHp>100</maxHp>
-		<phyAttack>40</phyAttack>
-		<reliveTime>5000</reliveTime>
-	</hero>
-	<hero>
+	<hero name="运动男">
 		<id>1</id>
-		<colliderRadius>0.2</colliderRadius>
-		<skillList>1000</skillList>
+		<colliderRadius>0.15</colliderRadius>
+		<skillList>1,2,3,4</skillList>
 		<maxHp>100</maxHp>
 		<phyAttack>40</phyAttack>
+		<attackSpeed>1000</attackSpeed>
 		<reliveTime>5000</reliveTime>
+		<attackDis>1000</attackDis>
+		<moveSpeed>1000</moveSpeed>
+		<phyDefence>20</phyDefence>
+		<magicDefence>20</magicDefence>
+		<costDiamond>10</costDiamond>
+		<costGold>1000</costGold>
 	</hero>
-	<hero>
-		<id>3</id>
+	<hero name="闪电人">
+		<id>2</id>
 		<colliderRadius>0.2</colliderRadius>
-		<skillList>1000</skillList>
+		<skillList>201</skillList>
 		<maxHp>100</maxHp>
 		<phyAttack>40</phyAttack>
+		<attackSpeed>1000</attackSpeed>
 		<reliveTime>5000</reliveTime>
+		<attackDis>200</attackDis>
+		<costDiamond>120</costDiamond>
+		<costGold>12000</costGold>
+	</hero>
+	<hero name="火男">
+		<id>3</id>
+		<colliderRadius>0.15</colliderRadius>
+		<skillList>301,302,303,304</skillList>
+		<maxHp>100</maxHp>
+		<phyAttack>40</phyAttack>
+		<attackSpeed>1000</attackSpeed>
+		<moveSpeed>1000</moveSpeed>
+		<reliveTime>5000</reliveTime>
+		<attackDis>1000</attackDis>
+		<phyDefence>20</phyDefence>
+		<magicDefence>20</magicDefence>
+		<costDiamond>10</costDiamond>
+		<costGold>50</costGold>
 	</hero>
 	<hero>
 		<id>4</id>

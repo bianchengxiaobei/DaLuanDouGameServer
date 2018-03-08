@@ -9,4 +9,9 @@ public class ColSphere
 		this.point = p;
 		this.radius = r;
 	}
+	@Override
+	public String toString()
+	{
+		return this.point.toString();
+	}
 }

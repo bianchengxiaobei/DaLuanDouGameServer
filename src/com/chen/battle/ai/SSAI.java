@@ -1,10 +1,13 @@
 package com.chen.battle.ai;
 
+import javax.imageio.spi.IIOServiceProvider;
+
 import com.chen.battle.ai.structs.EAttackState;
 import com.chen.battle.skill.SSSkill;
 import com.chen.battle.structs.CVector3D;
 import com.chen.battle.structs.EGOActionState;
 import com.chen.battle.structs.SSGameUnit;
+import com.chen.parameter.structs.EParameterCate;
 
 public class SSAI
 {
@@ -15,6 +18,7 @@ public class SSAI
 	public long lastCheckMoveTarTime;//上一次检查目标坐标的时间
 	public SSSkill attackSkill;
 	public EAttackState eAttackState;
+	public boolean bIsStandAttack = false;//站立攻击
 	public SSAI(SSGameUnit _theOwner)
 	{
 		this.theOwner = _theOwner;
@@ -30,9 +34,10 @@ public class SSAI
 			return true;
 		}
 		//如果是昏迷状态
-//		if( m_pcMasterGU->GetFPData(eEffectCate_Dizziness) > 0){
-//			return TRUE;
-//		}
+		if (theOwner.GetFPData(EParameterCate.Dizziness) > 0)
+		{
+			return true;
+		}
 		return false;
 	}
 	public void OnMoveBlock()
@@ -49,6 +54,20 @@ public class SSAI
 		if (this.attackSkill != null)
 		{
 			this.attackSkill.TryCancle();
+		}
+	}
+	public void StopAttack()
+	{
+		this.CancleAttack();
+		this.SetAttackTarget(null);
+		this.moveTarPos.zero();
+		lastCheckMoveTarTime = 0;
+	}
+	public void SetAttackTarget(SSGameUnit target)
+	{
+		if (attackSkill != null)
+		{
+			attackSkill.target = target;
 		}
 	}
 	public void TryFree()

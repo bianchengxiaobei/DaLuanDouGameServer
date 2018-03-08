@@ -25,10 +25,12 @@ public class SSParameterManager
 		}
 		paras[EParameterCate.CurHp.value].SetMinBaseValue(0);
 		
+		paras[EParameterCate.MoveSpeed.value].SetIfOnlyOneMinusePercent(true);
 		paras[EParameterCate.MoveSpeed.value].SetMinValue(1);
 		paras[EParameterCate.MoveSpeed.value].SetMinBaseValue(1);
 		paras[EParameterCate.MoveSpeed.value].SetMaxValue(1100);
 		
+		paras[EParameterCate.AttackSpeed.value].SetIfOnlyOneMinusePercent(true);
 		paras[EParameterCate.AttackSpeed.value].SetMinValue(1);
 		paras[EParameterCate.AttackSpeed.value].SetMinBaseValue(1);
 		paras[EParameterCate.AttackSpeed.value].SetMaxValue(5000);
@@ -75,6 +77,8 @@ public class SSParameterManager
 		this.AddBaseValue(EParameterCate.CriHarm.value, fp.criHarm);
 		this.AddBaseValue(EParameterCate.AttackDist.value, fp.attackDist);
 		this.AddBaseValue(EParameterCate.Dizziness.value, fp.dizzinessCounter);
+		this.AddBaseValue(EParameterCate.Silence.value, fp.silenceCounter);
+		this.AddBaseValue(EParameterCate.Invisible.value, fp.invisibleCounter);
 		if (isBaseValue)
 		{
 			this.AddBaseValue(EParameterCate.AttackSpeed.value, fp.attackSpeed);;
@@ -99,6 +103,10 @@ public class SSParameterManager
 		{
 			logger.error("找不带参数数据："+type);
 		}
+		if (type == EParameterCate.Dizziness.value && value != 0)
+		{
+			this.OnDizzChange(true, value);
+		}
 	}
 	public void RemoveBaseValue(int type,int value)
 	{
@@ -114,6 +122,10 @@ public class SSParameterManager
 		else
 		{
 			logger.error("找不带参数数据："+type);
+		}
+		if (type == EParameterCate.Dizziness.value && value != 0)
+		{
+			this.OnDizzChange(false, value);
 		}
 	}
 	public void AddPercentValue(int type,int value)
@@ -162,5 +174,19 @@ public class SSParameterManager
 		message.reason = reason;
 		message.value = value;
 		MessageUtil.tell_battlePlayer_message(theOwner.battle, message);
+	}
+	/**
+	 * 进入眩晕处理
+	 * @param bAdd
+	 * @param changeValue
+	 */
+	public void OnDizzChange(boolean bAdd,int changeValue)
+	{
+		int nowValue = paras[EParameterCate.Dizziness.value].GetValue();
+		int oldValue = bAdd ? nowValue - changeValue : nowValue + changeValue;
+		if (nowValue > 0 && oldValue <= 0)
+		{
+			theOwner.OnDizziness();
+		}
 	}
 }

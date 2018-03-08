@@ -46,7 +46,9 @@ public class LoginManager
 		{
 			return;
 		}
-		player.initHero();
+		player.InitHero();
+		player.InitFriend();
+		player.collectionManager.Init();
 		int serverId = GameServer.getInstance().getServer_id();
 		//通知网关服务器玩家登录成功
 		ResLoginSuccessToGateMessage gate_msg = new ResLoginSuccessToGateMessage();
@@ -55,13 +57,6 @@ public class LoginManager
 		gate_msg.setUserId(msg.getUserId());
 		gate_msg.setPlayerId(player.getId());
 		MessageUtil.send_to_gate(msg.getGateId(),player.getId(), gate_msg);
-		//发送进入大厅消息
-		ResEnterLobbyMessage enterLobbyMsg = new ResEnterLobbyMessage();
-		enterLobbyMsg.roleAllInfo = getRoleAllInfo(player);
-		enterLobbyMsg.server = serverId;
-		enterLobbyMsg.userId = player.getUserId();
-		enterLobbyMsg.isInBattle = 0;
-		MessageUtil.send_to_gate(msg.getGateId(), player.getId(), enterLobbyMsg);
 	}	
 	/**
 	 * 创建角色
@@ -101,10 +96,15 @@ public class LoginManager
 		player.setGateId(gateId);
 		return player;
 	}
-	private RoleAllInfo getRoleAllInfo(Player player)
+	public RoleAllInfo getRoleAllInfo(Player player)
 	{
 		RoleAllInfo allinfo = new RoleAllInfo();
 		allinfo.m_oBasicInfo = PlayerManager.getInstance().getPlayerBasicInfo(player);
+		allinfo.m_oHeroInfo = PlayerManager.getInstance().GetPlayerHeroInfo(player);
+		allinfo.m_oFriendInfo = PlayerManager.getInstance().GetPlayerFriendInfo(player);
+		allinfo.m_oDailySignInfo = PlayerManager.getInstance().GetPlayerSignInfo(player);
+		allinfo.m_oCollectionInfo = PlayerManager.getInstance().GetPlayerCollectionInfo(player);
+		allinfo.m_oEmailInfo = PlayerManager.getInstance().GetPlayerEmailInfo(player);
 		return allinfo;
 	}
 }

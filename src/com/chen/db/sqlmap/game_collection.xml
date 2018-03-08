@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="game_collection"> 
+  <resultMap id="collection_brief" type="com.chen.db.bean.Collection" >
+   	<result column="num" property="num" jdbcType="INTEGER"/>
+   	<result column="level" property="level" jdbcType="INTEGER"/>
+    <result column="collectionId" property="collectionId" jdbcType="INTEGER" />
+  </resultMap>
+  <insert id="insert" parameterType="com.chen.db.bean.Collection">
+  	insert into collection (roleId,num,collectionId,level)
+  	values(#{roleId},#{num},#{collectionId},#{level})
+  </insert>
+
+  <select id="selectByRoleId" parameterType="long" resultMap="collection_brief">
+  	select * from collection where roleId = #{roleId,jdbcType=BIGINT};
+  </select>
+  
+  <update id="update" parameterType="com.chen.db.bean.Collection" >
+     update collection
+      set num = #{num,jdbcType=INTEGER},
+      level = #{level,jdbcType=INTEGER}
+    where roleId = #{roleId,jdbcType=BIGINT} and collectionId = #{collectionId,jdbcType=INTEGER}
+  </update>
+</mapper>

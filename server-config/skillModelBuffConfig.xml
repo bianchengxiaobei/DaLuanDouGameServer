@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+	eTargetTtpe
+	eSMTC_None(0),
+	eSMTC_Self(1),//自己
+	eSMTC_Enemy(2),//敌人
+	eSMTC_AllObject(3);//所有单位
+
+public enum ESkillBuffType
+{
+	Other(0),
+	Positive(1),
+	Negative(2);
+	
+public enum EBuffReplaceType 
+{
+	None(0),
+	Forbit(1),
+	Reset(2),
+	SingleCaculate(3);
+	
+	public enum EParameterCate
+{
+	None(0),
+	PhyHurt(1),
+	MagicHurt(2),
+	CurHp(3),
+	PhyAttack(4),
+	MagicAttack(5),
+	PhyDefense(6),
+	MagicDefense(7),
+	MoveSpeed(8),
+	AttackSpeed(9),
+	MaxHp(10),
+	Dizziness(11),//昏迷
+	Silence(12),//沉默
+	AttackDist(13),//射程
+	TrueHurt(14),
+	CooldownReduce(15),//冷却缩减
+	MaxMp(16),
+	HpRecover(17),
+	MpRecover(18),
+	ReliveTime(19),
+	CriPersent(20),
+	CriHarm(21),
+	PhyPass(22),
+	PhyPassPercent(23),
+	MagicPass(24),
+	MagicPassPercent(25),
+	PhyDmgReduce(26),//(相当于物理护盾)
+	MagicDmgReduce(27),
+	DmgReducePercent(28),
+	PassitiveSkill(29),
+	End(30);
+	
+	public enum EEffectCaculateType 
+{
+	None(0),
+	
+	SelfPhyAttack(1),
+	SelfMagicAttack(2),
+	SelfPhyDefence(3),
+	SelfMagicDefence(4),
+	SelfCurHp(5),
+	SelfMaxHp(6),
+	SelfLostHpPercent(7),
+	SelfCupMp(8),
+	SelfMaxMp(9),
+	SelfLostMpPercent(10),
+	SelfLevel(11),
+	SelfMoveSpeed(12),
+	
+	TarPhyAttack(13),
+	TarMagicAttack(14),
+	TarPhyDefence(15),
+	TarMagicDefence(16),
+	TarCurHp(17),
+	TarMaxHp(18),
+	TarLostHpPercent(19),
+	TarCupMp(20),
+	TarMaxMp(21),
+	TarLostMpPercent(22),
+	TarLevel(23),
+	TarMoveSpeed(24);
+	
+ -->
+<skillConfigs>
+	<skill name="护盾(魔法)">
+		<skillModelId>100001</skillModelId>
+		<bIsCooldown>true</bIsCooldown>
+		<bIsCanMove>false</bIsCanMove>
+		<bIsCanBreak>false</bIsCanBreak>
+		<releaseTimeDelay>0</releaseTimeDelay>
+		<eTargetType>1</eTargetType>	
+		
+		<eBuffType>1</eBuffType>	
+		<eBuffReplaceType>2</eBuffReplaceType>
+		<replaceTimes>1</replaceTimes>
+		<rejectId>0</rejectId>
+		<replaceId>0</replaceId>
+		<effectLastTick>6000</effectLastTick>
+		<effectInterval>0</effectInterval>
+		<bIfClearWhenDead>true</bIfClearWhenDead>
+		
+		<eParamType>7</eParamType>
+		<effectBaseValue>100</effectBaseValue>
+		<effectRate>0</effectRate>
+		<eEffectPlusRate>0</eEffectPlusRate>
+		<eEffectMultiplyRate>0</eEffectMultiplyRate>
+		
+		<eventId>0</eventId>	
+		<startEventId>0</startEventId>
+		<intervalEventId>0</intervalEventId>	
+		<endEventId>0</endEventId>
+	</skill>
+	<skill name="火男——死亡之火（眩晕）">
+		<skillModelId>100002</skillModelId>
+		<bIsCooldown>true</bIsCooldown>
+		<bIsCanMove>false</bIsCanMove>
+		<bIsCanBreak>false</bIsCanBreak>
+		<releaseTimeDelay>0</releaseTimeDelay>
+		<eTargetType>2</eTargetType>	
+		
+		<eBuffType>2</eBuffType>	
+		<eBuffReplaceType>2</eBuffReplaceType>
+		<replaceTimes>1</replaceTimes>
+		<rejectId>0</rejectId>
+		<replaceId>0</replaceId>
+		<effectLastTick>2000</effectLastTick>
+		<effectInterval>0</effectInterval>
+		<bIfClearWhenDead>true</bIfClearWhenDead>
+		
+		<eParamType>11</eParamType>
+		<effectBaseValue>1</effectBaseValue>
+		<effectRate>0</effectRate>
+		<eEffectPlusRate>0</eEffectPlusRate>
+		<eEffectMultiplyRate>0</eEffectMultiplyRate>
+		
+		<eventId>0</eventId>	
+		<startEventId>0</startEventId>
+		<intervalEventId>0</intervalEventId>	
+		<endEventId>0</endEventId>
+	</skill>
+	<skill name="火男——炽热沼泽（减速）">
+		<skillModelId>100003</skillModelId>
+		<bIsCooldown>true</bIsCooldown>
+		<bIsCanMove>false</bIsCanMove>
+		<bIsCanBreak>false</bIsCanBreak>
+		<releaseTimeDelay>0</releaseTimeDelay>
+		<eTargetType>2</eTargetType>	
+		
+		<eBuffType>2</eBuffType>	
+		<eBuffReplaceType>2</eBuffReplaceType>
+		<replaceTimes>1</replaceTimes>
+		<rejectId>0</rejectId>
+		<replaceId>0</replaceId>
+		<effectLastTick>1500</effectLastTick>
+		<effectInterval>0</effectInterval>
+		<bIfClearWhenDead>true</bIfClearWhenDead>
+		
+		<eParamType>8</eParamType>
+		<effectBaseValue>0</effectBaseValue>
+		<effectRate>-500</effectRate>
+		<eEffectPlusRate>0</eEffectPlusRate>
+		<eEffectMultiplyRate>0</eEffectMultiplyRate>
+		
+		<eventId>0</eventId>	
+		<startEventId>0</startEventId>
+		<intervalEventId>0</intervalEventId>	
+		<endEventId>0</endEventId>
+	</skill>
+</skillConfigs>

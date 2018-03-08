@@ -7,17 +7,17 @@ public class BuffEffectInfo
 	public EParameterCate eParamType;
 	public int effectBaseValue;//基础值，用于伤害和属性改变
 	public int effectRate;//千分比该变量，只用于属性改变
-	public EEffectCaculateType eEffectAddCaculType[] = new EEffectCaculateType[16];
-	public int[] effectAddCaculValue = new int[16];
-	public EEffectCaculateType eEffectMultCaculType[] = new EEffectCaculateType[16];
-	public int[] effectMultCaculValue = new int[16];
+	public EEffectCaculateType eEffectAddCaculType[];
+	public int[] effectAddCaculValue;
+	public EEffectCaculateType eEffectMultCaculType[];
+	public int[] effectMultCaculValue;
 	
 	public BuffEffectInfo()
 	{
-		for (int i=0;i<16;i++)
-		{
-			this.eEffectAddCaculType[i] = EEffectCaculateType.None;
-			this.eEffectMultCaculType[i] = EEffectCaculateType.None;
-		}		
+//		for (int i=0;i<4;i++)
+//		{
+//			this.eEffectAddCaculType[i] = EEffectCaculateType.None;
+//			this.eEffectMultCaculType[i] = EEffectCaculateType.None;
+//		}		
 	}
 }

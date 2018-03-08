@@ -1,15 +1,14 @@
 package com.chen.battle.skill.message.res;
 
+import java.nio.ByteBuffer;
+
 import org.apache.mina.core.buffer.IoBuffer;
 
 import com.chen.message.Message;
 
 public class ResSkillInfoChangeMessage extends Message
 {
-	public long playerId;
-	public int skillSlotIndex;
 	public int skillId;
-	public int time;
 	public int coolTime;
 	@Override
 	public int getId() {
@@ -30,21 +29,17 @@ public class ResSkillInfoChangeMessage extends Message
 	}
 
 	@Override
-	public boolean read(IoBuffer buffer) 
+	public void read(ByteBuffer buffer) 
 	{
 		
-		return true;
 	}
 
 	@Override
-	public boolean write(IoBuffer buffer) 
+	public void write(IoBuffer buffer) 
 	{
-		writeLong(buffer, playerId);
-		writeInt(buffer, skillId);
-		writeInt(buffer, skillSlotIndex);
-		writeInt(buffer, time);
-		writeInt(buffer,coolTime);
-		return true;
+		writeInt(this.messagePack, skillId);
+		writeInt(this.messagePack, coolTime);
+		super.write(buffer);
 	}
 	
 }

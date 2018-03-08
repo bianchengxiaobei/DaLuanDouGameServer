@@ -10,15 +10,18 @@ public class Role
 	private String name;
 	private Integer sex;
 	private Integer level;
-	private Long exp;
+	private int rank;
+	private int exp;
 	private Integer icon;
 	private int money;
 	private int ticket;
-	private String loginIp;
-	private Long onlineTime;
-	private int addBlackCount;
-	private int isForbit;
 	private String data;
+	private String finishedGuideStep;
+	private String loginip;
+	private Integer addblackcount;
+	private Long onlinetime; 
+	private long dailyTime;
+	private int dailyCount;
 	public int getMoney() {
 		return money;
 	}
@@ -30,18 +33,6 @@ public class Role
 	}
 	public void setTicket(int ticket) {
 		this.ticket = ticket;
-	}
-	public Long getOnlineTime() {
-		return onlineTime;
-	}
-	public void setOnlineTime(Long onlineTime) {
-		this.onlineTime = onlineTime;
-	}
-	public int getAddBlackCount() {
-		return addBlackCount;
-	}
-	public void setAddBlackCount(int addBlackCount) {
-		this.addBlackCount = addBlackCount;
 	}
 	public Role() {
 		
@@ -76,17 +67,11 @@ public class Role
 	public void setLevel(Integer level) {
 		this.level = level;
 	}
-	public Long getExp() {
+	public int getExp() {
 		return exp;
 	}
-	public void setExp(Long exp) {
+	public void setExp(int exp) {
 		this.exp = exp;
-	}
-	public String getLoginIp() {
-		return loginIp;
-	}
-	public void setLoginIp(String loginIp) {
-		this.loginIp = loginIp;
 	}
 	public Integer getIcon() {
 		return icon;
@@ -106,10 +91,46 @@ public class Role
 	public void setData(String data) {
 		this.data = data;
 	}
-	public int getIsForbit() {
-		return isForbit;
+	public String getFinishedGuideStep() {
+		return finishedGuideStep;
 	}
-	public void setIsForbit(int isForbit) {
-		this.isForbit = isForbit;
+	public void setFinishedGuideStep(String finishedGuideStep) {
+		this.finishedGuideStep = finishedGuideStep;
+	}
+	public String getLoginip() {
+		return loginip;
+	}
+	public void setLoginip(String loginip) {
+		this.loginip = loginip;
+	}
+	public Integer getAddblackcount() {
+		return addblackcount;
+	}
+	public void setAddblackcount(Integer addblackcount) {
+		this.addblackcount = addblackcount;
+	}
+	public Long getOnlinetime() {
+		return onlinetime;
+	}
+	public void setOnlinetime(Long onlinetime) {
+		this.onlinetime = onlinetime;
+	}
+	public int getDailyCount() {
+		return dailyCount;
+	}
+	public void setDailyCount(int dailyCount) {
+		this.dailyCount = dailyCount;
+	}
+	public long getDailyTime() {
+		return dailyTime;
+	}
+	public void setDailyTime(long dailyTime) {
+		this.dailyTime = dailyTime;
+	}
+	public int getRank() {
+		return rank;
+	}
+	public void setRank(int rank) {
+		this.rank = rank;
 	}
 }

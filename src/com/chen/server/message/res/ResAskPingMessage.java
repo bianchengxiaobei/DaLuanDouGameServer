@@ -1,12 +1,13 @@
 package com.chen.server.message.res;
 
+import java.nio.ByteBuffer;
+
 import org.apache.mina.core.buffer.IoBuffer;
 
 import com.chen.message.Message;
 
 public class ResAskPingMessage extends Message
 {
-	//public long time;
 	@Override
 	public int getId() {
 		// TODO Auto-generated method stub
@@ -26,15 +27,14 @@ public class ResAskPingMessage extends Message
 	}
 
 	@Override
-	public boolean read(IoBuffer buffer) {
-		// TODO Auto-generated method stub
-		return true;
+	public void read(ByteBuffer buffer) {
+		
 	}
 
 	@Override
-	public boolean write(IoBuffer buffer) {
-		//writeLong(buffer, time);
-		return true;
+	public void write(IoBuffer buffer) 
+	{
+		super.write(buffer);
 	}
 	
 }

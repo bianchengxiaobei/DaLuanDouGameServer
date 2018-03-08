@@ -1,7 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+public enum ESkillEffectMoveToTargetType 
+{
+	Hit_Angle(0),
+	Self(1),
+	Target(2),
+	Target_Angle(3),
+	TheOwner_Angle(4),
+	SkillTarget(5); 
+	
+	public enum ESkillEffectMoveType 
+{
+	Teleport(0),
+	Absolute(1),
+	Opposite(2);
+ -->
 <skillConfigs>
 	<skill name="飞腿">
-		<skillModelId>10001</skillModelId>
+		<skillModelId>60001</skillModelId>
 		<bIsCooldown>true</bIsCooldown>
 		<bIsCanMove>true</bIsCanMove>
 		<bIsCanBreak>true</bIsCanBreak>
@@ -11,15 +27,15 @@
 		<bIsImpact>true</bIsImpact>
 		<eMoveType>2</eMoveType>
 		<eMovedTargetType>1</eMovedTargetType>
-		<eMoveToTargetType>3</eMoveToTargetType>
+		<eMoveToTargetType>5</eMoveToTargetType>
 		<angle>0</angle>
 		<speed>1500</speed>
 		<distance>1000</distance>
-		<impactEvents>10002:0;40001:0</impactEvents>
+		<impactEvents>10001:0;60002:0</impactEvents>
 		<eventId>0</eventId>
 	</skill>
 	<skill name="飞腿">
-		<skillModelId>10002</skillModelId>
+		<skillModelId>60002</skillModelId>
 		<bIsCooldown>false</bIsCooldown>
 		<bIsCanMove>true</bIsCanMove>
 		<bIsCanBreak>false</bIsCanBreak>
@@ -31,8 +47,8 @@
 		<eMovedTargetType>0</eMovedTargetType>
 		<eMoveToTargetType>0</eMoveToTargetType>
 		<angle>0</angle>
-		<speed>1500</speed>
-		<distance>700</distance>
+		<speed>2500</speed>
+		<distance>2700</distance>
 		<eventId>0</eventId>
 	</skill>
 </skillConfigs>

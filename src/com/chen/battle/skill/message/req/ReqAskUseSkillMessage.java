@@ -1,12 +1,15 @@
 package com.chen.battle.skill.message.req;
 
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.mina.core.buffer.IoBuffer;
-
 import com.chen.message.Message;
 
 public class ReqAskUseSkillMessage extends Message
 {
 	public int skillId;
+	public int[] skillParams;
 	@Override
 	public int getId() {
 		// TODO Auto-generated method stub
@@ -26,16 +29,16 @@ public class ReqAskUseSkillMessage extends Message
 	}
 
 	@Override
-	public boolean read(IoBuffer arg0) {
-		// TODO Auto-generated method stub
-		this.skillId = readInt(arg0);
-		return true;
+	public void read(ByteBuffer buffer)
+	{
+		super.read(buffer);
+		this.skillId = readInt(this.messageUnpacker);
+		this.skillParams = readIntList(this.messageUnpacker);
 	}
 
 	@Override
-	public boolean write(IoBuffer arg0) {
-		// TODO Auto-generated method stub
-		return true;
+	public void write(IoBuffer arg0) {
+	
 	}
 
 }

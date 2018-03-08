@@ -1,5 +1,7 @@
 package com.chen.match.message.req;
 
+import java.nio.ByteBuffer;
+
 import org.apache.mina.core.buffer.IoBuffer;
 
 import com.chen.message.Message;
@@ -25,15 +27,15 @@ public class ReqStartMatchMessage extends Message
 	}
 
 	@Override
-	public boolean read(IoBuffer buffer)
+	public void read(ByteBuffer buffer)
 	{	
-		return true;
+		super.read(buffer);
 	}
 
 	@Override
-	public boolean write(IoBuffer buffer) 
+	public void write(IoBuffer buffer) 
 	{	
-		return true;
+		super.write(buffer);
 	}
 
 }

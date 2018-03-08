@@ -68,7 +68,7 @@
    -->
 <skillConfigs>
 	<skill name="飞腿">
-		<skillModelId>40001</skillModelId>
+		<skillModelId>10001</skillModelId>
 		<bIsCooldown>false</bIsCooldown>
 		<bIsCanMove>false</bIsCanMove>
 		<bIsCanBreak>false</bIsCanBreak>
@@ -77,21 +77,77 @@
 		<eEffectCate>1</eEffectCate>
 		<EffectBaseValue>40</EffectBaseValue>
 		<EffectRate>0</EffectRate>
-		<eEffectPlusRate>1:400</eEffectPlusRate>
+		<eEffectPlusRate>1:20</eEffectPlusRate>
 		<eEffectMultiplyRate>0</eEffectMultiplyRate>
 		<eventId>0</eventId>
 	</skill>
 	<skill name="飞球">
-		<skillModelId>40002</skillModelId>
+		<skillModelId>10002</skillModelId>
+		<bIsCooldown>false</bIsCooldown>
+		<bIsCanMove>false</bIsCanMove>
+		<bIsCanBreak>false</bIsCanBreak>
+		<releaseTimeDelay>0</releaseTimeDelay>
+		<eTargetType>2</eTargetType>					
+		<eEffectCate>2</eEffectCate>
+		<EffectBaseValue>30</EffectBaseValue>
+		<EffectRate>0</EffectRate>
+		<eEffectPlusRate>1:30</eEffectPlusRate>
+		<eEffectMultiplyRate>0</eEffectMultiplyRate>
+		<eventId>0</eventId>
+	</skill>
+	<skill name="运动男普攻">
+		<skillModelId>10003</skillModelId>
 		<bIsCooldown>false</bIsCooldown>
 		<bIsCanMove>false</bIsCanMove>
 		<bIsCanBreak>false</bIsCanBreak>
 		<releaseTimeDelay>0</releaseTimeDelay>
 		<eTargetType>2</eTargetType>					
 		<eEffectCate>1</eEffectCate>
-		<EffectBaseValue>30</EffectBaseValue>
+		<EffectBaseValue>10</EffectBaseValue>
 		<EffectRate>0</EffectRate>
-		<eEffectPlusRate>1:400</eEffectPlusRate>
+		<eEffectPlusRate>0</eEffectPlusRate>
+		<eEffectMultiplyRate>0</eEffectMultiplyRate>
+		<eventId>0</eventId>
+	</skill>
+	<skill name="火男——死亡之火(魔法)">
+		<skillModelId>10004</skillModelId>
+		<bIsCooldown>false</bIsCooldown>
+		<bIsCanMove>false</bIsCanMove>
+		<bIsCanBreak>false</bIsCanBreak>
+		<releaseTimeDelay>0</releaseTimeDelay>
+		<eTargetType>2</eTargetType>					
+		<eEffectCate>2</eEffectCate>
+		<EffectBaseValue>40</EffectBaseValue>
+		<EffectRate>0</EffectRate>
+		<eEffectPlusRate>2:40</eEffectPlusRate>
+		<eEffectMultiplyRate>0</eEffectMultiplyRate>
+		<eventId>0</eventId>
+	</skill>
+	<skill name="火男——烈焰之柱(魔法)">
+		<skillModelId>10005</skillModelId>
+		<bIsCooldown>false</bIsCooldown>
+		<bIsCanMove>false</bIsCanMove>
+		<bIsCanBreak>false</bIsCanBreak>
+		<releaseTimeDelay>0</releaseTimeDelay>
+		<eTargetType>2</eTargetType>					
+		<eEffectCate>2</eEffectCate>
+		<EffectBaseValue>40</EffectBaseValue>
+		<EffectRate>0</EffectRate>
+		<eEffectPlusRate>2:40</eEffectPlusRate>
+		<eEffectMultiplyRate>0</eEffectMultiplyRate>
+		<eventId>0</eventId>
+	</skill>
+	<skill name="火男——普攻">
+		<skillModelId>10006</skillModelId>
+		<bIsCooldown>false</bIsCooldown>
+		<bIsCanMove>false</bIsCanMove>
+		<bIsCanBreak>false</bIsCanBreak>
+		<releaseTimeDelay>0</releaseTimeDelay>
+		<eTargetType>2</eTargetType>					
+		<eEffectCate>1</eEffectCate>
+		<EffectBaseValue>10</EffectBaseValue>
+		<EffectRate>0</EffectRate>
+		<eEffectPlusRate>0</eEffectPlusRate>
 		<eEffectMultiplyRate>0</eEffectMultiplyRate>
 		<eventId>0</eventId>
 	</skill>

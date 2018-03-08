@@ -15,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.chen.battle.skill.SSSkill;
 import com.chen.battle.skill.SSSkillEffect;
+import com.chen.battle.skill.SSSkillEffect_Buff;
 import com.chen.battle.skill.SSSkillEffect_Caculate;
 import com.chen.battle.skill.SSSkillEffect_Emit;
 import com.chen.battle.skill.SSSkillEffect_Move;
@@ -94,14 +95,14 @@ public class SSEffectManager
 	public void AddEffectsFromConfig(NextSkillEffectConfig[] effectCfg,SSGameUnit theOwner,SSGameUnit target,CVector3D pos,CVector3D dir,
 			SSSkill skill,long beginTime,SSGameUnit startSkillGo)
 	{
-		if (theOwner == null)
+		if (theOwner == null || effectCfg == null || effectCfg.length == 0)
 		{
 			return ;
 		}
 		SSSkillEffect beDependedEffect = null;
 		int dependEffectIdList[] = new int[16];
 		int dependNum = 0;
-		for (int i=0;i<16;i++)
+		for (int i=0;i<effectCfg.length;i++)
 		{
 			NextSkillEffectConfig config = effectCfg[i];
 			if (config == null)
@@ -132,13 +133,13 @@ public class SSEffectManager
 			//将依赖的效果ID加入到该效果的列表中。只存储ID
 			if (config.dependedArr[0] != 0)				
 			{
-				dependEffectIdList = Arrays.copyOf(config.dependedArr, 16);
+				dependEffectIdList = Arrays.copyOf(config.dependedArr, 4);
 				beDependedEffect = effect;
 				dependNum = 0;
 			}
 			if (beDependedEffect != null)
 			{
-				for (int j=0;j<16;j++)
+				for (int j=0;j<4;j++)
 				{
 					if (dependEffectIdList[j] == config.skillEffectId)
 					{
@@ -225,6 +226,15 @@ public class SSEffectManager
 				break;
 			}
 			effect = new SSSkillEffect_Caculate();
+			break;
+		case Buffer:
+			config = DataManager.getInstance().skillBuffConfigXMLLoader.skillModelBuffConfig.get(effectId);
+			if (config == null)
+			{
+				logger.error("BUffConfig == null,skillId:"+effectId);
+				break;
+			}
+			effect = new SSSkillEffect_Buff();
 			break;
 		}
 		if (effect == null)

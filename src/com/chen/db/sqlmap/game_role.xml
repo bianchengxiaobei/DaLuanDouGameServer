@@ -11,18 +11,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <result column="name" property="name" jdbcType="VARCHAR" />
     <result column="sex" property="sex" jdbcType="INTEGER" />
     <result column="roleindex" property="roleIndex" jdbcType="INTEGER" />
+    <result column="exp" property="exp" jdbcType="INTEGER" />
     <result column="icon" property="icon" jdbcType="INTEGER"/>
-    <result column="logintime" property="loginTime" jdbcType="BIGINT" />
+    <result column="finishedGuideStep" property="finishedGuideStep" jdbcType="VARCHAR"/>
+    <result column="loginip" property="loginip" jdbcType="VARCHAR"/>
+    <result column="addblackcount" property="addblackcount" jdbcType="INTEGER"/>
+    <result column="onlinetime" property="onlinetime" jdbcType="BIGINT"/>
+    <result column="dailyTime" property="dailyTime" jdbcType="BIGINT"/>
+    <result column="dailyCount" property="dailyCount" jdbcType="INTEGER"/>
+    <result column="rank" property="rank" jdbcType="INTEGER"/>
   </resultMap>
   <resultMap id="role" type="com.chen.db.bean.Role" extends="game_role.role_brief" >
   	<result column="data" property="data" jdbcType="LONGVARCHAR"/>
   </resultMap>
   <insert id="insert" parameterType="com.chen.db.bean.Role">
-  	insert into role (roleid,userid,create_server,name,sex,level,exp,icon,money,ticket,loginip,onlinetime,addblackcount)
-  	values(#{roleId},#{userId},#{createServer},#{name},#{sex},#{level},#{exp},#{icon},#{money},#{ticket},#{loginIp},#{onlineTime},#{addBlackCount})
+  	insert into role (roleid,userid,create_server,name,sex,level,exp,icon,money,ticket,loginip,addblackcount,onlinetime,dailyTime,dailyCount)
+  	values(#{roleId},#{userId},#{createServer},#{name},#{sex},#{level},#{exp},#{icon},#{money},#{ticket},#{loginip},#{addblackcount},#{onlinetime},#{dailyTime},#{dailyCount})
   </insert>
   <select id="selectByUser" parameterType="java.util.Map" resultMap="role_brief">
-  	select roleid, userid, create_server,icon,level, name, sex from role where userid = #{userId,jdbcType=VARCHAR} and create_server = #{createServer,jdbcType=INTEGER}
+  	select roleid, userid, create_server,icon,ticket,money,exp,level, name, sex, finishedGuideStep,rank from role where userid = #{userId,jdbcType=VARCHAR} and create_server = #{createServer,jdbcType=INTEGER}
   </select>
   
   <select id="selectByName" parameterType="String" resultType="int">
@@ -30,23 +37,22 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   </select>
   
   <select id="selectById" parameterType="long" resultMap="role">
-  	select roleid, userid, create_server,icon, level, name, sex from role where roleid = #{roleId,jdbcType=BIGINT};
+  	select roleid, userid, create_server,icon,ticket,money,exp, level, name, sex, finishedGuideStep,dailyTime,dailyCount,rank from role where roleid = #{roleId,jdbcType=BIGINT};
   </select>
   
    <select id="selectNames" resultType="String">
-  	select name from role
+  	select name from role where name=#{name,jdbcType=VARCHAR}
   </select>
   <update id="update" parameterType="com.chen.db.bean.Role" >
      update role
       set level = #{level,jdbcType=INTEGER},
-      name = #{name,jdbcType=VARCHAR},
-      icon = #{icon,jdbcType=INTEGER},
-      logintime = #{loginTime,jdbcType=BIGINT},
-      isForbid = #{isForbid,jdbcType=INTEGER},
-      loginIp = #{loginIp,jdbcType=VARCHAR}, 
-      addBlackCount = #{addBlackCount,jdbcType=INTEGER}, 
+      money = #{money,jdbcType=INTEGER},
+      ticket= #{ticket,jdbcType=INTEGER},
       exp = #{exp,jdbcType=BIGINT},
-      onlineTime = #{onlineTime,jdbcType=BIGINT}, 
+      finishedGuideStep = #{finishedGuideStep,jdbcType=VARCHAR},
+      dailyTime = #{dailyTime,jdbcType=BIGINT},
+      rank = #{rank,jdbcType=BIGINT},
+      dailyCount = #{dailyCount,jdbcType=INTEGER}
     where roleid = #{roleId,jdbcType=BIGINT}
   </update>
 </mapper>

@@ -21,4 +21,6 @@ public class FightProperty
 	public int criPersend;
 	public int criHarm;
 	public int dizzinessCounter;
+	public int silenceCounter;
+	public int invisibleCounter;
 }

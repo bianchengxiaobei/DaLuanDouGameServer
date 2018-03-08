@@ -1,5 +1,7 @@
 package com.chen.match.message.res;
 
+import java.nio.ByteBuffer;
+
 import org.apache.mina.core.buffer.IoBuffer;
 
 import com.chen.message.Message;
@@ -11,23 +13,8 @@ import com.chen.message.Message;
  */
 public class ResMatchStartMessage extends Message
 {
-	private int m_reason;
-	private int m_waitTime;
-	public int getM_reason() {
-		return m_reason;
-	}
-
-	public void setM_reason(int m_reason) {
-		this.m_reason = m_reason;
-	}
-
-	public int getM_waitTime() {
-		return m_waitTime;
-	}
-
-	public void setM_waitTime(int m_waitTime) {
-		this.m_waitTime = m_waitTime;
-	}
+	public boolean m_reason;
+	public int m_waitTime;
 
 	@Override
 	public int getId() {
@@ -48,17 +35,17 @@ public class ResMatchStartMessage extends Message
 	}
 
 	@Override
-	public boolean read(IoBuffer buf) {
-		this.m_reason = readInt(buf);
-		this.m_waitTime = readInt(buf);
-		return true;
+	public void read(ByteBuffer buf) 
+	{
+		
 	}
 
 	@Override
-	public boolean write(IoBuffer buf) {
-		writeInt(buf, m_reason);
-		writeInt(buf, m_waitTime);
-		return true;
+	public void write(IoBuffer buf) 
+	{
+		writeBoolean(this.messagePack, m_reason);
+		writeInt(this.messagePack, m_waitTime);
+		super.write(buf);
 	}
 	
 }

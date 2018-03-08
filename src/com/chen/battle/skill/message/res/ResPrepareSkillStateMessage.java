@@ -1,5 +1,7 @@
 package com.chen.battle.skill.message.res;
 
+import java.nio.ByteBuffer;
+
 import org.apache.mina.core.buffer.IoBuffer;
 
 import com.chen.message.Message;
@@ -32,22 +34,21 @@ public class ResPrepareSkillStateMessage extends Message
 	}
 
 	@Override
-	public boolean read(IoBuffer arg0) {
-		// TODO Auto-generated method stub
-		return false;
+	public void read(ByteBuffer arg0) {
+	
 	}
 
 	@Override
-	public boolean write(IoBuffer buffer) 
+	public void write(IoBuffer buffer) 
 	{
-		writeLong(buffer, playerId);
-		writeLong(buffer, targetId);
-		writeInt(buffer, PosX);
-		writeInt(buffer, PosZ);
-		writeInt(buffer, dirAngle);
-		writeInt(buffer, skillId);
-		writeInt(buffer, speed);
-		return true;
+		writeLong(this.messagePack, playerId);
+		writeLong(this.messagePack, targetId);
+		writeInt(this.messagePack, PosX);
+		writeInt(this.messagePack, PosZ);
+		writeInt(this.messagePack, dirAngle);
+		writeInt(this.messagePack, skillId);
+		writeInt(this.messagePack, speed);
+		super.write(buffer);
 	}
 
 }

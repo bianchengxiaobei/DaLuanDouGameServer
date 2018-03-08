@@ -11,6 +11,7 @@ import org.apache.mina.core.session.IoSession;
 import com.chen.battle.structs.BattleContext;
 import com.chen.message.Message;
 import com.chen.player.structs.Player;
+import com.chen.player.structs.PlayerState;
 import com.chen.server.impl.GameServer;
 
 public class MessageUtil 
@@ -82,6 +83,15 @@ public class MessageUtil
 	 */
 	public static void tell_player_message(Player player, Message message)
 	{
+//		if (player.getGateId() != 0 && player.getState() != PlayerState.Quit.value)
+//		{
+//			message.getRoleId().add(player.getId());
+//			send_to_gate(player.getGateId(), player.getId(), message);
+//		}
+//		else
+//		{
+//			log.error("网关id为0 或者角色不在线");
+//		}
 		if (player.getGateId() != 0)
 		{
 			message.getRoleId().add(player.getId());
@@ -89,7 +99,7 @@ public class MessageUtil
 		}
 		else
 		{
-			log.error("网关id为0");
+			log.error("网关id为0 或者角色不在线");
 		}
 	}
 	/**
@@ -99,11 +109,11 @@ public class MessageUtil
 	 */
 	public static void tell_battlePlayer_message(BattleContext battle,Message message)
 	{
-		for (int i=0; i<battle.getM_battleUserInfo().length; i++)
+		for (int i=0; i<battle.memberCount; i++)
 		{
-			if (battle.getM_battleUserInfo()[i] != null && battle.getM_battleUserInfo()[i].sPlayer.bIfConnect)
+			if (battle.m_battleUserInfo[i] != null && battle.m_battleUserInfo[i].sPlayer.bIfConnect)
 			{
-				message.getRoleId().add(battle.getM_battleUserInfo()[i].sPlayer.player.getId());
+				message.getRoleId().add(battle.m_battleUserInfo[i].sPlayer.player.getId());
 			}
 		}
 		send_to_gate(message);		

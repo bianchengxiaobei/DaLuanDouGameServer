@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="game_mail"> 
+  <resultMap id="email_brief" type="com.chen.db.bean.Mail" >
+    <id column="mailId" property="mailId" jdbcType="BIGINT" />
+    <result column="receiverId" property="receiverId" jdbcType="BIGINT" />
+   	<result column="sendTime" property="sendTime" jdbcType="BIGINT"/>
+   	<result column="senderId" property="senderId" jdbcType="BIGINT"/>
+    <result column="endTime" property="endTime" jdbcType="BIGINT" />
+    <result column="mailState" property="mailState" jdbcType="BIT" />
+    <result column="mailType" property="mailType" jdbcType="BIT" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="gift" property="gift" jdbcType="VARCHAR"/>
+  </resultMap>
+  <insert id="insert" parameterType="com.chen.db.bean.Mail">
+  	insert into mail (mailId,receiverId,sendTime,senderId,endTime,mailState,mailType,title,content,gift)
+  	values(#{mailId},#{receiverId},#{sendTime},#{senderId},#{endTime},#{mailState},#{mailType},#{title},#{content},#{gift})
+  </insert>
+
+  <select id="selectById" parameterType="long" resultMap="email_brief">
+  	select * from mail where mailId = #{mailId,jdbcType=BIGINT};
+  </select>
+   <select id="selectByRoleId" parameterType="long" resultMap="email_brief">
+  	select * from mail where receiverId = #{receiverId,jdbcType=BIGINT};
+  </select>
+  <delete id="delete" parameterType="long" >
+     delete from mail where mailId = #{mailId,jdbcType=BIGINT}
+  </delete>
+  <update id="update" parameterType="com.chen.db.bean.Mail">
+      update mail 
+      set mailState = #{mailState}
+      where mailId = #{mailId};
+  </update>
+</mapper>

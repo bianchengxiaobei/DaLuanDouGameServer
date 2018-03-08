@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collectionConfigs>
+	<collection>
+		<collectionId>1001</collectionId>
+		<gold>1000</gold>
+		<rate>1</rate>
+		<addRate>40</addRate>
+	</collection>
+</collectionConfigs>

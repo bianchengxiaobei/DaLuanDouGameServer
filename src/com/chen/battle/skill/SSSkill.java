@@ -15,6 +15,7 @@ import com.chen.battle.structs.CVector3D;
 import com.chen.battle.structs.EGOActionState;
 import com.chen.battle.structs.SSGameUnit;
 import com.chen.battle.structs.SSHero;
+import com.chen.parameter.structs.EParameterCate;
 
 public class SSSkill 
 {
@@ -66,7 +67,19 @@ public class SSSkill
 		//CD需要将普通攻击和技能攻击分开计算
 		if (this.skillConfig.bIsNormalAttack)
 		{
-			
+			int attackSpeed = theOwner.GetFPData(EParameterCate.AttackSpeed);
+			int releaseTime = (int)(this.skillConfig.releaseTime * attackSpeed * 0.001f);
+			int standCooldownTime = (int)((this.skillConfig.cooldownTime + this.skillConfig.releaseTime)*attackSpeed*0.001f);
+			if (cooldownTime + releaseTime + 150 >= stateTime)
+			{				
+				cooldownTime += standCooldownTime;
+				//System.err.println("1:"+cooldownTime);
+			}
+			else
+			{
+				cooldownTime = beginTime + standCooldownTime;
+				//System.err.println("2:"+cooldownTime);
+			}
 		}
 		//如果是普通技能，直接从技能放出来的时间加上CD即可
 		else
@@ -106,11 +119,19 @@ public class SSSkill
 			return false;
 		}
 		//是否在沉默、眩晕等等状态
+		if (theOwner.GetFPData(EParameterCate.Dizziness) > 0)
+		{
+			return false;
+		}
+		if (theOwner.GetFPData(EParameterCate.Silence) > 0)
+		{
+			return false;
+		}		
 		return true;
 	}
 	private int CheckAndSetTarget()
 	{
-		if (this.skillConfig.eReleaseWay == ESkillReleaseWay.No_Target)
+		if (this.skillConfig.eReleaseWay == ESkillReleaseWay.No_Target_Pos || this.skillConfig.eReleaseWay == ESkillReleaseWay.Auto)
 		{
 			this.target = null;
 		}
@@ -150,7 +171,7 @@ public class SSSkill
 		{
 			return rst;
 		}
-		if (target != null && target.IsDead())
+		if (target != null && (target.IsDead() || target.curActionInfo.eOAS == EGOActionState.Reliving))
 		{
 			return 0;
 		}
@@ -159,7 +180,7 @@ public class SSSkill
 			//距离不够
 			return 2;
 		}
-		return 1;
+		return 1;//normal
 	}
 	/**
 	 * 开始技能
@@ -194,7 +215,7 @@ public class SSSkill
 				rst = 0;
 				break;
 			}
-			if (eSkillState.value <= ESkillState.Releasing.value && theOwner.IfInReleaseSkillRange(target, skillConfig, 1000) == false)
+			if (eSkillState.value <= ESkillState.Releasing.value && theOwner.IfInReleaseSkillRange(target, skillConfig, 1) == false)
 			{
 				logger.error("距离不够，取消释放技能");
 				rst = 2;//NUllPointer
@@ -203,7 +224,7 @@ public class SSSkill
 			//等待 状态
 			if (eSkillState == ESkillState.Free)
 			{
-				System.out.println("Free");
+				//System.out.println("Free");
 				eSkillState = ESkillState.Preparing;
 				stateTime = now;
 				SetSkillDir();
@@ -211,7 +232,7 @@ public class SSSkill
 			//准备 状态
 			if (eSkillState == ESkillState.Preparing)
 			{
-				System.out.println("Preparing");
+				//System.out.println("Preparing");
 				long deltaTime = now - stateTime;
 				//如果需要等待,直接返回
 				if (deltaTime < this.skillConfig.prepareTime)
@@ -226,11 +247,16 @@ public class SSSkill
 			//技能前摇
 			if (eSkillState == ESkillState.Releasing)
 			{
-				System.out.println("Releasing");
+				//System.out.println("Releasing");
 				int releaseTime = this.skillConfig.releaseTime;
+				//理应加上角色的攻击速度
 				if (this.skillConfig.bIsNormalAttack)
 				{
-					
+					if (normalAttackReleaseTime == 0)
+					{
+						normalAttackReleaseTime = (int)(releaseTime * theOwner.GetFPData(EParameterCate.AttackSpeed) * 0.001f);
+					}
+					releaseTime = normalAttackReleaseTime;
 				}
 				long span = now - stateTime;
 				if (span < releaseTime)
@@ -246,7 +272,7 @@ public class SSSkill
 			//使用 状态
 			if (eSkillState == ESkillState.Using)
 			{
-				System.out.println("Using");
+				//System.out.println("Using");
 				boolean bIfUsing = false;
 				//遍历所有的使用中的技能效果,看其是否依然在占用中
 				for (int i=0; i<32; i++)
@@ -279,7 +305,7 @@ public class SSSkill
 			//后摇状态
 			if (eSkillState == ESkillState.Lasting)
 			{
-				System.out.println("Lasting");
+				//System.out.println("Lasting");
 				if (stateTime + skillConfig.lastTime > now)
 				{
 					rst = 1;
@@ -346,14 +372,31 @@ public class SSSkill
 		this.dir = theOwner.GetCurDir();
 		switch (this.skillConfig.eReleaseWay) {
 		case Need_Target:
-		case Auto:
 			if (target != null)
 			{
-				dir = target.GetCurDir();
+				dir = CVector3D.Sub(target.GetCurPos(), theOwner.GetCurPos());
 				dir.y = 0;
-				dir.normalized();
+				dir.normalized();//引用
 				theOwner.curActionInfo.dir = dir;
 			}
+			break;
+		case No_Target_Pos:
+			if (theOwner.curActionInfo.skillParams != null)
+			{
+				this.dir = CVector3D.Sub(theOwner.curActionInfo.skillParams, theOwner.GetCurPos());
+				theOwner.curActionInfo.dir = this.dir;
+			}
+			break;
+		case No_Target_Dir:
+			if (theOwner.curActionInfo.skillParams != null)
+			{
+				//this.dir = CVector3D.Sub(theOwner.curActionInfo.skillParams, theOwner.GetCurPos());
+				this.dir = theOwner.curActionInfo.skillParams.clone();
+				theOwner.curActionInfo.dir = this.dir;
+			}
+			break;
+		case Auto:
+			this.dir = theOwner.GetCurDir();
 			break;
 		}
 	}
@@ -424,6 +467,7 @@ public class SSSkill
 		}
 		if (ifCanCancle)
 		{
+			logger.debug("成功取消技能："+this.skillConfig.skillId);
 			if (eSkillState == ESkillState.Using)
 			{
 				for (int i=0;i<32;i++)
@@ -452,6 +496,10 @@ public class SSSkill
 	{
 		bIsRunning = false;
 		eSkillState = ESkillState.End;		
+		if (!this.IfImpactSkill())
+		{
+			theOwner.ai.bIsStandAttack = false;
+		}
 	}
 	public void Clear()
 	{
@@ -475,5 +523,37 @@ public class SSSkill
 	private void ClearPassSkill()
 	{
 		Arrays.fill(passitiveSkillArray, 0);
+	}
+	/**
+	 * 是否在该阶段能否移动
+	 * @return
+	 */
+	public boolean IfMasterMoveable()
+	{
+		//如果不是引导阶段，那么可以移动
+		if (eSkillState != ESkillState.Using)
+		{
+			return true;
+		}
+		else if(eSkillState == ESkillState.Using)
+		{
+			for (int i=0;i<32;i++)
+			{
+				int effectId = usingEffectArray[i];
+				if (effectId == 0)
+				{
+					continue;
+				}
+				SSSkillEffect effect = theOwner.battle.effectManager.GetEffect(effectId);
+				if (effect != null)
+				{
+					if (effect.IfCanMove() == false)
+					{
+						return false;
+					}
+				}
+			}
+		}
+		return true;
 	}
 }

@@ -1,6 +1,10 @@
 package com.chen.battle.structs;
 
+import java.nio.ByteBuffer;
+
 import org.apache.mina.core.buffer.IoBuffer;
+import org.msgpack.core.MessageBufferPacker;
+import org.msgpack.core.MessageUnpacker;
 
 import com.chen.message.Bean;
 
@@ -11,20 +15,18 @@ public class ReConnectInfo extends Bean
 	public int heroId;
 	public int campId;
 	@Override
-	public boolean read(IoBuffer arg0) 
+	public void read(MessageUnpacker messageUnpacker)
 	{
-		
-		return true;
+
 	}
 
 	@Override
-	public boolean write(IoBuffer buffer) 
+	public void write(MessageBufferPacker messagePack)
 	{
-		writeLong(buffer, playerId);
-		writeInt(buffer, heroId);
-		writeString(buffer, nickName);
-		writeInt(buffer, campId);
-		return true;
+		writeLong(messagePack, playerId);
+		writeInt(messagePack, heroId);
+		writeString(messagePack, nickName);
+		writeInt(messagePack, campId);
 	}
 
 }

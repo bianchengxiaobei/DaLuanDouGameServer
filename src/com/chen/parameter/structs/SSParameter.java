@@ -23,7 +23,10 @@ public class SSParameter
 	private Vector<Integer> percentSubVec = new Vector<>();//千分比减少列表
 	public boolean maxValueCallBack = false;
 	public boolean valueCallBack = false;
-	
+	public SSParameter()
+	{
+		this.type = EParameterType.Normal;
+	}
 	public void SetType(EParameterType type)
 	{
 		this.type = type;
@@ -121,7 +124,10 @@ public class SSParameter
 		}
 		this.ReCount();
 	}
-	
+	public void SetIfOnlyOneMinusePercent(boolean value)
+	{
+		this.bIfOnlyOneMinusePercent = value;
+	}
 	
 	
 	public void OnMaxValueChanged(int oldValue,int newValue)
@@ -135,7 +141,7 @@ public class SSParameter
 	}
 	public void OnValueChanged(int oldValue,int newValue)
 	{
-		
+		//这里如果攻速改变的话，要改变普攻的冷却时间
 	}
 	private void ChangeBaseValue(int value)
 	{
@@ -156,11 +162,12 @@ public class SSParameter
 		{
 			if (this.bIfCountdown)
 			{
-				this.value = (int)(this.baseValue / (1 + (float)(percent / 1000)));
+				this.value = (int)(this.baseValue / (1 + percent * 0.001f));
 			}
 			else
 			{
-				this.value = (int)(this.baseValue * (1 + (float)(percent / 1000)));
+				this.value = (int)(this.baseValue * (1 + percent * 0.001f));
+				System.err.println(this.value);
 			}
 		}
 		else

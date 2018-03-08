@@ -13,28 +13,76 @@
 	Buffer(10); 
  -->
 <skills>
-	<skill name="飞腿">
-		<id>10001</id>
+	<skill name="运动男_飞腿（没击中）">
+		<id>60001</id>
 		<type>6</type>		
 	</skill>
-	<skill name="飞腿">
-		<id>40001</id>
+	<skill name="运动男_飞腿_伤害">
+		<id>10001</id>
 		<type>1</type>
 	</skill>
-	<skill name="飞腿_击飞">
-		<id>10002</id>
+	<skill name="运动男_飞腿_击飞">
+		<id>60002</id>
 		<type>6</type>		
 	</skill>	
-	<skill name="旋转飞腿">
-		<id>20001</id>
+	<skill name="运动女_旋转飞腿">
+		<id>30001</id>
 		<type>3</type>		
 	</skill>
-	<skill name="飞球">
-		<id>30001</id>
+	<skill name="运动男_飞球_飞行">
+		<id>20001</id>
 		<type>2</type>		
 	</skill>
-	<skill name="飞球">
-		<id>40002</id>
+	<skill name="运动男_飞球_伤害">
+		<id>10002</id>
+		<type>1</type>		
+	</skill>
+	<skill name="运动男_普攻">
+		<id>20002</id>
+		<type>2</type>		
+	</skill>
+	<skill name="运动男_普攻_伤害">
+		<id>10003</id>
+		<type>1</type>		
+	</skill>
+	<skill name="运动男_护盾">
+		<id>100001</id>
+		<type>10</type>		
+	</skill>
+	<skill name="火男——死亡之火">
+		<id>30003</id>
+		<type>3</type>		
+	</skill>
+	<skill name="火男——死亡之火(buff)">
+		<id>100002</id>
+		<type>10</type>		
+	</skill>
+	<skill name="火男——死亡之火（伤害）">
+		<id>10004</id>
+		<type>1</type>		
+	</skill>
+	<skill name="火男——烈焰之柱">
+		<id>30004</id>
+		<type>3</type>		
+	</skill>
+	<skill name="火男——烈焰之柱(伤害)">
+		<id>10005</id>
+		<type>1</type>		
+	</skill>
+	<skill name="火男——炽热沼泽">
+		<id>30005</id>
+		<type>3</type>		
+	</skill>
+	<skill name="火男——炽热沼泽(buff)">
+		<id>100003</id>
+		<type>10</type>		
+	</skill>
+	<skill name="火男——普攻Fly">
+		<id>20003</id>
+		<type>2</type>		
+	</skill>
+	<skill name="火男——普攻伤害">
+		<id>10006</id>
 		<type>1</type>		
 	</skill>
 </skills>

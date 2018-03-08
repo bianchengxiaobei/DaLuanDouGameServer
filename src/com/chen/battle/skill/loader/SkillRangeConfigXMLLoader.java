@@ -110,6 +110,10 @@ public class SkillRangeConfigXMLLoader
 							else if("eventId".equals(schilds.item(j).getNodeName()))
 							{
 								String content =  schilds.item(j).getTextContent().trim();
+								if (content.equals("0"))
+								{
+									return;
+								}
 								String[] nextConfigString = content.split(";");
 								for (String value : nextConfigString)
 								{

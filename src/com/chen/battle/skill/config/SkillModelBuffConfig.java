@@ -14,12 +14,11 @@ public class SkillModelBuffConfig extends SkillEffectBaseConfig
 	public int rejectId;//互斥id
 	public int replaceId;//替换Id
 	public boolean bIfClearWhenDead;//死亡是否清理
-	public boolean onFlyEffectId;//击飞Id
 	public int effectLastTick;//持续时间
 	public int effectInterval;//间隔时间
 	public BuffEffectInfo buffEffectInfo;
-	public NextSkillEffectConfig skillStartModelList[] = new NextSkillEffectConfig[16];//开始技能配置
-	public NextSkillEffectConfig skillIntervalModelList[] = new NextSkillEffectConfig[16];//持续技能配置
-	public NextSkillEffectConfig skillEndModelList[] = new NextSkillEffectConfig[16];//结束技能配置
+	public NextSkillEffectConfig skillStartModelList[] = new NextSkillEffectConfig[3];//开始技能配置
+	public NextSkillEffectConfig skillIntervalModelList[] = new NextSkillEffectConfig[3];//持续技能配置
+	public NextSkillEffectConfig skillEndModelList[] = new NextSkillEffectConfig[3];//结束技能配置
 }
 

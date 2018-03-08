@@ -3,8 +3,10 @@ package com.chen.battle.ai;
 import com.chen.battle.skill.SSSkill;
 import com.chen.battle.skill.structs.ESkillState;
 import com.chen.battle.structs.CVector3D;
+import com.chen.battle.structs.EGOActionState;
 import com.chen.battle.structs.SSGameUnit;
 import com.chen.battle.structs.SSHero;
+import com.mysql.jdbc.log.Log;
 
 public class SSAI_Hero extends SSAI
 {
@@ -18,12 +20,26 @@ public class SSAI_Hero extends SSAI
 	}
 	public void AskMoveDir(CVector3D dir)
 	{
+		//如果是普通攻击
+		if (bIsStandAttack)
+		{
+			System.err.println("还在前摇中");
+			return;
+		}
 		if(IfPassitiveState() == true)
 		{
 			return;
 		}
+		if (this.StopAllSkills(false) == false)
+		{
+			if (this.nowSkill == null || this.nowSkill.IfMasterMoveable() == false)
+			{
+				return;
+			}
+		}		
 		if (theOwner.battle.AskMoveDir(theOwner, dir) == false)
 		{
+			System.err.println("ffefeefefe");
 			theOwner.BeginActionIdle(true);
 			return;
 		}
@@ -45,6 +61,11 @@ public class SSAI_Hero extends SSAI
 	 */
 	public void AskUseSkill(int skillId)
 	{
+		//如果是普通攻击
+		if (bIsStandAttack)
+		{
+			return;
+		}
 		//是否在不能操作状态
 		if (IfPassitiveState() == true)
 		{
@@ -89,7 +110,7 @@ public class SSAI_Hero extends SSAI
 				bIsMoveDir = false;
 				wantUseSkill = skill;
 				moveTarPos = wantUseSkill.target.GetCurPos();
-				lastCheckMoveTarTime = System.currentTimeMillis();
+				lastCheckMoveTarTime = theOwner.battle.battleHeartBeatTime;
 				//MoveToTar
 				return;
 			}
@@ -103,17 +124,21 @@ public class SSAI_Hero extends SSAI
 				//如果是非瞬发技能
 				if (skill.IfImpactSkill() == false || 
 						(skill.skillConfig.lastTime > 0 
-								&& bIsMoving == false)) //&& 
-								//attackSkill.bIsRunning == false))
+								&& bIsMoving == false)&& 
+								attackSkill.bIsRunning == false)
 				{
 					//停止攻击
 					this.CancleAttack();
 					//停止移动
 					bIsMoveDir = false;
-					theOwner.battle.AskStopMoveDir(theOwner);
+					theOwner.battle.AskStopMoveObjectAll(theOwner);
 					//开始使用技能，停止其他技能
 					this.StopAllSkills(false);
 					this.nowSkill = skill;
+					if (!skill.IfImpactSkill())
+					{
+						bIsStandAttack = true;
+					}
 				}
 				skill.Start();
 			}
@@ -176,6 +201,7 @@ public class SSAI_Hero extends SSAI
 			StopWantUseSkill(true);
 			nextSkill = null;
 			bIsMoveDir = false;
+			bIsStandAttack = false;
 			if (bIsMoving)
 			{
 				theOwner.battle.AskStopMoveDir(theOwner);
@@ -187,6 +213,10 @@ public class SSAI_Hero extends SSAI
 		{
 			UseSkillHeartBeat(now, tick);
 		}
+//		else if(bIsMoving == false)
+//		{
+//			this.DoStandNormalAttack(now, tick);
+//		}
 	}
 	public void UseSkillHeartBeat(long now,long tick)
 	{
@@ -208,5 +238,59 @@ public class SSAI_Hero extends SSAI
 	public void TryUseSkillWithAnyType(SSSkill skill)
 	{
 		AskUseSkill(skill.skillConfig.skillId);
+	}
+	public void DoStandNormalAttack(long now,long tick)
+	{
+		long lockId = ((SSHero)theOwner).GetLockTargetId();
+		if (lockId > 0)
+		{
+			SSGameUnit target = theOwner.battle.GetGameObjectById(lockId);
+			//如果普攻正在攻击
+			if (this.attackSkill.bIsRunning)
+			{
+				if (target == null || target.IsDead() || target.curActionInfo.eOAS == EGOActionState.Reliving)
+				{
+					bIsStandAttack = false;
+					TryFree();
+				}
+				else
+				{
+					int rst = attackSkill.HeartBeat(now, tick);
+					if (rst == 2)//NullPoint
+					{
+						bIsStandAttack = false;
+						TryFree();
+					}
+				}
+			}
+			else
+			{
+				if (attackSkill.IfSkillUsableWithNowTarget() == 1)
+				{
+					if (attackSkill.IfSkillUsable() == true)
+					{
+						if (theOwner.IfInReleaseSkillRange(target, attackSkill.skillConfig, 0))
+						{
+							attackSkill.target = target;
+							bIsStandAttack = true;
+							attackSkill.Start();
+						}
+						else
+						{
+							if (bIsStandAttack)
+							{
+								bIsStandAttack = false;
+								TryFree();
+							}
+						}
+					}
+				}
+			}
+		}
+		else if(bIsStandAttack == false && now + 100 > attackSkill.cooldownTime)
+		{
+			bIsStandAttack = false;
+			TryFree();
+		}
 	}
 }

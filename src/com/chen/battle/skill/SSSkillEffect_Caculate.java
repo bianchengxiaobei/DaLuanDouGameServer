@@ -62,23 +62,51 @@ public class SSSkillEffect_Caculate extends SSSkillEffect
 			return false;
 		}
 		float value = skillInfo.effectBaseValue;
-		for (int i=0; i<16; i++)
+		if (skillInfo.eEffectAddCaculType != null) 
 		{
-			if (skillInfo.eEffectAddCaculType[i] == EEffectCaculateType.None)
+			for (int i = 0; i < skillInfo.eEffectAddCaculType.length; i++)
 			{
-				continue;
-			}
-			switch (skillInfo.eEffectAddCaculType[i]) 
-			{
-			case SelfPhyAttack:
-				value += (float)theOwner.GetFPData(EParameterCate.PhyAttack) * skillInfo.effectAddCaculValue[i] * 0.001f;
-				break;
-			case SelfPhyDefence:
-				value += (float)theOwner.GetFPData(EParameterCate.PhyDefense) * skillInfo.effectAddCaculValue[i] * 0.001f;
-			default:
-				break;
+				if (skillInfo.eEffectAddCaculType[i] == EEffectCaculateType.None) 
+				{
+					continue;
+				}
+				switch (skillInfo.eEffectAddCaculType[i]) 
+				{
+				case SelfPhyAttack:
+					value += (float) theOwner.GetFPData(EParameterCate.PhyAttack) * skillInfo.effectAddCaculValue[i]
+							* 0.01f;
+					break;
+				case SelfPhyDefence:
+					value += (float) theOwner.GetFPData(EParameterCate.PhyDefense) * skillInfo.effectAddCaculValue[i]
+							* 0.01f;
+				default:
+					break;
+				}
 			}
 		}
+		float multAdd = 0;
+		if (skillInfo.eEffectMultCaculType != null)
+		{
+			for (int i = 0; i < skillInfo.eEffectMultCaculType.length; i++)
+			{
+				if (skillInfo.eEffectMultCaculType[i] == EEffectCaculateType.None) {
+					continue;
+				}
+				switch (skillInfo.eEffectMultCaculType[i]) {
+				case SelfPhyAttack:
+					multAdd += (float) theOwner.GetFPData(EParameterCate.PhyAttack) * skillInfo.effectMultCaculValue[i]
+							* 0.01f;
+					break;
+				case SelfPhyDefence:
+					multAdd += (float) theOwner.GetFPData(EParameterCate.PhyDefense) * skillInfo.effectMultCaculValue[i]
+							* 0.01f;
+					break;
+				default:
+					break;
+				}
+			}
+		}
+		value = value * (1 + multAdd);
 		boolean bIsCrit = false;
 		switch (skillInfo.eParamType) 
 		{

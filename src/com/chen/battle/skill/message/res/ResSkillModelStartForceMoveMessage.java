@@ -1,5 +1,7 @@
 package com.chen.battle.skill.message.res;
 
+import java.nio.ByteBuffer;
+
 import org.apache.mina.core.buffer.IoBuffer;
 
 import com.chen.message.Message;
@@ -33,23 +35,22 @@ public class ResSkillModelStartForceMoveMessage extends Message
 	}
 
 	@Override
-	public boolean read(IoBuffer buffer) 
+	public void read(ByteBuffer buffer) 
 	{
 		
-		return true;
 	}
 
 	@Override
-	public boolean write(IoBuffer buffer) 
+	public void write(IoBuffer buffer) 
 	{
-		writeLong(buffer, playerId);
-		writeInt(buffer, skillId);
-		writeInt(buffer, posX);
-		writeInt(buffer, posY);
-		writeInt(buffer, posZ);
-		writeInt(buffer, dirAngle);
-		writeInt(buffer, speed);
-		return true;
+		writeLong(this.messagePack, playerId);
+		writeInt(this.messagePack, skillId);
+		writeInt(this.messagePack, posX);
+		writeInt(this.messagePack, posY);
+		writeInt(this.messagePack, posZ);
+		writeInt(this.messagePack, dirAngle);
+		writeInt(this.messagePack, speed);
+		super.write(buffer);
 	}
 
 }

@@ -2,24 +2,19 @@ package com.chen.battle.structs;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.swing.DebugGraphics;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.chen.battle.ball.Ball;
 import com.chen.battle.hero.config.SHeroConfig;
 import com.chen.battle.manager.BattleManager;
+import com.chen.battle.message.res.ResBattleFinishMessage;
 import com.chen.battle.message.res.ResBattleTipMessage;
-import com.chen.battle.message.res.ResEnterRoomMessage;
+import com.chen.battle.message.res.ResDeadStateMessage;
 import com.chen.battle.message.res.ResEnterSceneMessage;
 import com.chen.battle.message.res.ResGamePrepareMessage;
 import com.chen.battle.message.res.ResHeroRebornMessage;
@@ -27,16 +22,20 @@ import com.chen.battle.message.res.ResReConnectMessage;
 import com.chen.battle.message.res.ResSceneLoadedMessage;
 import com.chen.battle.message.res.ResSelectHeroMessage;
 import com.chen.battle.skill.manager.SSEffectManager;
+import com.chen.battle.skill.passiveSkill.PassiveSkillManager;
 import com.chen.data.manager.DataManager;
+import com.chen.db.bean.Hero;
+import com.chen.map.MapStaticData;
 import com.chen.match.structs.EBattleModeType;
 import com.chen.message.Message;
 import com.chen.move.manager.SSMoveManager;
 import com.chen.move.struct.ColVector;
 import com.chen.move.struct.EAskStopMoveType;
+import com.chen.move.struct.SSMoveObject;
 import com.chen.player.structs.Player;
 import com.chen.server.BattleServer;
-import com.chen.server.config.BattleConfig;
 import com.chen.utils.MessageUtil;
+import com.chen.utils.Tools;
 
 public class BattleContext extends BattleServer
 {
@@ -46,21 +45,24 @@ public class BattleContext extends BattleServer
 	private long battleId;
 	public int mapId;
 	private long battleStateTime;
+	protected long battleAllTime;//战斗时间
 	public long battleHeartBeatTime;
 	private long lastCheckPlayTimeout;
 	private long battleFinishProtectTime = 0;
-	private BattleUserInfo[] m_battleUserInfo = new BattleUserInfo[maxMemberCount];
-	
+	public BattleUserInfo[] m_battleUserInfo;
+	public Thread thread;
 	public Map<Long, SSGameUnit> gameObjectMap = new HashMap<>();
-	public Set<EBattleTipType> tipSet = new HashSet<>();
 	public SSMoveManager moveManager;
 	public SSEffectManager effectManager;
+	public PassiveSkillManager passiveSkillManager;
 	public IBattleContextMode gameMode;
+	public int winCampId;
 	public AtomicInteger effectId = new AtomicInteger(0);
-	public static final int maxMemberCount = 6; 
+	//public static final int maxMemberCount = 6; 
+	public int memberCount;
 	public static final int timeLimit = 200000;
 	public static final int prepareTimeLimit = 5000;
-	public static final int loadTimeLimit = 100000;
+	public static final int loadTimeLimit = 60000;//默认加载一分钟
 	public long getBattleId() {
 		return battleId;
 	}
@@ -70,27 +72,26 @@ public class BattleContext extends BattleServer
 	public EBattleServerState getBattleState() {
 		return battleState;
 	}
-	public BattleUserInfo[] getM_battleUserInfo() {
-		return m_battleUserInfo;
-	}
-	public void setM_battleUserInfo(BattleUserInfo[] m_battleUserInfo) {
-		this.m_battleUserInfo = m_battleUserInfo;
-	}
 	public BattleContext(EBattleModeType type, long battleId,int mapId)
 	{
 		super("战斗-"+battleId);
 		this.battleId = battleId;
 		this.mapId = mapId;
 		this.battleType = type;
+		this.battleHeartBeatTime = System.currentTimeMillis();
+		this.setBattleState(EBattleServerState.eSSBS_SelectHero, false);
 		this.moveManager = new SSMoveManager();
 		this.effectManager = new SSEffectManager();
+		passiveSkillManager = new PassiveSkillManager();
+		this.moveManager.battle = this;
 		this.effectManager.battle = this;
+		this.passiveSkillManager.battleContext = this;
 	}
 	
 	@Override
 	protected void init() 
 	{
-         System.out.println("BattleContent:Init");
+         //System.out.println("BattleContent:Init");
 	}
 	@Override
 	public void run()
@@ -101,15 +102,36 @@ public class BattleContext extends BattleServer
 			this.OnHeartBeat(BattleContext.this.battleHeartBeatTime, 50);
 			if (this.battleState == EBattleServerState.eSSBS_Finished)
 			{
-				log.debug("战斗结束");
+				log.debug("战斗结束:"+this.battleId);
 				BattleManager.getInstance().allBattleMap.remove(this.battleId);
 				BattleManager.getInstance().mServers.remove(this.battleId, this);				
 			}
+			long delTime = System.currentTimeMillis() - this.battleHeartBeatTime;
+			if(delTime > 50)
+			{
+				log.error(delTime);
+			}
 			try {
-				Thread.sleep(50);
+				Thread.sleep(50-delTime);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		}
+	}
+	public void Stop()
+	{
+		if (this.thread != null)
+		{
+			this.thread.stop();
+			this.thread = null;
+		}
+	}
+	public void Start()
+	{
+		if (this.thread == null)
+		{
+			this.thread = new Thread(this);
+			this.thread.start();
 		}
 	}
 	public void OnHeartBeat(long now,long tickSpan)
@@ -176,7 +198,7 @@ public class BattleContext extends BattleServer
 			//更新球的信息
 			if (gameMode != null)
 			{
-				gameMode.SyncState();
+				gameMode.SyncReconnectState(player);
 				gameMode.SyncScoreState();
 			}
 		}
@@ -189,7 +211,7 @@ public class BattleContext extends BattleServer
 			return ;
 		}
 		boolean ifAllUserSelect = true;
-		for (int i=0; i<maxMemberCount; i++)
+		for (int i=0; i<memberCount; i++)
 		{
 			if (this.m_battleUserInfo[i] != null)
 			{
@@ -201,16 +223,17 @@ public class BattleContext extends BattleServer
 			}
 		}
 		//等待时间结束
-		if (ifAllUserSelect || (System.currentTimeMillis() - this.battleStateTime) >= timeLimit)
+		if (ifAllUserSelect || (this.battleHeartBeatTime - this.battleStateTime) >= timeLimit)
 		{
-			for (int i = 0; i < maxMemberCount; i++) {
+			for (int i = 0; i < memberCount; i++) {
 				if (this.m_battleUserInfo[i] != null)
 				{
 					if (false == this.m_battleUserInfo[i].bIsHeroChoosed) {
 						//如果还没有选择神兽，就随机选择一个
 						if (this.m_battleUserInfo[i].selectedHeroId == -1)
 						{
-							this.m_battleUserInfo[i].selectedHeroId = randomPickHero(this.m_battleUserInfo[i].sPlayer.canUserHeroList);
+							System.err.println("fefefe");
+							this.m_battleUserInfo[i].selectedHeroId = randomPickHero(this.m_battleUserInfo[i].sPlayer.player.getHeroList());
 						}
 						this.m_battleUserInfo[i].bIsHeroChoosed = true;
 						//然后将选择该神兽的消息广播给其他玩家
@@ -232,10 +255,10 @@ public class BattleContext extends BattleServer
 			return ;
 		}
 		boolean bIfAllPlayerConnect = true;
-		//时间未到，则检查是否所有玩家已经连接
-		if (System.currentTimeMillis() - this.battleStateTime < loadTimeLimit)
+		//时间未到，则检查是否所有玩家已经连接，时间到了，客户端提示重连
+		if (this.battleHeartBeatTime - this.battleStateTime < loadTimeLimit)
 		{
-			for (int i=0;i<this.m_battleUserInfo.length;i++)
+			for (int i=0;i<memberCount;i++)
 			{
 				if (this.m_battleUserInfo[i] != null)
 				{
@@ -254,24 +277,36 @@ public class BattleContext extends BattleServer
 		//加载静态的配置文件
 		this.LoadMapConfigNpc();
 		//然后创建神兽
-		for (int i=0;i<this.m_battleUserInfo.length;i++)
+		for (int i=0;i<this.memberCount;i++)
 		{
 			if (this.m_battleUserInfo[i] == null)
 			{
 				continue;
 			}
+			int selectHeroId = this.m_battleUserInfo[i].selectedHeroId;
+			//说明是向导英雄
+			if (selectHeroId <= 0)
+			{
+				selectHeroId = 1;
+			}
 			SSPlayer user = this.m_battleUserInfo[i].sPlayer;
-			CVector3D bornPos = new CVector3D(0, 0, 0);//这里需要通过配置文件加载
+			CVector3D bornPos = DataManager.getInstance().heroBornConfigXMLLoader.
+					heroBornPosConfigMap.get(this.mapId).get(this.m_battleUserInfo[i].camp.value).
+					GetFirstBornPos();//这里需要通过配置文件加载
+			//将英雄的位置适当分散，修改出生位置
+			float bornAngle = ((i/2)%3) * (3.141592f*2 / 3);
+			CVector3D movePos = new CVector3D((float)Math.cos(bornAngle),0,(float)Math.sin(bornAngle));
+			movePos = CVector3D.Mul(movePos, 2);
+			bornPos = CVector3D.Add(bornPos, movePos);
 			CVector3D dir = new CVector3D(0,0,0);
 			SSHero hero = null;
-			hero = AddHero(user.player.getId(), bornPos, dir, user, this.m_battleUserInfo[i].selectedHeroId,this.m_battleUserInfo[i].camp);
+			hero = AddHero(user.player.getId(), bornPos, dir, user, selectHeroId,this.m_battleUserInfo[i].camp);
 			this.m_battleUserInfo[i].sHero = hero;
-			//通知玩家游戏开始战斗倒计时
-			BoradTipsByType(EBattleTipType.eTips_ObjAppear, this.m_battleUserInfo[i].sPlayer.player);
-		}
-		
+		}		
 		this.PostStartGameMsg();
 		this.setBattleState(EBattleServerState.eSSBS_Playing,false);
+		//通知玩家游戏开始战斗倒计时
+		BoradTipsByType(EBattleTipType.eTips_ObjAppear);
 	}
 	public boolean CheckPlayTimeout(long now)
 	{
@@ -287,7 +322,7 @@ public class BattleContext extends BattleServer
 		}
 		this.lastCheckPlayTimeout = now;
 		boolean bAllUserOffline = true;
-		for (int i=0;i<maxMemberCount;i++)
+		for (int i=0;i<memberCount;i++)
 		{
 			if (this.m_battleUserInfo[i] != null)
 			{
@@ -312,7 +347,7 @@ public class BattleContext extends BattleServer
 		if (bAllUserOffline && now > this.battleFinishProtectTime)
 		{
 			log.debug("所有玩家离线，战斗结束");
-			Finish();
+			Finish(false);
 			return true;
 		}
 		return false;
@@ -334,6 +369,20 @@ public class BattleContext extends BattleServer
 		{
 			return;
 		}
+		if (System.currentTimeMillis() - this.battleStateTime > this.battleAllTime)
+		{
+			//System.err.println("jieshu");
+			//说明战斗结束
+			if (gameMode != null)
+			{
+				this.winCampId = gameMode.CheckBattleFinish();
+				if (this.winCampId == -1)
+				{
+					log.debug("平局");
+				}
+			}
+			this.Finish(true);
+		}
 		this.moveManager.OnHeartBeat();
 		for (SSGameUnit unit : gameObjectMap.values())
 		{
@@ -343,31 +392,34 @@ public class BattleContext extends BattleServer
 			}
 		}		
 		this.effectManager.OnHeartBeat(now, tick);
-		this.gameMode.OnHeartBeat(now, tick);
-	}
-	public void BoradTipsByType(EBattleTipType type,Player player)
-	{
-		boolean flag = false;
-		if (!this.tipSet.contains(type))
+		this.passiveSkillManager.OnHeartBeat(now, tick);
+		if (gameMode != null)
 		{
-			this.tipSet.add(type);
-			flag = true;
-		}
-		if (flag)
-		{
-			ResBattleTipMessage message = new ResBattleTipMessage();
-			switch (type) {
-			case eTips_ObjAppear:
-				message.tipCode = 100;
-				break;
-			case eTips_Gas:
-				message.tipCode = 101;
-				break;
-			default:
-				break;
+		//如果该模式需要刚开始等待
+			if (gameMode.GetBWaitStart() && battleHeartBeatTime - this.battleStateTime > this.gameMode.GetWaitTime())
+			{
+				//开始出现等代的模式道具
+				this.gameMode.Start();
 			}
-			MessageUtil.tell_player_message(player, message);
-		}	
+			this.gameMode.OnHeartBeat(now, tick);
+		}
+	}
+	public void BoradTipsByType(EBattleTipType type)
+	{
+		ResBattleTipMessage message = new ResBattleTipMessage();
+		message.battleAllTime =this.battleAllTime - this.battleHeartBeatTime + this.battleStateTime;
+		switch (type)
+		{
+		case eTips_ObjAppear:
+			message.tipCode = 100;
+			break;
+		case eTips_CountDown:
+			message.tipCode = 101;
+			break;
+		default:
+			break;
+		}
+		MessageUtil.tell_battlePlayer_message(this, message);
 	}
 	/**
 	 * 改变游戏状态
@@ -377,7 +429,7 @@ public class BattleContext extends BattleServer
 	public void setBattleState(EBattleServerState state,boolean isSendToClient)
 	{
 		this.battleState = state;
-		this.battleStateTime = System.currentTimeMillis();
+		this.battleStateTime = this.battleHeartBeatTime;
 		if (isSendToClient)
 		{
 			switch (state) {
@@ -392,10 +444,17 @@ public class BattleContext extends BattleServer
 				ResEnterSceneMessage scene_msg = new ResEnterSceneMessage();
 				MessageUtil.tell_battlePlayer_message(this, scene_msg);
 				break;			
-			default:
+			case eSSBS_Finished:
+				ResBattleFinishMessage message = new ResBattleFinishMessage();
+				message.winCampId = this.winCampId;
+				MessageUtil.tell_battlePlayer_message(this, message);
 				break;
 			}
 		}
+	}
+	public void OnChangeBattleState()
+	{
+		
 	}
 	/**
 	 * 请求开始移动
@@ -451,9 +510,9 @@ public class BattleContext extends BattleServer
 	 * @param bIfImpact
 	 * @return
 	 */
-	public boolean AskStartMoveForced(SSGameUnit player, CVector3D dir, float speed, boolean bIfImpact)
+	public boolean AskStartMoveForced(SSGameUnit player, CVector3D dir, float speed, boolean bIfImpact,long endTime)
 	{
-		return moveManager.AskMoveForced(player, new ColVector(dir.x, dir.y, dir.z), speed, bIfImpact);
+		return moveManager.AskMoveForced(player, new ColVector(dir.x, dir.y, dir.z), speed, bIfImpact,endTime);
 	}
 	public boolean AskStopMoveObjectForceMove(SSGameUnit player)
 	{
@@ -468,6 +527,19 @@ public class BattleContext extends BattleServer
 //		map = new SSMap();
 //		map.Init(0, "server-config/map-config.xml");
 	}	
+	public boolean LoadMapData(int mapId)
+	{
+		MapStaticData staticData = DataManager.getInstance().mapConfigLoader.mapconfigs.get(mapId);
+		if (staticData != null)
+		{
+			if(this.moveManager.staticData == null)
+			{
+				this.moveManager.staticData = staticData;
+			}
+			return true;
+		}
+		return false;
+	}
 	/**
 	 * 取得场景中独立无二的特效Id
 	 * @return
@@ -489,7 +561,8 @@ public class BattleContext extends BattleServer
 		SSHero hero = new SSHero(playerId,this,_camp);
 		hero.LoadHeroConfig(heroConfig);
 		//hero.LOadHeroConfig
-		user.sHero = hero;
+		if (user != null)
+			user.sHero = hero;
 		hero.player = user;
 		hero.BeginActionIdle(false);
 		hero.bornPos = pos;
@@ -519,24 +592,23 @@ public class BattleContext extends BattleServer
 	/**
 	 * 战斗结束
 	 */
-	public void Finish()
+	public void Finish(boolean bNormalFinished)
 	{
 		if (this.battleState == EBattleServerState.eSSBS_Finished)
 		{
 			return;
 		}
-		for (int i=0; i<this.m_battleUserInfo.length; i++)
-		{
-			if (this.m_battleUserInfo[i] == null)
-			{
-				continue;
-			}
-			this.m_battleUserInfo[i].sPlayer.player.getBattleInfo().reset();
-		}
 		//通知客户端战斗结束
 		setBattleState(EBattleServerState.eSSBS_Finished,true);
-		//通知客户端那方赢了
-		
+		//通知SsBattle结束
+		if (bNormalFinished)
+		{
+			BattleManager.getInstance().allBattleMap.get(this.battleId).OnFinish(this.winCampId,this.gameMode.CaculateRank());		
+		}
+		else
+		{
+			BattleManager.getInstance().allBattleMap.get(this.battleId).OnFinish(this.winCampId,null);		
+		}
 	}
 	public void AddMoveObject(SSMoveObject obj)
 	{
@@ -552,15 +624,39 @@ public class BattleContext extends BattleServer
 		Message message = obj.ConstructObjStateMessage();
 		MessageUtil.tell_battlePlayer_message(this, message);
 	}
+	public void SyncState(SSGameUnit target,long killerId)
+	{
+		if (target == null)
+		{
+			log.error("不存在英雄");
+			return;
+		}
+		if (target.curActionInfo.eOAS.value == EGOActionState.Dead.value)
+		{
+			ResDeadStateMessage deadStateMessage = new ResDeadStateMessage();
+			deadStateMessage.playerId = target.id;
+			deadStateMessage.killerId = killerId;
+			deadStateMessage.posX = (int)(target.curActionInfo.pos.x * 1000);
+			deadStateMessage.posZ = (int)(target.curActionInfo.pos.z * 1000);
+			deadStateMessage.angle = Tools.GetDirAngle(target.curActionInfo.dir);
+			MessageUtil.tell_battlePlayer_message(this, deadStateMessage);
+		}
+	}
 	public void AskRebornGameHero(SSHero obj)
 	{
-		Player player =  obj.player.player;
-		if (player != null)
+		if (obj.player != null)
 		{
-			ResHeroRebornMessage message = new ResHeroRebornMessage();
-			MessageUtil.tell_player_message(player, message);
+			Player player =  obj.player.player;
+			if (player != null)
+			{
+				ResHeroRebornMessage message = new ResHeroRebornMessage();
+				MessageUtil.tell_player_message(player, message);
+			}
 		}
 		obj.BeginActionIdle(false);
+		obj.bornPos = DataManager.getInstance().heroBornConfigXMLLoader.
+				heroBornPosConfigMap.get(this.mapId).get(obj.camp.value).
+				GetRandomOneBornPos();
 		//重新设置到出生点
 		ResetPos(obj, obj.bornPos, false);
 		obj.FullHp();
@@ -572,16 +668,16 @@ public class BattleContext extends BattleServer
 	 * @param camType
 	 * @return
 	 */
-	private int randomPickHero(Set<Integer> pickHeroList)
+	private int randomPickHero(List<Hero> heros)
 	{
 		List<Integer> canChooseList = new ArrayList<Integer>();
-		if (pickHeroList == null || pickHeroList.size() == 0)
+		if (heros == null || heros.size() == 0)
 		{
 			System.out.println("没有英雄可以选择");
 		}
-		for (int heroId : pickHeroList) 
+		for (Hero heroId : heros) 
 		{
-			canChooseList.add(heroId);
+			canChooseList.add(heroId.getHeroId());
 		}
 		return canChooseList.get((int) (Math.random()*canChooseList.size()));		
 	}
@@ -596,7 +692,7 @@ public class BattleContext extends BattleServer
 		{
 			return null;
 		}
-		for (int i=0; i<this.m_battleUserInfo.length; i++)
+		for (int i=0; i<this.memberCount; i++)
 		{
 			if (this.m_battleUserInfo[i] == null)
 			{
@@ -697,7 +793,7 @@ public class BattleContext extends BattleServer
 				//移除消息通信
 				info.sPlayer.bIfConnect = false;
 				info.bIsLoadedComplete = false;
-				info.bReconnect = true;
+				//info.bReconnect = true;
 				if (battleState == EBattleServerState.eSSBS_Playing)
 				{
 					info.offlineTime = System.currentTimeMillis();
@@ -716,15 +812,20 @@ public class BattleContext extends BattleServer
 		{
 			info.sPlayer.bIfConnect = true;
 			//需要重新连接
-			if (info.bReconnect == true)
-			{
+//			if (info.bReconnect == true)
+//			{
 				//发送给客户端重新连接的消息
 				ResReConnectMessage message = new ResReConnectMessage();
 				message.battleState = this.battleState.getValue();
 				message.battleId = this.battleId;
+				message.gameType = this.battleType.getValue();
 				message.mapId = this.mapId;
 				message.playerId = player.getId();
-				for (int i=0;i<this.m_battleUserInfo.length;i++)
+				message.battleTime = this.battleAllTime - (this.battleHeartBeatTime - this.battleStateTime);
+				message.timeLimit = (int)(this.battleHeartBeatTime - this.battleStateTime);
+				int index = 0;
+				message.ReConnectInfo = new ReConnectInfo[memberCount];
+				for (int i=0;i<memberCount;i++)
 				{
 					if (this.m_battleUserInfo[i] == null)
 					{
@@ -735,10 +836,10 @@ public class BattleContext extends BattleServer
 					info2.heroId = this.m_battleUserInfo[i].selectedHeroId;
 					info2.nickName = this.m_battleUserInfo[i].sPlayer.player.getName();
 					info2.campId = this.m_battleUserInfo[i].camp.value;
-					message.ReConnectInfo.add(info2);
+					message.ReConnectInfo[index++] = info2;
 				}
 				MessageUtil.tell_player_message(player, message);
-			}
+//			}
 			switch (battleState) {
 			case eSSBS_SelectHero:
 				//选定的英雄重新发送
@@ -777,7 +878,7 @@ public class BattleContext extends BattleServer
 	}
 	private void PostStartGameMsg()
 	{
-		for (int i=0; i<this.m_battleUserInfo.length; i++)
+		for (int i=0; i<this.memberCount; i++)
 		{
 			if (this.m_battleUserInfo[i] == null)
 			{
@@ -790,7 +891,28 @@ public class BattleContext extends BattleServer
 			//发送每个玩家的英雄信息
 			//然后通知客户端加载模型
 		}
-		gameMode.Start();
 	}
-	
+	public void ChangeBattleTime(long time)
+	{		
+		this.battleAllTime = System.currentTimeMillis() - this.battleStateTime + time;
+	}
+	public void AskLockTarget(SSHero hero, long lockTargetId)
+	{
+		if (hero == null)
+		{
+			return;
+		}
+		if (lockTargetId <= 0)
+		{
+			hero.ClearLockTargetId();
+			return;
+		}
+		SSGameUnit obj = GetGameObjectById(lockTargetId);
+		if (obj == null)
+		{
+			log.error("游戏场景中找不到角色:"+lockTargetId);
+			return;
+		}
+		hero.AskLockTarget(obj);
+	}
 }

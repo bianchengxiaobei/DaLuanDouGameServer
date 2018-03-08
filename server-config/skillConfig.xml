@@ -6,10 +6,11 @@
 	Move(3);
  -->
  <!-- eReleaseWay:
- 	No_Target(0),
+ 	No_Target_Pos(0),
 	Need_Target_No_Turn(1),
 	Need_Target(2),
-	Auto(3);
+	Auto(3),
+	No_Target_Dir(4);
   -->
   <!-- eSkillTargetType:
   	None(0),
@@ -20,7 +21,7 @@
    -->
 <skillConfigs>
 	<skill>
-		<!-- 飞腿  -->
+		<!-- 飞腿  （向指定方向飞行，碰到敌人造成[phy+]伤害并击退敌人）-->
 		<skillId>1</skillId>
 		<eSkillType>1</eSkillType>
 		<eReleaseWay>0</eReleaseWay>
@@ -32,36 +33,127 @@
 		<releaseDis>1200</releaseDis>
 		<bImpact>true</bImpact>
 		<eSkillTargetType>4</eSkillTargetType>
-		<eventId>10001</eventId>
+		<eventId>60001</eventId>
 	</skill>
 	<skill>
 		<!-- 飞球  -->
 		<skillId>2</skillId>
 		<eSkillType>1</eSkillType>
-		<eReleaseWay>0</eReleaseWay>
+		<eReleaseWay>4</eReleaseWay>
 		<bIsNormalAttack>false</bIsNormalAttack>
 		<prepareTime>0</prepareTime>
 		<cooldownTime>3000</cooldownTime>
 		<releaseTime>0</releaseTime>
-		<lastTime>1500</lastTime>
+		<lastTime>900</lastTime>
 		<releaseDis>1200</releaseDis>
-		<bImpact>true</bImpact>
+		<bImpact>false</bImpact>
 		<eSkillTargetType>4</eSkillTargetType>
-		<eventId>30001</eventId>
+		<eventId>20001</eventId>
 	</skill>
 	<skill>
-		<!-- 旋转飞腿  -->
-		<skillId>1000</skillId>
+		<!-- 运动男普攻  -->
+		<skillId>3</skillId>
+		<eSkillType>1</eSkillType>
+		<eReleaseWay>2</eReleaseWay>
+		<bIsNormalAttack>true</bIsNormalAttack>
+		<prepareTime>0</prepareTime>
+		<cooldownTime>950</cooldownTime>
+		<releaseTime>500</releaseTime>
+		<lastTime>0</lastTime>
+		<releaseDis>200</releaseDis>
+		<bImpact>false</bImpact>
+		<eSkillTargetType>4</eSkillTargetType>
+		<eventId>20002</eventId>
+	</skill>
+	<skill>
+		<!-- 运动男护盾 (魔法) -->
+		<skillId>4</skillId>
+		<eSkillType>0</eSkillType>
+		<eReleaseWay>0</eReleaseWay>
+		<bIsNormalAttack>false</bIsNormalAttack>
+		<prepareTime>0</prepareTime>
+		<cooldownTime>20000</cooldownTime>
+		<releaseTime>0</releaseTime>
+		<lastTime>0</lastTime>
+		<releaseDis>0</releaseDis>
+		<bImpact>true</bImpact>
+		<eSkillTargetType>1</eSkillTargetType>
+		<eventId>100001</eventId>
+	</skill>
+	<skill>
+		<!--闪电打击  -->
+		<!--向目标区域发射一阵雷电，对范围内所有敌方单位造成90([mag,+1])点的魔法伤害 -->
+		<skillId>201</skillId>
 		<eSkillType>1</eSkillType>
 		<eReleaseWay>0</eReleaseWay>
 		<bIsNormalAttack>false</bIsNormalAttack>
 		<prepareTime>0</prepareTime>
-		<cooldownTime>3000</cooldownTime>
+		<cooldownTime>6000</cooldownTime>
+		<releaseTime>0</releaseTime>
+		<lastTime>970</lastTime>
+		<releaseDis>1300</releaseDis>
+		<bImpact>false</bImpact>
+		<eSkillTargetType>4</eSkillTargetType>
+		<eventId>30002</eventId>
+	</skill>
+	<skill>
+		<!-- 火男 （死亡之火（锤击地面），眩晕敌人2秒，并且造成240魔法伤害）-->
+		<skillId>301</skillId>
+		<eSkillType>1</eSkillType>
+		<eReleaseWay>3</eReleaseWay>
+		<bIsNormalAttack>false</bIsNormalAttack>
+		<prepareTime>0</prepareTime>
+		<cooldownTime>10000</cooldownTime>
+		<releaseTime>100</releaseTime>
+		<lastTime>0</lastTime>
+		<releaseDis>0</releaseDis>
+		<bImpact>false</bImpact>
+		<eSkillTargetType>4</eSkillTargetType>
+		<eventId>30003</eventId>
+	</skill>
+	<skill>
+		<!-- 火男 （烈焰之柱1秒的延迟后，目标区域创造一根烈焰之柱(600码半径),造成150魔法伤害）-->
+		<skillId>302</skillId>
+		<eSkillType>1</eSkillType>
+		<eReleaseWay>0</eReleaseWay>
+		<bIsNormalAttack>false</bIsNormalAttack>
+		<prepareTime>0</prepareTime>
+		<cooldownTime>8000</cooldownTime>
+		<releaseTime>1000</releaseTime>
+		<lastTime>0</lastTime>
+		<releaseDis>0</releaseDis>
+		<bImpact>false</bImpact>
+		<eSkillTargetType>4</eSkillTargetType>
+		<eventId>30004</eventId>
+	</skill>
+	<skill>
+		<!-- 火男 （炽热沼泽,在目标区域形成沼泽，减速敌人50%）-->
+		<skillId>303</skillId>
+		<eSkillType>2</eSkillType>
+		<eReleaseWay>0</eReleaseWay>
+		<bIsNormalAttack>false</bIsNormalAttack>
+		<prepareTime>0</prepareTime>
+		<cooldownTime>8000</cooldownTime>
 		<releaseTime>0</releaseTime>
 		<lastTime>0</lastTime>
-		<releaseDis>1200</releaseDis>
+		<releaseDis>0</releaseDis>
 		<bImpact>true</bImpact>
 		<eSkillTargetType>4</eSkillTargetType>
-		<eventId>20001</eventId>
+		<eventId>30005</eventId>
+	</skill>
+	<skill>
+		<!-- 火男普攻  -->
+		<skillId>304</skillId>
+		<eSkillType>1</eSkillType>
+		<eReleaseWay>2</eReleaseWay>
+		<bIsNormalAttack>true</bIsNormalAttack>
+		<prepareTime>0</prepareTime>
+		<cooldownTime>950</cooldownTime>
+		<releaseTime>500</releaseTime>
+		<lastTime>0</lastTime>
+		<releaseDis>200</releaseDis>
+		<bImpact>false</bImpact>
+		<eSkillTargetType>4</eSkillTargetType>
+		<eventId>20003</eventId>
 	</skill>
 </skillConfigs>

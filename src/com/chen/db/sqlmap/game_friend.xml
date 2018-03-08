@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="game_friend"> 
+  <resultMap id="friend_brief" type="com.chen.db.bean.Friend" >
+    <id column="roleId" property="roleId" jdbcType="BIGINT" />
+    <result column="relationship" property="relationship" jdbcType="BIT" />
+    <result column="friendId" property="friendId" jdbcType="BIGINT"/>
+    <result column="icon" property="icon" jdbcType="BIT"/>
+    <result column="name" property="name" jdbcType="VARCHAR"/>
+  </resultMap>
+  
+  <insert id="insert" parameterType="com.chen.db.bean.Friend">
+  	insert into friend (roleId,friendId,relationship,icon,name)
+  	values(#{roleId},#{friendId},#{relationship},#{icon},#{name})
+  </insert>
+  
+  <select id="select" parameterType="long" resultMap="friend_brief">
+  	select * from friend where roleId = #{roleId,jdbcType=BIGINT}
+  </select>
+
+  <update id="update" parameterType="com.chen.db.bean.Friend" >
+     update friend
+      set relationship = #{relationship,jdbcType=BIT}
+    where roleId = #{roleId,jdbcType=BIGINT}
+  </update>
+   <delete id="delete" parameterType="java.util.Map" >
+     delete from friend where roleId = #{roleId,jdbcType=BIGINT} and friendId = #{friendId,jdbcType=BIGINT}
+  </delete>
+</mapper>

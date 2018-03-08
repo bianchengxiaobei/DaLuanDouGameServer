@@ -1,5 +1,7 @@
 package com.chen.login.message.req;
 
+import java.nio.ByteBuffer;
+
 import org.apache.mina.core.buffer.IoBuffer;
 
 import com.chen.message.Message;
@@ -83,27 +85,22 @@ public class ReqLoginCharacterToGameServerMessage extends Message
 		return null;
 	}
 	@Override
-	public boolean read(IoBuffer buffer) {
-		this.gateId = readInt(buffer);
-		this.isAdult = readByte(buffer);
-		this.loginIp = readString(buffer);
-		this.loginType = readInt(buffer);
-		this.playerId = readLong(buffer);
-		this.serverId = readInt(buffer);
-		this.userId = readString(buffer);
-		this.userName = readString(buffer);
-		return true;
+	public void read(ByteBuffer buffer)
+	{
+		super.read(buffer);
+		this.gateId = readInt(this.messageUnpacker);
+		this.isAdult = readByte(this.messageUnpacker);
+		this.loginIp = readString(this.messageUnpacker);
+		this.loginType = readInt(this.messageUnpacker);
+		this.playerId = readLong(this.messageUnpacker);
+		this.serverId = readInt(this.messageUnpacker);
+		this.userId = readString(this.messageUnpacker);
+		this.userName = readString(this.messageUnpacker);
+		this.readEnd();
 	}
 	@Override
-	public boolean write(IoBuffer buffer) {
-		writeInt(buffer, gateId);
-		writeByte(buffer, isAdult);
-		writeString(buffer, loginIp);
-		writeInt(buffer, loginType);
-		writeLong(buffer, playerId);
-		writeInt(buffer, serverId);
-		writeString(buffer, userId);
-		writeString(buffer, userName);
-		return true;
+	public void write(IoBuffer buffer)
+	{
+
 	}
 }

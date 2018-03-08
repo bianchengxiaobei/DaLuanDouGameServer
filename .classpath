@@ -8,9 +8,10 @@
 	<classpathentry kind="lib" path="lib/mybatis-3.3.0.jar"/>
 	<classpathentry kind="lib" path="lib/mysql-jdbc.jar"/>
 	<classpathentry kind="lib" path="lib/quartz-2.2.2.jar"/>
-	<classpathentry kind="lib" path="lib/ServerCore.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-api-1.7.7.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-log4j12-1.7.7.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.16.jar"/>
+	<classpathentry kind="lib" path="lib/MsgPack-0814.jar"/>
+	<classpathentry kind="lib" path="lib/NewServerCode.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

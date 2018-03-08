@@ -12,6 +12,7 @@ import com.chen.battle.skill.config.SkillModelFlyConfig;
 import com.chen.battle.skill.message.res.ResSkillFlyEmitDestoryMessage;
 import com.chen.battle.skill.message.res.ResSkillFlyEmitMessage;
 import com.chen.battle.skill.structs.ESkillEffectType;
+import com.chen.battle.skill.structs.ESkillEmitToTargetType;
 import com.chen.battle.skill.structs.ElementArray;
 import com.chen.battle.structs.CVector3D;
 import com.chen.battle.structs.SSGameUnit;
@@ -72,7 +73,6 @@ public class SSSkillEffect_Emit extends SSSkillEffect
 	@Override
 	public boolean Begin() 
 	{
-		logger.debug("FlyBegin");
 		if (theOwner == null)
 		{
 			logger.error("没有主实体");
@@ -83,9 +83,17 @@ public class SSSkillEffect_Emit extends SSSkillEffect
 		this.flyConfig = (SkillModelFlyConfig)this.config;
 		int flyNum = this.flyConfig.num;
 		int leftAngle = -(int)(this.flyConfig.angle * (flyNum - 1) * 0.5f);
+		CVector3D curDir = null;
+		if (this.flyConfig.eSkillEmitToTargetType == ESkillEmitToTargetType.Self)
+		{
+			curDir = theOwner.GetCurDir().clone();
+		}
+		else if(this.flyConfig.eSkillEmitToTargetType == ESkillEmitToTargetType.Custom)
+		{
+			curDir = theOwner.curActionInfo.skillParams.clone();
+		}
 		for (int i=0;i<flyNum;i++)
 		{
-			CVector3D curDir = theOwner.GetCurDir();
 			int angle = leftAngle + this.flyConfig.angle * i;
 			curDir.RotateAngle(angle);
 			SSBulletEntity entity = new SSBulletEntity();
@@ -98,8 +106,7 @@ public class SSSkillEffect_Emit extends SSSkillEffect
 			if (startSkillGO != null)
 			{
 				startObj = startSkillGO;
-			}
-			
+			}			
 			entity.curPos = startObj.GetEmitPos();
 			entity.curDir = curDir;
 			entity.launchTime = System.currentTimeMillis();
@@ -174,7 +181,7 @@ public class SSSkillEffect_Emit extends SSSkillEffect
 							skill, System.currentTimeMillis(), null);
 					//技能命中目标
 					//OnSkillHitTarget(entity.pTarget);
-					logger.debug("Fly技能命中目标");
+					//logger.debug("Fly技能命中目标");
 				}
 				this.bulletHitTargetArrays.array.get(i).isVaild = false;
 				--this.bulletHitTargetArrays.curSize;
@@ -248,6 +255,37 @@ public class SSSkillEffect_Emit extends SSSkillEffect
 			}
 			entityDir.normalized();
 			entity.curPos = CVector3D.Add(entityPos, CVector3D.Mul(entityDir, fCanMoveDist));
+			break;
+		case Follow:
+		case AutoFind:
+			if (entity.targetId > 0 && entity.target != null && entity.target.bExpire ==false 
+			&& entity.target.IsDead() == false)
+			{
+				if (entity.target.id != entity.targetId)
+				{
+					entity.bIfEnd = true;
+					return;
+				}
+				CVector3D targetPos = entity.target.GetCurPos();
+				CVector3D selfPos = entity.curPos;
+				CVector3D cDir = CVector3D.Sub(targetPos, selfPos);
+				//飞行道具也有包围合
+				float fDist = cDir.Length() - entity.target.GetColliderRadius();
+				float fCanMoveDist2 = this.flyConfig.flySpeed * tick * 0.001f * 0.001f;
+				if (fCanMoveDist2 >= fDist)
+				{
+					SSEmitHitTargetInfo info = new SSEmitHitTargetInfo(entity.target, entity.target.GetCurPos(),cDir);
+					this.bulletHitTargetArrays.AddElement(info);
+					entity.bIfEnd = true;
+					return;
+				}
+				cDir.normalized();
+				entity.curPos = CVector3D.Add(selfPos, CVector3D.Mul(cDir, fCanMoveDist2));
+			}
+			else
+			{
+				entity.bIfEnd = true;
+			}
 			break;
 		}
 	}

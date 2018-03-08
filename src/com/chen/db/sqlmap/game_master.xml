@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="game_master">
+	<resultMap id="gameMaster" type="com.chen.db.bean.GameMaster">
+		<result column="username" property="username" jdbcType="VARCHAR" />
+		<result column="gmLevel" property="gmLevel" jdbcType="INTEGER" />
+		<result column="userId" property="userId" jdbcType="BIGINT" />
+		<result column="idDeleted" property="idDeleted" jdbcType="INTEGER" />
+	</resultMap>
+	<select id="select" parameterType="long" resultMap="gameMaster">
+		select username, userId,gmLevel from gamemaster where idDeleted = 0;
+	</select>
+	<select id="selectByUserId" parameterType="long" resultMap="gameMaster">
+		select username, userId,gmLevel from gamemaster where userId = #{userId};
+	</select>
+</mapper>

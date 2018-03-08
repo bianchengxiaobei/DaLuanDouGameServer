@@ -1,7 +1,9 @@
 package com.chen.player.structs;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -9,10 +11,25 @@ import org.apache.logging.log4j.Logger;
 import com.chen.battle.manager.BattleManager;
 import com.chen.battle.structs.BattleContext;
 import com.chen.battle.structs.EBattleState;
+import com.chen.battle.structs.EBuyType;
 import com.chen.battle.structs.PlayerBattleInfo;
+import com.chen.collection.manager.CollectionManager;
+import com.chen.data.manager.DataManager;
+import com.chen.db.bean.Friend;
 import com.chen.db.bean.Hero;
-import com.chen.db.dao.HeroDao;
+import com.chen.db.bean.Mail;
+import com.chen.friend.message.res.ResAddFriendResultMessage;
+import com.chen.friend.message.res.ResFrientListRemoveMessage;
+import com.chen.friend.message.res.ResNotifyBecomeFriendMessage;
+import com.chen.friend.structs.ERelationShip;
+import com.chen.login.bean.FriendData;
+import com.chen.login.message.res.ResGetHeroMessage;
+import com.chen.login.message.res.ResGuideStepInfoMessage;
+import com.chen.login.message.res.ResNotifyGoldMessage;
 import com.chen.match.structs.MatchPlayer;
+import com.chen.player.manager.PlayerManager;
+import com.chen.utils.Tools;
+import com.chen.utils.MessageUtil;
 
 
 public class Player
@@ -40,6 +57,8 @@ public class Player
 	private byte sex;
 	//玩家等级
 	private int level;
+	//玩家天梯分数
+	private int rank;
 	//游戏所在网关id编号
 	private int gateId;
 	//玩家登陆的时间
@@ -57,24 +76,37 @@ public class Player
 	//被加入黑名单次数
 	private int addBlackCount;
 	//经验值
-	private long exp;
+	private int exp;
 	//是否是重新连接
 	private boolean isReconnect;
-	
+	//已经完成的向导id
+	private String finishedGuideStep;
+	//日常奖励时间点
+	private long dailyTime;
+	//日常奖励次数
+	private int dailyCount;
 	private transient int state;
+	//GM等级 
+	private transient int gmlevel;
 	//-------------------------------战斗---------------------
 	//玩家匹配信息
 	private MatchPlayer matchPlayer;	
 	//玩家战斗信息
 	private PlayerBattleInfo battleInfo;
 	
+	public CollectionManager collectionManager;
 	private List<Hero> heroList;
-	
+	public Map<Long, Friend> friendList;
+	public transient Map<Long, Mail> mailList;
+	public static final byte MaxFriendCount = 64;
 	public Player()
 	{
 		matchPlayer = new MatchPlayer(this);	
 		battleInfo = new PlayerBattleInfo();
-		setHeroList(new ArrayList<>());
+		heroList = new ArrayList<>();
+		friendList = new HashMap<>();
+		mailList = new HashMap<>();
+		collectionManager = new CollectionManager(this);
 	}
 	public boolean isForbid() {
 		return forbid;
@@ -100,10 +132,10 @@ public class Player
 	public void setAddBlackCount(int addBlackCount) {
 		this.addBlackCount = addBlackCount;
 	}
-	public long getExp() {
+	public int getExp() {
 		return exp;
 	}
-	public void setExp(long exp) {
+	public void setExp(int exp) {
 		this.exp = exp;
 	}
 	public int getCreateServerId() {
@@ -205,8 +237,8 @@ public class Player
 	public int getState() {
 		return state;
 	}
-	public void setState(int state) {
-		this.state = state;
+	public void setState(PlayerState state) {
+		this.state = state.value;
 	}
 	public int getServerId() {
 		// TODO Auto-generated method stub
@@ -224,14 +256,11 @@ public class Player
 	public void setBattleInfo(PlayerBattleInfo battleInfo) {
 		this.battleInfo = battleInfo;
 	}
-	
-	public void initHero()
-	{
-		if (this.id != 0)
-		{
-			this.getHeroList().clear();
-			this.getHeroList().addAll(new HeroDao().selectById(this.id));
-		}	
+	public String getFinishedGuideStep() {
+		return finishedGuideStep;
+	}
+	public void setFinishedGuideStep(String finishedGuideStep) {
+		this.finishedGuideStep = finishedGuideStep;
 	}
 	public List<Hero> getHeroList() {
 		return heroList;
@@ -239,10 +268,50 @@ public class Player
 	public void setHeroList(List<Hero> heroList) {
 		this.heroList = heroList;
 	}
-	
-	
+	public void InitHero()
+	{
+		if (this.id != 0)
+		{
+			this.heroList.clear();
+			List<Hero> heros = PlayerManager.getInstance().heroDao.selectById(this.id);
+			this.heroList.addAll(heros);
+		}
+	}
+	public void InitFriend()
+	{
+		this.friendList.clear();
+		List<Friend> friends = PlayerManager.getInstance().friendDao.selectById(this.id);
+		if (friends == null)
+		{
+			return;
+		}
+		for (Friend friend : friends)
+		{
+			this.friendList.put(friend.getFriendId(), friend);
+		}
+	}
+	public void AddHero(int heroId)
+	{
+		if (this.id != 0)
+		{
+			log.debug("fefe:"+heroId);
+			Hero hero = new Hero();
+			hero.setHeroId(heroId);
+			hero.setRoleId(this.id);
+			hero.setServer(this.createServerId);
+			//更新缓存
+			this.getHeroList().add(hero);
+			//更新数据库
+			PlayerManager.getInstance().heroDao.insert(hero);
+			//通知客户端购买成功
+			ResGetHeroMessage message = new ResGetHeroMessage();
+			message.heroId = heroId;
+			MessageUtil.tell_player_message(this, message);
+		}	
+	}
 	public void Offline()
 	{
+		//this.setState(PlayerState.Quit);
 		if (this.battleInfo.battleState.value < EBattleState.eBattleState_Async.value)
 		{
 			switch (this.battleInfo.battleTyoe) {
@@ -266,5 +335,341 @@ public class Player
 				log.error("找不到战斗线程");
 			}
 		}
+	}
+	public void PostGuideStep()
+	{
+		ResGuideStepInfoMessage message = new ResGuideStepInfoMessage();
+		if (this.finishedGuideStep == null || this.finishedGuideStep.equals(""))
+		{
+			message.allComp = false;
+			MessageUtil.tell_player_message(this, message);
+			return;
+		}
+		if (this.finishedGuideStep.indexOf("ok") != -1)
+		{
+			message.allComp =true;
+		}else
+		{
+			message.allComp = false;
+			String[] steps = this.finishedGuideStep.split(",");
+			int size = steps.length;
+			message.finishedList = new int[size];
+			for(int i=0; i<size; i++)
+			{
+				message.finishedList[i] = Integer.parseInt(steps[i]);
+			}
+		}
+		MessageUtil.tell_player_message(this, message);
+	}
+	/**
+	 * 购买商品
+	 * @param goodId
+	 * @param buyType
+	 * @param num
+	 */
+	public void AskBuyGood(int goodId,byte buyType,byte num)
+	{
+		int cost = 0;
+		boolean buySuccess = false;
+		int goodType = 0;
+		//判断商品类型
+		if (Tools.IsHeroGood(goodId))
+		{
+			goodType = 1;
+			//如果已经有改角色
+			if (this.HasHero(goodId))
+			{
+				return ;
+			}
+			cost = this.GetHeroGoodCost(goodId, buyType);
+		}
+		do 
+		{
+			switch (EBuyType.values()[buyType])
+			{
+			case Gold:	
+				if (cost <= this.money)
+				{
+					//改数据库数据
+					int left = this.money-cost;
+					this.setMoney(left);
+					buySuccess = true;
+					this.SyncCurGold();
+					log.debug("购买角色花费："+cost+",剩余:"+left);
+				}
+				else
+				{
+					return;
+				}
+				break;
+			case Diamond:
+				
+				break;
+			}
+		} while (false);
+		if (buySuccess)
+		{
+			if (goodType == 1)
+			{
+				this.AddHero(goodId);
+			}
+		}
+	}
+	public boolean HasHero(int heroId)
+	{
+		for (Hero hero : heroList)
+		{
+			if (hero.getHeroId() == heroId)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	public int GetHeroGoodCost(int heroId,byte buyType)
+	{
+		int cost = 0;
+		switch (EBuyType.values()[buyType])
+		{
+		case Gold:	
+			cost = DataManager.getInstance().heroConfigXMLLoader.heroConfigMap.get(heroId).costGold;
+			break;
+		case Diamond:
+			cost = DataManager.getInstance().heroConfigXMLLoader.heroConfigMap.get(heroId).costDimaond;
+			break;
+		}
+		return cost;
+	}
+	
+	public void SyncCurGold()
+	{
+		ResNotifyGoldMessage message = new ResNotifyGoldMessage();
+		message.gold = this.money;
+		MessageUtil.tell_player_message(this, message);
+	}
+	public int CheckUpgrade(int exp,int needExp1)
+	{
+		int allExp = this.exp + exp;
+		int needExp = needExp1;
+		while (allExp >= needExp)
+		{
+			allExp -= needExp;
+			this.level++;
+			needExp = DataManager.getInstance().playerExpConfigXMLLoader.levelToExpConfig.levelToExp.get(this.level);
+		}
+		this.exp = allExp;
+		return needExp;
+	}
+	public void UpdateDataBase()
+	{
+		
+	}
+	/**
+	 * 添加好友
+	 * @param friendId
+	 * @param relationShip
+	 */
+	public void AddFriendById(long friendId,byte relationShip)
+	{
+		if (relationShip == ERelationShip.Friend.value)
+		{
+			Player player = PlayerManager.getInstance().getPlayer(friendId);
+			if (player != null)
+			{
+				this.AddToFriendList(player, relationShip);
+			}
+		}
+		else
+		{
+			//添加黑名单
+			log.debug("添加黑名单：thisId:"+this.id+",friend:"+friendId);
+		}
+	}
+	/**
+	 * 删除好友
+	 * @param friendId
+	 * @param relationShip
+	 */
+	public void DeleteFriend(long friendId,byte relationShip)
+	{
+		ERelationShip ship = ERelationShip.values()[relationShip];
+		this.RemoveFriendCache(friendId, ship);
+		//如果玩家在线，如果不在线呢？
+		Player player = PlayerManager.getInstance().getPlayer(friendId);
+		if (player != null)
+		{
+			player.RemoveFriendCache(this.getId(), ship);
+		}
+	}
+	/**
+	 * 接受或者拒绝成为好友
+	 * @param playerId
+	 * @param accept
+	 */
+	public void RepalyBecomeFriend(long playerId,boolean accept)
+	{
+		Player player = PlayerManager.getInstance().getPlayer(playerId);
+		if (player == null)
+		{
+			log.error("回复添加好友的时候对方下线");
+			return;
+		}
+		if (player == this)
+		{
+			log.error("不能是自己");
+		}
+		if (accept)
+		{
+			if (this.friendList.containsKey(playerId))
+			{
+				log.error("该玩家已经是你的好友了:"+playerId);
+				return;
+			}
+			boolean bError = true;
+			//双方都添加
+			//先自己
+			Friend friend = new Friend();
+			friend.setFriendId(playerId);
+			friend.setIcon((byte)player.getIcon());
+			friend.setName(player.getName());
+			friend.setRelationship(ERelationShip.Friend.value);
+			friend.setRoleId(this.id);
+			bError = this.AddFriendToCache(friend);	
+			if(bError)
+			{
+				PlayerManager.getInstance().friendDao.insert(friend);
+				this.NotifyAddFriend(playerId, ERelationShip.Friend);
+			}
+			
+			//后对方
+			Friend friend1 = new Friend();
+			friend1.setFriendId(this.id);
+			friend1.setIcon((byte)this.getIcon());
+			friend1.setName(this.getName());
+			friend1.setRelationship(ERelationShip.Friend.value);
+			friend1.setRoleId(playerId);
+			bError = player.AddFriendToCache(friend1);
+			//数据库客户端
+			if(bError)
+			{
+				PlayerManager.getInstance().friendDao.insert(friend1);
+				player.NotifyAddFriend(this.id, ERelationShip.Friend);
+			}
+		}
+		else
+		{
+			//拒绝就不做处理，其实可以返回给客户端通知下，但是没必要
+			log.error("拒绝成为朋友");
+		}
+	}
+	public boolean AddFriendToCache(Friend friend)
+	{
+		if (this.friendList.containsKey(friend.getRoleId()))
+		{
+			log.error("已经是你的好友:"+friend.getRoleId());
+			return false;
+		}
+		else
+		{
+			this.friendList.put(friend.getFriendId(), friend);
+			return true;
+		}
+	}
+
+	private void AddToFriendList(Player friend,byte relaion)
+	{
+		if (friend == null)
+		{
+			log.debug("缓存中找不到该角色:"+friend.id);
+			return;
+		}
+		if (friend.id == this.id)
+		{
+			log.error("不能自己添加自己:"+friend.id);
+			return;
+		}
+		if (friend.getState() == PlayerState.Quit.value)
+		{
+			log.error("玩家没有在线:"+friend.id);
+			return;
+		}
+		if (friend.getBattleInfo().battleId != 0)
+		{
+			log.error("玩家在战斗中:"+friend.id);
+			return;
+		}
+		if (this.friendList.containsKey(friend.id))
+		{
+			log.error("该玩家已经是你的好友了:"+friend.id);
+			return;
+		}
+		if (this.friendList.size() >= MaxFriendCount)
+		{
+			log.error("已经超过最多玩家数量，不能再添加了:"+friend.id);
+			return;
+		}
+		//发送给好友通知
+		ResNotifyBecomeFriendMessage message = new ResNotifyBecomeFriendMessage();
+		message.targetId = this.id;
+		message.name = this.name;
+		message.icon = this.icon;
+		MessageUtil.tell_player_message(friend, message);
+	}
+	public void RemoveFriendCache(long friendId,ERelationShip ship)
+	{
+		if (ship == ERelationShip.Friend)
+		{			
+			if (this.friendList.containsKey(friendId))
+			{
+				this.friendList.remove(friendId);
+				//发送给客户端好友改变了
+				ResFrientListRemoveMessage message = new ResFrientListRemoveMessage();
+				message.friendId = friendId;
+				MessageUtil.tell_player_message(this, message);
+				//更改数据库
+				PlayerManager.getInstance().friendDao.deleteFriend(this.id, friendId);
+			}
+		}
+		else
+		{
+			
+		}
+	}
+	public void NotifyAddFriend(long friendId,ERelationShip ship)
+	{
+		Friend friend = this.friendList.get(friendId); 
+		ResAddFriendResultMessage message = new ResAddFriendResultMessage();
+		FriendData data = new FriendData();
+		data.icon = friend.getIcon();
+		data.name = friend.getName();
+		data.playerId = friendId;
+		data.relationShip = ship.value;
+		data.status = PlayerManager.getInstance().GetPlayerStatus(friendId);
+		message.data = data;
+		MessageUtil.tell_player_message(this, message);
+	}
+	public long getDailyTime() {
+		return dailyTime;
+	}
+	public void setDailyTime(long dailyTime) {
+		this.dailyTime = dailyTime;
+	}
+	public int getDailyCount() {
+		return dailyCount;
+	}
+	public void setDailyCount(int dailyCount) {
+		this.dailyCount = dailyCount;
+	}
+	public int getRank() {
+		return rank;
+	}
+	public void setRank(int rank) {
+		this.rank = rank;
+	}
+	public int getGmlevel() {
+		return gmlevel;
+	}
+	public void setGmlevel(int gmlevel) {
+		this.gmlevel = gmlevel;
 	}
 }

@@ -1,6 +1,6 @@
 package com.chen.battle.structs;
 
-public class CVector3D
+public class CVector3D implements Cloneable
 {
 	public static double dDegToRad = Math.PI / 180.0f;
 	public float x;
@@ -68,6 +68,10 @@ public class CVector3D
 	{
 		float x = targetPos.x - this.x;
 		float y = targetPos.y - this.y;
+		if(y != 0)
+		{
+			System.err.println("y != null");
+		}
 		float z = targetPos.z - this.z;
 		return x * x + y * y + z * z;
 	}
@@ -112,5 +116,28 @@ public class CVector3D
 	public static float Mul(CVector3D vector3d,CVector3D vector3d2)
 	{
 		return vector3d.x * vector3d2.x + vector3d.y * vector3d2.y + vector3d.z * vector3d2.z;
+	}
+	@Override 
+	public String toString()
+	{
+		StringBuffer stringBuffer = new StringBuffer();
+		stringBuffer.append("X:"+this.x);
+		stringBuffer.append("Y:"+this.y);
+		stringBuffer.append("Z:"+this.z);
+		return stringBuffer.toString();
+	}
+	@Override 
+	public CVector3D clone() 
+	{
+		try 
+		{
+			return (CVector3D)super.clone();
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+			return null;
+		}
+		
 	}
 }

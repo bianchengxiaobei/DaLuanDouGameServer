@@ -3,24 +3,26 @@ package com.chen.db.bean;
 public class Hero
 {
 	private Long roleId;
-	private int server;
-	private int heroId;
+	private Integer server;
+	private Integer heroId;
+	
+	
 	public Long getRoleId() {
 		return roleId;
 	}
 	public void setRoleId(Long roleId) {
 		this.roleId = roleId;
 	}
-	public int getServer() {
+	public Integer getServer() {
 		return server;
 	}
-	public void setServer(int server) {
+	public void setServer(Integer server) {
 		this.server = server;
 	}
-	public int getHeroId() {
+	public Integer getHeroId() {
 		return heroId;
 	}
-	public void setHeroId(int heroId) {
+	public void setHeroId(Integer heroId) {
 		this.heroId = heroId;
 	}
 }

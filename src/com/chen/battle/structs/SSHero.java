@@ -87,7 +87,14 @@ public class SSHero extends SSGameUnit
 	@Override
 	public float GetSpeed() 
 	{	
-		return 1;
+		if (GetFPData(EParameterCate.Dizziness) > 0)
+		{
+			return 0;
+		}
+		else
+		{
+			return GetFPData(EParameterCate.MoveSpeed) * 0.001f;
+		}
 	}
 	@Override
 	public void OnMoved(ColVector pos)
@@ -123,6 +130,7 @@ public class SSHero extends SSGameUnit
 			ai = null;
 		}
 		ai = new SSAI_Hero(this);
+		ai.attackSkill = normalAttackSkill;
 	}
 	/**
 	 * 是否拥有该技能
@@ -164,7 +172,11 @@ public class SSHero extends SSGameUnit
 			float dist = 30000000;
 			for (SSGameUnit unit : this.battle.gameObjectMap.values())
 			{
-				if (unit.bExpire == false && GetCurPos().CanWatch(30, unit.GetCurPos()))
+				if (unit == this || !unit.IfEnemy(this))
+				{
+					continue;
+				}
+				if (unit.bExpire == false && GetCurPos().CanWatch(3, unit.GetCurPos()))
 				{
 					float tempDist = GetCurPos().GetWatchDistSqr(unit.GetCurPos());
 					if (tempDist < dist)
@@ -180,6 +192,35 @@ public class SSHero extends SSGameUnit
 			}
 		}
 		return this.lockedTargetId;
+	}
+	public void ClearLockTargetId()
+	{
+		this.lockedTargetId = 0;
+	}
+	public void AskLockTarget(SSGameUnit target)
+	{
+		if (this.curActionInfo.eOAS.value > EGOActionState.PassiveState.value)
+		{
+			log.debug("当前状态不允许改变目标id");
+			return;
+		}
+		if (target == null)
+		{
+			log.debug("目标为空引用");
+			return;
+		}
+		BattleContext battleContext = target.battle;
+		if (battleContext != this.battle)
+		{
+			log.debug("战斗线程不匹配");
+			return;
+		}
+		if (target.IsDead())
+		{
+			log.debug("目标已经死亡");
+			return;
+		}
+		this.lockedTargetId = target.id;		
 	}
 	public void SyncSkillState(int skillId)
 	{
@@ -206,17 +247,15 @@ public class SSHero extends SSGameUnit
 			return;
 		}
 		ResSkillInfoChangeMessage message = new ResSkillInfoChangeMessage();
-		message.playerId = this.id;
-		message.skillSlotIndex = skillSlotIndex;
 		message.skillId = skill.skillConfig.skillId;
 		message.coolTime = skill.skillConfig.cooldownTime;
-		int tDiff = (int)(skill.cooldownTime - System.currentTimeMillis());
-		if (tDiff < 0)
-		{
-			System.err.println("Skill.Time < 0");
-			tDiff = 0;
-		}
-		message.time = tDiff;
+//		int tDiff = (int)(skill.cooldownTime - System.currentTimeMillis());
+//		if (tDiff < 0)
+//		{
+//			System.err.println("Skill.Time < 0");
+//			tDiff = 0;
+//		}
+//		message.time = tDiff;
 		MessageUtil.tell_player_message(this.player.player, message);
 	}
 	private boolean IfDamage(HPMPChangeReason reason,int changeHp)
@@ -244,10 +283,6 @@ public class SSHero extends SSGameUnit
 	@Override
 	public int OnHeartBeat(long now, long tick)
 	{
-		if (IsDead())
-		{
-			
-		}
 		OnGameUnitHeartBeat(now, tick);
 		return 0;
 	}
@@ -257,12 +292,16 @@ public class SSHero extends SSGameUnit
 		{
 			CheckDeadStateToReborn();
 		}
+		if (GetFPData(EParameterCate.Dizziness) > 0 && this.curActionInfo.eOAS.value < EGOActionState.PassiveState.value && this.curActionInfo.eOAS.value != EGOActionState.Idle.value)
+		{
+			BeginActionIdle(true);
+		}
 		if (ai != null)
 		{
 			ai.HeartBeat(now, tick);
 		}
 	}
-	public int DoChangeHp(int value,HPMPChangeReason reason,SSGameUnit reasonGo,SSGameUnit deadGo)
+	public int DoChangeHp(int value,HPMPChangeReason reason,SSGameUnit reasonGo)
 	{
 		if (value == 0)
 		{
@@ -285,7 +324,7 @@ public class SSHero extends SSGameUnit
 				//OnPassitiveSkillCalled(EPassiveSkillTriggerType_Die, pcReasonGO);
 				if (IfCanBeTarget() == true)
 				{
-					this.BeginActionDead(reasonGo, true);
+					this.BeginActionDead(reasonGo.id, true);
 					return 2;
 				}
 			}
@@ -307,7 +346,7 @@ public class SSHero extends SSGameUnit
 				//记录伤害
 			}
 		}
-		int ret = this.DoChangeHp(changeValue, reason, obj, this);
+		int ret = this.DoChangeHp(changeValue, reason, obj);
 		if (ret == 0)
 		{
 			return;
@@ -325,11 +364,11 @@ public class SSHero extends SSGameUnit
 		return true;
 	}
 	@Override
-	public void BeginActionDead(SSGameUnit taret, boolean asyn) 
+	public void BeginActionDead(long killerId,boolean asyn) 
 	{
 		this.curActionInfo.eOAS = EGOActionState.Dead;
 		this.curActionInfo.time = battle.battleHeartBeatTime;
-		if (taret == null)
+		if (killerId == 0)
 		{
 			return;
 		}
@@ -337,13 +376,16 @@ public class SSHero extends SSGameUnit
 		{
 			this.lastHeroDeadTime = battle.battleHeartBeatTime;
 			//发送重生时间
-			ResHeroRebornTimeMessage message = new ResHeroRebornTimeMessage();
-			message.rebornTime = this.GetFPData(EParameterCate.ReliveTime);
-			MessageUtil.tell_player_message(this.player.player, message);
+			if (this.player != null)
+			{
+				ResHeroRebornTimeMessage message = new ResHeroRebornTimeMessage();
+				message.rebornTime = this.GetFPData(EParameterCate.ReliveTime);
+				MessageUtil.tell_player_message(this.player.player, message);
+			}
 		}
 		if (asyn)
 		{
-			battle.SyncState(this);
+			battle.SyncState(this,killerId);
 		}
 	}
 	@Override
@@ -355,5 +397,6 @@ public class SSHero extends SSGameUnit
 			log.debug("重生");
 			battle.AskRebornGameHero(this);
 		}
-	}	
+	}
+	
 }

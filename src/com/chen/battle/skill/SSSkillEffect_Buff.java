@@ -1,10 +1,12 @@
 package com.chen.battle.skill;
 
 import com.chen.battle.skill.config.SkillModelBuffConfig;
+import com.chen.battle.skill.message.res.ResBuffEffectMessage;
 import com.chen.battle.skill.structs.EBuffReplaceType;
 import com.chen.battle.skill.structs.ESkillEffectType;
 import com.chen.battle.skill.structs.ESkillModelTargetType;
 import com.chen.parameter.structs.EParameterCate;
+import com.chen.utils.MessageUtil;
 
 public class SSSkillEffect_Buff extends SSSkillEffect
 {
@@ -42,11 +44,11 @@ public class SSSkillEffect_Buff extends SSSkillEffect
 		{
 			return false;
 		}
-		SSSkillEffect_Buff sameBuff = null;
+		SSSkillEffect_Buff sameBuff = null;//可重复的buf
 		int sameBuffNum = 0;
-		SSSkillEffect_Buff conflictBuff = null;
-		SSSkillEffect_Buff replaceBuff = null;
-		long curTime = System.currentTimeMillis();
+		SSSkillEffect_Buff conflictBuff = null;//相互冲突的buf
+		SSSkillEffect_Buff replaceBuff = null;//会覆盖的buf
+		long curTime = battle.battleHeartBeatTime;
 		for (Integer id = target.bufferArray.Begin();id != target.bufferArray.End();id = target.bufferArray.Next())
 		{
 			SSSkillEffect_Buff buffEffect = (SSSkillEffect_Buff)target.battle.effectManager.GetEffect(id);
@@ -78,12 +80,14 @@ public class SSSkillEffect_Buff extends SSSkillEffect
 				logger.error("找不到buffEffect："+id);
 			}
 		}
+		//如果有互斥的buff，则本buff失效
 		if (conflictBuff != null)
 		{
 			return false;
 		}
 		if (replaceBuff != null)
 		{
+			//有需要覆盖的buff。被覆盖的buff直接终结
 			replaceBuff.isExpired = true;
 		}
 		//如果有相同的buff
@@ -94,6 +98,7 @@ public class SSSkillEffect_Buff extends SSSkillEffect
 			{
 				return false;
 			}
+			//如果为重置时间类型的堆叠
 			else if(m_BuffConfig.eBuffReplaceType == EBuffReplaceType.Reset)
 			{
 				//如果堆叠次数未满，则给原有buff添加效果
@@ -104,8 +109,10 @@ public class SSSkillEffect_Buff extends SSSkillEffect
 				sameBuff.ResetTime();
 				return false;
 			}
+			//如果是各自计算持续时间的堆叠
 			else if (m_BuffConfig.eBuffReplaceType == EBuffReplaceType.SingleCaculate)
 			{
+				//如果堆叠的次数大于最大可堆叠次数，本次buff失效
 				if (m_BuffConfig.replaceTimes > 0 && sameBuffNum >= m_BuffConfig.replaceTimes)
 				{
 					return false;
@@ -119,6 +126,7 @@ public class SSSkillEffect_Buff extends SSSkillEffect
 		{
 			this.AddBuffEffect(false);
 			target.AddBuffEffect(id);
+			this.BuffOnShowScene(true);
 		}
 		target.battle.effectManager.AddEffectsFromConfig(m_BuffConfig.skillStartModelList, theOwner,
 				target, target.GetCurPos(), target.GetCurDir(), skill, curTime, null);
@@ -159,8 +167,38 @@ public class SSSkillEffect_Buff extends SSSkillEffect
 	@Override
 	public void End() 
 	{
+		if (bIfBuffAdded == false)
+		{
+			return ;
+		}
+		bIfBuffAdded = false;
 		
-		
+		if (target == null)
+		{
+			return ;
+		}
+		battle.effectManager.AddEffectsFromConfig(m_BuffConfig.skillEndModelList, theOwner, 
+				target, target.GetCurPos(), target.GetCurDir(), skill, System.currentTimeMillis(), null);
+		if (m_BuffConfig.buffEffectInfo.eParamType != EParameterCate.None)
+		{
+			if (m_BuffConfig.buffEffectInfo.eParamType == EParameterCate.PassitiveSkill)
+			{
+				if (this.passitiveSkillId > 0)
+				{
+					//GetBattle()->GetPassiveSkillMgr()->RevmovePassiveSkill(m_passitiveSkillID);
+					this.passitiveSkillId = 0;
+				}
+			}
+			else
+			{
+				for (int i=0;i<repeatTimes;i++)
+				{
+					SSSkillEffect_Caculate.CaculateSkillEffectOnce(theOwner, target, this.m_BuffConfig.buffEffectInfo, 0, false, false);
+				}
+			}
+		}
+		target.RemoveBuffEffect(id);
+		this.BuffOnShowScene(false);
 	}
 	
 	public void AddRepeatEffect()
@@ -190,5 +228,15 @@ public class SSSkillEffect_Buff extends SSSkillEffect
 	public void Clear()
 	{
 		this.End();
+	}
+	private void BuffOnShowScene(boolean show)
+	{
+		ResBuffEffectMessage message = new ResBuffEffectMessage();
+		message.playerId = target.id;
+		message.projectId = this.id;
+		message.effectId = config.skillModelId;
+		message.time = (int) (battle.battleHeartBeatTime - this.beginDotTime - this.m_BuffConfig.effectInterval);
+		message.buffStateEnd = !show;
+		MessageUtil.tell_battlePlayer_message(battle, message);
 	}
 }

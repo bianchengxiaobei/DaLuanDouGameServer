@@ -4,5 +4,5 @@ public class NextSkillEffectConfig
 {
 	public int skillEffectId;
 	public int delay;
-	public int dependedArr[] = new int[16];	
+	public int dependedArr[] = new int[4];	
 }

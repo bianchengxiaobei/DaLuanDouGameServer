@@ -1,5 +1,7 @@
 package com.chen.login.message.req;
 
+import java.nio.ByteBuffer;
+
 import org.apache.mina.core.buffer.IoBuffer;
 
 import com.chen.message.Message;
@@ -36,32 +38,25 @@ public class ReqCreateCharacterToGameServerMessage extends Message
 		return null;
 	}
 	@Override
-	public boolean read(IoBuffer buf) {
-		this.gateId = readInt(buf);
-		this.createServer = readInt(buf);
-		this.userId = readString(buf);
-		this.userName = readString(buf);
-		this.name = readString(buf);
-		this.sex = readByte(buf);
-		this.icon = readInt(buf);
-		this.isAdult = readByte(buf);
-		this.optIp = readString(buf);
-		this.loginType = readInt(buf);
-		return true;
+	public void read(ByteBuffer buf)
+	{
+		super.read(buf);
+		this.gateId = readInt(this.messageUnpacker);
+		this.createServer = readInt(this.messageUnpacker);
+		this.userId = readString(this.messageUnpacker);
+		this.userName = readString(this.messageUnpacker);
+		this.name = readString(this.messageUnpacker);
+		this.sex = readByte(this.messageUnpacker);
+		this.icon = readInt(this.messageUnpacker);
+		this.isAdult = readByte(this.messageUnpacker);
+		this.optIp = readString(this.messageUnpacker);
+		this.loginType = readInt(this.messageUnpacker);
+		this.readEnd();
 	}
 	@Override
-	public boolean write(IoBuffer buf) {
-		writeInt(buf, gateId);
-		writeInt(buf, createServer);
-		writeString(buf, userId);
-		writeString(buf, userName);
-		writeString(buf, name);
-		writeByte(buf, this.sex);
-		writeInt(buf, icon);
-		writeByte(buf, isAdult);
-		writeString(buf, optIp);
-		writeInt(buf, loginType);
-		return true;
+	public void write(IoBuffer buf) 
+	{
+		
 	}
 	public int getGateId() {
 		return gateId;

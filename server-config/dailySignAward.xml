@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dailyConfig>
+	<daily>
+		<dayIndex>1</dayIndex>
+		<num>12</num>
+		<awardId>1001</awardId>
+	</daily>
+	<daily>
+		<dayIndex>2</dayIndex>
+		<num>12</num>
+		<awardId>1001</awardId>
+	</daily>
+</dailyConfig>

@@ -34,14 +34,20 @@ public class SSSkillEffect_Range extends SSSkillEffect
 		}
 		else if(rangeEffectConfig.eSkillAOEType == ESkillAOEType.FixDist)
 		{
-			curPos = CVector3D.Add(theOwner.GetCurPos(), CVector3D.Mul(theOwner.GetCurDir(), this.rangeEffectConfig.releaseDist)); 
+			curPos = CVector3D.Add(theOwner.GetCurPos(), CVector3D.Mul(theOwner.GetCurDir(), this.rangeEffectConfig.releaseDist*0.001f)); 
 		}
-		else
+		else if(rangeEffectConfig.eSkillAOEType == ESkillAOEType.TargetCenter)
 		{
 			if (this.target != null)
 			{
 				curPos = target.GetCurPos();
 			}
+		}
+		else if(rangeEffectConfig.eSkillAOEType == ESkillAOEType.CustomPos)
+		{
+			curPos = theOwner.curActionInfo.skillParams;
+			dir = CVector3D.Sub(curPos, theOwner.GetCurPos());
+			dir.normalized();
 		}
 		this.NotifySkillRangeBegin(theOwner, curPos, dir);
 		Update(System.currentTimeMillis(), 0);
@@ -55,6 +61,7 @@ public class SSSkillEffect_Range extends SSSkillEffect
 		message.PosZ = (int)(pos.z * 1000);
 		message.dirAngle = Tools.GetDirAngle(dir);
 		message.effectId = this.rangeEffectConfig.skillModelId;
+		message.projectId = this.id;
 		MessageUtil.tell_battlePlayer_message(battle, message);
 	}
 	@Override
@@ -97,7 +104,7 @@ public class SSSkillEffect_Range extends SSSkillEffect
 		nextTime = 0;
 		rangeTimes = 0;
 		IsForceStop = false;
-		curPos = new CVector3D();
+		curPos = null;
 	}
 	public boolean GetBeHittedObjs()
 	{

@@ -1,5 +1,7 @@
 package com.chen.move.message.req;
 
+import java.nio.ByteBuffer;
+
 import org.apache.mina.core.buffer.IoBuffer;
 
 import com.chen.message.Message;
@@ -27,18 +29,17 @@ public class ReqAskMoveMessage extends Message
 	}
 
 	@Override
-	public boolean read(IoBuffer buffer)
+	public void read(ByteBuffer buffer)
 	{
-		this.x = readInt(buffer);
-		this.z = readInt(buffer);
-		return true;
+		super.read(buffer);
+		this.x = readInt(this.messageUnpacker);
+		this.z = readInt(this.messageUnpacker);
 	}
 
 	@Override
-	public boolean write(IoBuffer buffer) 
+	public void write(IoBuffer buffer) 
 	{
 		
-		return true;
 	}
 
 }

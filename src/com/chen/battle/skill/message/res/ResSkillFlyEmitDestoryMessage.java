@@ -1,5 +1,7 @@
 package com.chen.battle.skill.message.res;
 
+import java.nio.ByteBuffer;
+
 import org.apache.mina.core.buffer.IoBuffer;
 
 import com.chen.message.Message;
@@ -26,17 +28,16 @@ public class ResSkillFlyEmitDestoryMessage extends Message
 	}
 
 	@Override
-	public boolean read(IoBuffer buffer)
+	public void read(ByteBuffer buffer)
 	{
-		
-		return true;
+
 	}
 
 	@Override
-	public boolean write(IoBuffer buffer) 
+	public void write(IoBuffer buffer) 
 	{
-		writeInt(buffer, emitId);
-		return true;
+		writeInt(this.messagePack, emitId);
+		super.write(buffer);
 	}
 
 }

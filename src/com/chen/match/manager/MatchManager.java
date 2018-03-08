@@ -57,6 +57,18 @@ public class MatchManager
 		}
 		return team;
 	}
+	public void UserStopTeam(MatchPlayer player)
+	{
+		if (player.getMatchTeamId() == 0)
+		{
+			log.error("MatchId == 0");
+			return;
+		}
+		if (allTeamMap.containsKey(player.getMatchTeamId()))
+		{
+			allTeamMap.get(player.getMatchTeamId()).Stop(player);
+		}
+	}
 	/**
 	 * 移除匹配队员
 	 * @param player
@@ -132,9 +144,6 @@ public class MatchManager
 			{
 				case Game_Mode_Ball:
 					list = new MatchList_Ball(team.getMapId());			
-					break;
-				case MATCH_MODE_QUICK_AI:
-					list = new MatchList_AI(team.getMapId());
 					break;
 				case Game_Mode_Flag:
 					list = new MatchList_Ladder(team.getMapId());

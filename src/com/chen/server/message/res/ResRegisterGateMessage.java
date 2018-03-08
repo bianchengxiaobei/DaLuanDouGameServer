@@ -1,5 +1,7 @@
 package com.chen.server.message.res;
 
+import java.nio.ByteBuffer;
+
 import org.apache.mina.core.buffer.IoBuffer;
 
 import com.chen.message.Message;
@@ -20,24 +22,26 @@ public class ResRegisterGateMessage extends Message
 	 * 写入字节缓存
 	 */
 	@Override
-	public boolean write(IoBuffer buf) {
+	public void write(IoBuffer buf) 
+	{
 		// 服务器编号
-		writeInt(buf, this.serverId);
+		writeInt(this.messagePack, this.serverId);
 		// 服务器名字
-		writeString(buf, this.serverName);
-		return true;
+		writeString(this.messagePack, this.serverName);
+		super.write(buf);
 	}
 
 	/**
 	 * 读取字节缓存
 	 */
 	@Override
-	public boolean read(IoBuffer buf) {
+	public void read(ByteBuffer buf)
+	{
+		super.read(buf);
 		// 服务器编号
-		this.serverId = readInt(buf);
+		this.serverId = readInt(this.messageUnpacker);
 		// 服务器名字
-		this.serverName = readString(buf);
-		return true;
+		this.serverName = readString(this.messageUnpacker);
 	}
 
 	/**

@@ -1,12 +1,7 @@
-package com.chen.battle.structs;
+package com.chen.move.struct;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import com.chen.move.struct.ColSphere;
-import com.chen.move.struct.ColVector;
-import com.chen.move.struct.ESSMoveObjectMoveType;
-import com.chen.move.struct.SSMoveObjectStatus;
 
 public abstract class SSMoveObject
 {
@@ -15,6 +10,7 @@ public abstract class SSMoveObject
 	public ESSMoveObjectMoveType moveType;
 	public long startMoveTime;//开始移动时间
 	public long lastFailedMoveTime;//上次尝试移动失败
+	public long endForceMoveTime;//强制移动结束时间
 	public float forceMoveSpeed;//强制移动时间
 	private float oldSpeed;//缓存的速度
 	public boolean bIfSpeedChanged;//是否速度发生改变
@@ -22,6 +18,7 @@ public abstract class SSMoveObject
 	public ColVector dir;//实际方向
 	public ColVector beforeMovePos;//上次位移坐标
 	public ColSphere stepMoveTarget;
+	public long bTryTrunTime;//上次尝试自动转向时间
 	public boolean bIfForceMoveImapce;//强制位移是否需要检测碰撞
 	
 	public abstract ColVector GetColVector();
@@ -38,12 +35,12 @@ public abstract class SSMoveObject
 		long timeDiff = now - startMoveTime;
 		if (timeDiff > 500)
 		{
-			System.err.println("时间太大");
+			logger.error("时间太大:"+timeDiff);
 			timeDiff = 500;			
 		}
 		if (timeDiff < 0)
 		{
-			System.err.println("时间不对");
+			logger.error("时间不对");
 			timeDiff = 0;
 		}
 		float speed = moveStatus == SSMoveObjectStatus.SSMoveObjectStatus_ForceMove ? forceMoveSpeed : GetSpeed();
@@ -53,7 +50,6 @@ public abstract class SSMoveObject
 			bIfSpeedChanged = true;
 		}
 		ColVector moveVec = ColVector.Multiply(dir, speed * timeDiff * 0.001f);
-		//float moveDist = moveVec.Length();
 		ColSphere sphere = GetColSphere();
 		sphere.point.AddVector(moveVec);
 		stepMoveTarget = sphere;
@@ -67,7 +63,7 @@ public abstract class SSMoveObject
 		startMoveTime = now;
 		if (bIfSpeedChanged)
 		{
-			logger.debug("移动速度发生改变，通知客户端");
+			//logger.debug("移动速度发生改变，通知客户端");
 			bIfSpeedChanged = false;
 			OnStartMove(dir);
 		}

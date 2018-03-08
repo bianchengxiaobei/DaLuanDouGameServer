@@ -31,8 +31,9 @@ public enum EParameterCate
 	PhyDmgReduce(26),//(相当于物理护盾)
 	MagicDmgReduce(27),
 	DmgReducePercent(28),
-	PassitiveSkill(29),
-	End(30);
+	Invisible(29),
+	PassitiveSkill(30),
+	End(31);
 	public int value;
 	EParameterCate(int value)
 	{

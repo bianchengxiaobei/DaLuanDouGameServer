@@ -66,9 +66,37 @@ public class SSHeroConfigXMLLoader
 							{
 								config.baseFp.phyAttack = Integer.parseInt(schilds.item(j).getTextContent().trim());
 							}
+							else if(("attackSpeed").equals(schilds.item(j).getNodeName()))
+							{
+								config.baseFp.attackSpeed = Integer.parseInt(schilds.item(j).getTextContent().trim());
+							}
 							else if(("reliveTime").equals(schilds.item(j).getNodeName()))
 							{
 								config.baseFp.reliveSecond = Integer.parseInt(schilds.item(j).getTextContent().trim());
+							}
+							else if(("attackDis").equals(schilds.item(j).getNodeName()))
+							{
+								config.baseFp.attackDist = Integer.parseInt(schilds.item(j).getTextContent().trim());
+							}
+							else if(("phyDefence").equals(schilds.item(j).getNodeName()))
+							{
+								config.baseFp.phyDefence = Integer.parseInt(schilds.item(j).getTextContent().trim());
+							}
+							else if(("magicDefence").equals(schilds.item(j).getNodeName()))
+							{
+								config.baseFp.magicDefence = Integer.parseInt(schilds.item(j).getTextContent().trim());
+							}
+							else if(("costGold").equals(schilds.item(j).getNodeName()))
+							{
+								config.costGold = Integer.parseInt(schilds.item(j).getTextContent().trim());
+							}
+							else if(("costDimaond").equals(schilds.item(j).getNodeName()))
+							{
+								config.costDimaond = Integer.parseInt(schilds.item(j).getTextContent().trim());
+							}
+							else if(("moveSpeed").equals(schilds.item(j).getNodeName()))
+							{
+								config.baseFp.moveSpeed = Integer.parseInt(schilds.item(j).getTextContent().trim());
 							}
 						}		
 						this.heroConfigMap.put(id, config);

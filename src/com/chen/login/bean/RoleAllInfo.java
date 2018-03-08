@@ -1,6 +1,7 @@
 package com.chen.login.bean;
 
-import org.apache.mina.core.buffer.IoBuffer;
+import org.msgpack.core.MessageBufferPacker;
+import org.msgpack.core.MessageUnpacker;
 
 import com.chen.message.Bean;
 /**
@@ -11,19 +12,28 @@ import com.chen.message.Bean;
 public class RoleAllInfo extends Bean
 {
 	public RoleBasicInfo m_oBasicInfo;
-	
+	public HeroInfo m_oHeroInfo;
+	public FriendListInfo m_oFriendInfo;
+	public DailySignInfo m_oDailySignInfo;
+	public CollectionInfo m_oCollectionInfo;
+	public EmailInfo m_oEmailInfo;
 	public RoleAllInfo()
 	{
 		this.m_oBasicInfo = new RoleBasicInfo();
 	}
 	@Override
-	public boolean write(IoBuffer buf) {
-		writeBean(buf, this.m_oBasicInfo);
-		return true;
+	public void write(MessageBufferPacker messagePack) 
+	{
+		this.m_oBasicInfo.write(messagePack);;
+		this.m_oHeroInfo.write(messagePack);;
+		m_oFriendInfo.write(messagePack);
+		this.m_oDailySignInfo.write(messagePack);
+		this.m_oCollectionInfo.write(messagePack);
+		this.m_oEmailInfo.write(messagePack);
 	}
 	@Override
-	public boolean read(IoBuffer buf) {
-		this.m_oBasicInfo = (RoleBasicInfo)readBean(buf, RoleBasicInfo.class);
-		return true;
+	public void read(MessageUnpacker messageUnpacker) 
+	{
+		
 	}	
 }

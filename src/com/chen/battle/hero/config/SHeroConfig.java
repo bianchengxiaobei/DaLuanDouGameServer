@@ -9,4 +9,6 @@ public class SHeroConfig
 	public CVector3D emitPos = new CVector3D();
 	public int[] skillList = new int[7];
 	public FightProperty baseFp = new FightProperty();
+	public int costGold;
+	public int costDimaond;
 }

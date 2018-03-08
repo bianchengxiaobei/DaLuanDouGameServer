@@ -1,5 +1,7 @@
 package com.chen.battle.message.res;
 
+import java.nio.ByteBuffer;
+
 import org.apache.mina.core.buffer.IoBuffer;
 
 import com.chen.message.Message;
@@ -31,15 +33,14 @@ public class ResGamePrepareMessage extends Message
 	}
 
 	@Override
-	public boolean read(IoBuffer buf) {
-		this.timeLimit = readInt(buf);
-		return true;
+	public void read(ByteBuffer buf) {
+	
 	}
 
 	@Override
-	public boolean write(IoBuffer buf) {
-		writeInt(buf, this.timeLimit);
-		return true;
+	public void write(IoBuffer buf) {
+		writeInt(this.messagePack, this.timeLimit);
+		super.write(buf);
 	}
 
 	public int getTimeLimit() {

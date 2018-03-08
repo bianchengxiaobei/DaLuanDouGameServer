@@ -106,9 +106,9 @@ public class MatchTeam
 		MessageUtil.tell_player_message(player.getPlayer(), msg1);
 		ResMatchTeamPlayerInfoMessage msg2 = new ResMatchTeamPlayerInfoMessage();
 		msg2.pos = (byte)players.size();
-		msg2.icon = 0;
+		msg2.icon = player.getPlayer().getIcon();
 		msg2.nickName = player.getPlayer().getName();
-		msg2.isInsert = 1;
+		msg2.isInsert = true;
 		byte pos = 0;
 		ResMatchTeamPlayerInfoMessage msg3 = new ResMatchTeamPlayerInfoMessage();
 		Iterator<MatchPlayer> playerIter = players.iterator();
@@ -118,7 +118,7 @@ public class MatchTeam
 			msg3.pos = pos;
 			msg3.nickName = p.getPlayer().getUserName();
 			msg3.icon = 0;
-			msg3.isInsert = 1;
+			msg3.isInsert = true;
 			MessageUtil.tell_player_message(player.getPlayer(), msg3);
 			MessageUtil.tell_player_message(p.getPlayer(), msg2);
 		}
@@ -186,12 +186,13 @@ public class MatchTeam
 		ResMatchStartMessage msg = new ResMatchStartMessage();
 		if (isMatch)
 		{
-			msg.setM_reason(1);
+			msg.m_reason = true;
 		}else
 		{
-			msg.setM_reason(0);
+			msg.m_reason = false;
 		}
-		msg.setM_waitTime(90);
+		//根据匹配人数动态调整
+		msg.m_waitTime = 90;
 		for (int i=0; i<this.players.size(); i++)
 		{
 			MessageUtil.tell_player_message(this.players.get(i).getPlayer(),msg);
@@ -225,5 +226,9 @@ public class MatchTeam
 			stopedPlayers.remove(current.getPlayer().getId());
 		}
 		return true;
+	}
+	public void Stop(MatchPlayer player)
+	{
+		this.stopedPlayers.put(player.getPlayer().getId(), true);
 	}
 }
