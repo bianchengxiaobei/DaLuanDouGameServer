@@ -1,12 +1,14 @@
 package com.chen.battle.ai;
 
 import com.chen.battle.skill.SSSkill;
+import com.chen.battle.skill.message.res.ResUseSkillResultMessage;
 import com.chen.battle.skill.structs.ESkillState;
+import com.chen.battle.skill.structs.EUseSkillErrorCode;
 import com.chen.battle.structs.CVector3D;
 import com.chen.battle.structs.EGOActionState;
 import com.chen.battle.structs.SSGameUnit;
 import com.chen.battle.structs.SSHero;
-import com.mysql.jdbc.log.Log;
+import com.chen.utils.MessageUtil;
 
 public class SSAI_Hero extends SSAI
 {
@@ -23,7 +25,7 @@ public class SSAI_Hero extends SSAI
 		//如果是普通攻击
 		if (bIsStandAttack)
 		{
-			System.err.println("还在前摇中");
+			System.err.println("还在前摇中");	
 			return;
 		}
 		if(IfPassitiveState() == true)
@@ -64,12 +66,14 @@ public class SSAI_Hero extends SSAI
 		//如果是普通攻击
 		if (bIsStandAttack)
 		{
+			this.NotifyUseSkillResult(skillId,EUseSkillErrorCode.IsStandAttack.value);
 			return;
 		}
 		//是否在不能操作状态
 		if (IfPassitiveState() == true)
 		{
 			System.err.println("在不能操作的阶段");
+			this.NotifyUseSkillResult(skillId,EUseSkillErrorCode.Controller.value);
 			return;
 		}
 		//是否在沉默状态
@@ -78,24 +82,28 @@ public class SSAI_Hero extends SSAI
 		if (skill == null)
 		{
 			System.err.println("不存在该技能");
+			this.NotifyUseSkillResult(skillId,EUseSkillErrorCode.NoSkill.value);
 			return;
 		}
 		//是否符合技能使用条件
 		if (!skill.IfSkillUsable())
 		{
 			System.err.println("在技能CD当中");
+			this.NotifyUseSkillResult(skillId,EUseSkillErrorCode.InCD.value);
 			return;
 		}
 		//检查是否是正在运行的技能，不能重复s
 		if (this.nowSkill != null && this.nowSkill.skillConfig.skillId == skillId)
 		{
 			System.err.println("重复技能："+skillId);
+			this.NotifyUseSkillResult(skillId,EUseSkillErrorCode.Repeat.value);
 			return;
 		}
 		//首先判断是否在施放技能中。如果在施放技能中，则后面的技能都进行记录，等待施放
 		if (IfUsingSkill() && (this.nowSkill.IfSkillBeforeRelease() || this.nowSkill.eSkillState == ESkillState.Using))
 		{
 			System.err.println("技能运行中："+skillId);
+			this.NotifyUseSkillResult(skillId,EUseSkillErrorCode.Running.value);
 			nextSkill = skill;
 			return;
 		}
@@ -106,6 +114,7 @@ public class SSAI_Hero extends SSAI
 			if (rts == 2)
 			{
 				System.err.println("技能释放距离不够："+skillId);
+				this.NotifyUseSkillResult(skillId,EUseSkillErrorCode.ToFar.value);
 				//如果技能射程不够，则启动自动追踪释放技能功能
 				bIsMoveDir = false;
 				wantUseSkill = skill;
@@ -117,6 +126,7 @@ public class SSAI_Hero extends SSAI
 			else if(rts != 1)
 			{
 				System.err.println("其他原因导致技能不能释放："+skillId);
+				this.NotifyUseSkillResult(skillId,EUseSkillErrorCode.Other.value);
 				return;
 			}
 			else
@@ -292,5 +302,17 @@ public class SSAI_Hero extends SSAI
 			bIsStandAttack = false;
 			TryFree();
 		}
+	}
+	private void NotifyUseSkillResult(int skillId, int errorCode)
+	{
+		ResUseSkillResultMessage message = new ResUseSkillResultMessage();
+		message.errorCode = errorCode;
+		message.skillId = skillId;
+		SSHero hero = (SSHero)theOwner;
+		if (hero != null)
+		{
+			MessageUtil.tell_player_message(hero.player.player, message);
+		}
+
 	}
 }
