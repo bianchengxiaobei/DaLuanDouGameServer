@@ -28,10 +28,12 @@
       <environment id="development"> 
         <transactionManager type="JDBC"/> 
       	<dataSource type="POOLED"> 
-       	 <property name="driver" value="com.mysql.jdbc.Driver"/> 
-       	 <property name="url" value="jdbc:mysql://localhost/dazhuozhan_game_inner?useUnicode=true&amp;characterEncoding=utf8"/> 
-       	 <property name="username" value="root"/> 
-      	  <property name="password" value=""/>
+	       	 <property name="driver" value="com.mysql.jdbc.Driver"/> 
+	       	 <property name="url" value="jdbc:mysql://localhost/dazhuozhan_game_inner?useUnicode=true&amp;characterEncoding=utf8"/> 
+	       	 <property name="username" value="root"/> 
+	      	 <property name="password" value=""/>
+	      	 <property name="poolPingQuery" value="SELECT 1" />
+	         <property name="poolPingEnabled" value="true" />
      	 </dataSource> 
     	</environment> 
    	</environments> 
