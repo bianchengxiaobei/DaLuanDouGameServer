@@ -598,7 +598,7 @@ public class BattleContext extends BattleServer
 			log.error("找不到英雄："+heroId);
 			return null;
 		}
-		if (!bIfAI && user == null)
+		if (!bIfAI && user == null && this.battleType != EBattleModeType.Game_Mode_Guide)
 		{
 			log.error("user == null:"+playerId);
 			return null;
