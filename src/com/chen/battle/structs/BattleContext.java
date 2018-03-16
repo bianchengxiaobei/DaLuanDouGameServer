@@ -315,8 +315,16 @@ public class BattleContext extends BattleServer
 					heroBornPosConfigMap.get(this.mapId).get(this.m_battleUserInfo[i].camp.value).
 					GetFirstBornPos();//这里需要通过配置文件加载
 			//将英雄的位置适当分散，修改出生位置
-			int mod = (int)(this.memberCount *0.5);
-			float bornAngle = ((i/(mod-1)) % mod) * (3.141592f*(mod-1) / mod);
+			float bornAngle = 0;
+			if (this.battleType != EBattleModeType.Game_Mode_Guide)
+			{
+				int mod = (int)(this.memberCount *0.5);
+				bornAngle = ((i/(mod-1)) % mod) * (3.141592f*(mod-1) / mod);
+			}
+			else
+			{
+				bornAngle = 0;
+			}	
 			CVector3D movePos = new CVector3D((float)Math.cos(bornAngle),0,(float)Math.sin(bornAngle));
 			movePos = CVector3D.Mul(movePos, 0.2f);
 			bornPos = CVector3D.Add(bornPos, movePos);
