@@ -129,7 +129,7 @@ public class SSAI
 				{
 					if (!moveTarPos.equals(this.attackTarget.GetCurPos()))
 					{
-						this.moveTarPos = this.attackTarget.GetCurPos();
+						this.moveTarPos = this.attackTarget.GetCurPos().clone();
 						this.MoveToTargetPos(this.moveTarPos, false, 0);
 					}
 					this.lastCheckMoveTarTime = now;

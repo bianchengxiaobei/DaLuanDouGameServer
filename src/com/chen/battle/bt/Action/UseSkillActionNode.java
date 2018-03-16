@@ -19,7 +19,6 @@ public class UseSkillActionNode extends BTActionNode
 	@Override
 	public boolean Action(SSAI_Robot robot)
 	{
-		System.err.println("ffeff");
 		SSHero hero = robot.hero;
 		robot.lastTimeAction = hero.battle.battleHeartBeatTime;
 		SSSkill skill = robot.GetPrepareSkill();
@@ -42,8 +41,10 @@ public class UseSkillActionNode extends BTActionNode
 				return false;
 			}
 			ifUseSkill = true;
+			System.err.println("UseSkill:"+skill.skillConfig.skillId);
 			if (skill.skillConfig.eReleaseWay == ESkillReleaseWay.No_Target_Pos)
 			{
+				
 				robot.hero.curActionInfo.skillParams = target.GetCurPos().clone();
 			}
 			else if(skill.skillConfig.eReleaseWay == ESkillReleaseWay.No_Target_Dir)

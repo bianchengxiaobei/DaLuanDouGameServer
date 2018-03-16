@@ -135,7 +135,6 @@ public class SSHero extends SSGameUnit
 		}
 		if (this.bIfAI)
 		{
-			System.err.println("fefefef");
 			EAIRobotType eaiRobotType = EAIRobotType.BallRobot;
 			switch (battle.battleType)
 			{

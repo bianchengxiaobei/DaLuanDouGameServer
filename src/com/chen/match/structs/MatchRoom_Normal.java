@@ -197,7 +197,7 @@ public class MatchRoom_Normal
 			}
 
 		}
-		if (System.currentTimeMillis() - this.createTime >= 90 * 1000 && MatchManager.StartRobot)
+		if (System.currentTimeMillis() - this.createTime >= 5 * 1000 && MatchManager.StartRobot)
 		{
 			this.bAddRobot = true;
 		}
