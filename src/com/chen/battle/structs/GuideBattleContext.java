@@ -66,7 +66,7 @@ public class GuideBattleContext extends BattleContext
 	{
 		CVector3D bornPos = new CVector3D(5.22f,0,13.14f);
 		CVector3D bornDir = hero.GetCurDir();
-		SSHero aiHero = AddHero(1L, bornPos, bornDir, null, 3, EGameObjectCamp.eGOCamp_2);
+		SSHero aiHero = AddHero(1L, bornPos, bornDir, null, 3, EGameObjectCamp.eGOCamp_2,true);
 		if (aiHero == null)
 		{
 			return;

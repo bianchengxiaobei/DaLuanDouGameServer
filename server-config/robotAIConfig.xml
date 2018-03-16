@@ -1,0 +1,545 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+public enum EBTNodeType 
+{
+	Selector(0),
+	Sequence(1),
+	Condition(2),
+	Action(3);
+	
+	public enum EAIRobotType 
+{
+	BallRobot(0),
+	GuideRobot(1);
+ -->
+<robots>
+	<robot info="初始节点(Selctor)">
+		<id>1</id>
+		<ModelId>0</ModelId>
+		<NodeType>0</NodeType>
+		<ParentId>0</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="等待(sequence)">
+		<id>1001</id>
+		<ModelId>0</ModelId>
+		<NodeType>1</NodeType>
+		<ParentId>1</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="是否到了等待时间结束(Condition)">
+		<id>1002</id>
+		<ModelId>80001</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>1001</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="是否到了等待时间结束(Action)">
+		<id>1003</id>
+		<ModelId>90001</ModelId>
+		<NodeType>3</NodeType>
+		<ParentId>1001</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="各种等待(Selector)">
+		<id>2000</id>
+		<ModelId>0</ModelId>
+		<NodeType>0</NodeType>
+		<ParentId>1</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="眩晕等待(Sequence)">
+		<id>2001</id>
+		<ModelId>0</ModelId>
+		<NodeType>1</NodeType>
+		<ParentId>2000</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="眩晕等待(Condition)">
+		<id>2002</id>
+		<ModelId>80002</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>2001</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="眩晕等待(Action)">
+		<id>2003</id>
+		<ModelId>90001</ModelId>
+		<NodeType>3</NodeType>
+		<ParentId>2001</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="死亡等待(Sequence)">
+		<id>2004</id>
+		<ModelId>0</ModelId>
+		<NodeType>1</NodeType>
+		<ParentId>2000</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="死亡等待(Condition)">
+		<id>2005</id>
+		<ModelId>80003</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>2004</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="死亡等待(Action)">
+		<id>2006</id>
+		<ModelId>90001</ModelId>
+		<NodeType>3</NodeType>
+		<ParentId>2004</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="寻路等待(Sequence)">
+		<id>2007</id>
+		<ModelId>0</ModelId>
+		<NodeType>1</NodeType>
+		<ParentId>2000</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="寻路等待(Condition)">
+		<id>2008</id>
+		<ModelId>80004</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>2007</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="寻路等待(Action)">
+		<id>2009</id>
+		<ModelId>90001</ModelId>
+		<NodeType>3</NodeType>
+		<ParentId>2007</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="攻击等待(Sequence)">
+		<id>2010</id>
+		<ModelId>0</ModelId>
+		<NodeType>1</NodeType>
+		<ParentId>2000</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="攻击等待(Condition)">
+		<id>2011</id>
+		<ModelId>80005</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>2010</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="攻击等待(Action)">
+		<id>2012</id>
+		<ModelId>90001</ModelId>
+		<NodeType>3</NodeType>
+		<ParentId>2010</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="技能等待(Sequence)">
+		<id>2013</id>
+		<ModelId>0</ModelId>
+		<NodeType>1</NodeType>
+		<ParentId>2000</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="技能等待(Condition)">
+		<id>2014</id>
+		<ModelId>80006</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>2013</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="技能等待(Action)">
+		<id>2015</id>
+		<ModelId>90001</ModelId>
+		<NodeType>3</NodeType>
+		<ParentId>2013</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="自卫(Selector)">
+		<id>3000</id>
+		<ModelId>0</ModelId>
+		<NodeType>0</NodeType>
+		<ParentId>1</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="逃跑(Selector)">
+		<id>3001</id>
+		<ModelId>0</ModelId>
+		<NodeType>1</NodeType>
+		<ParentId>3000</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="逃跑(Condition)血量低于(?)">
+		<id>3002</id>
+		<ModelId>80007</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>3001</ParentId>
+		<Values>50</Values>
+	</robot>
+	<robot info="逃跑(Selector)">
+		<id>3003</id>
+		<ModelId>0</ModelId>
+		<NodeType>0</NodeType>
+		<ParentId>3001</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="逃跑等待(Sequence)">
+		<id>3004</id>
+		<ModelId>0</ModelId>
+		<NodeType>1</NodeType>
+		<ParentId>3003</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="逃跑等待.是否在移动中(Condition)">
+		<id>3005</id>
+		<ModelId>80004</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>3004</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="等待(Action)">
+		<id>3006</id>
+		<ModelId>90001</ModelId>
+		<NodeType>3</NodeType>
+		<ParentId>3004</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="执行逃跑寻路(Action)">
+		<id>3007</id>
+		<ModelId>90002</ModelId>
+		<NodeType>3</NodeType>
+		<ParentId>3003</ParentId>
+		<Values>2</Values>
+	</robot>
+	<robot info="使用自卫技能(Selector)">
+		<id>3008</id>
+		<ModelId>0</ModelId>
+		<NodeType>1</NodeType>
+		<ParentId>3000</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="生命值低于(?)(Condition)">
+		<id>3009</id>
+		<ModelId>80007</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>3008</ParentId>
+		<Values>100</Values>
+	</robot>
+	<robot info="半径(?)是否有敌人(Condition)">
+		<id>3010</id>
+		<ModelId>80008</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>3008</ParentId>
+		<Values>2000</Values>
+	</robot>
+	<robot info="增益技能(Sequence)">
+		<id>3011</id>
+		<ModelId>0</ModelId>
+		<NodeType>1</NodeType>
+		<ParentId>3008</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="是否技能准备好(Condition)">
+		<id>3012</id>
+		<ModelId>80009</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>3011</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="是否技能冷却中(Condition)">
+		<id>3013</id>
+		<ModelId>80010</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>3011</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="是否被沉默(Condition)">
+		<id>3014</id>
+		<ModelId>80011</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>3011</ParentId>
+		<Values>0</Values>
+	</robot>
+	<!--
+	public enum ESkillType
+{
+	Cure(0),//治疗
+	Hurt(1),
+	Control(2),//控制
+	Move(3); 
+	 -->
+	<robot info="技能类型检测（治疗技能）(Condition)">
+		<id>3015</id>
+		<ModelId>80012</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>3011</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="对自己释放技能(Action)">
+		<id>3016</id>
+		<ModelId>90003</ModelId>
+		<NodeType>3</NodeType>
+		<ParentId>3011</ParentId>
+		<Values>1</Values>
+	</robot>
+	<robot info="伤害技能(Sequence)">
+		<id>3017</id>
+		<ModelId>0</ModelId>
+		<NodeType>1</NodeType>
+		<ParentId>3008</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="是否技能准备好(Condition)">
+		<id>3018</id>
+		<ModelId>80009</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>3017</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="是否技能冷却中(Condition)">
+		<id>3019</id>
+		<ModelId>80010</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>3017</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="是否被沉默(Condition)">
+		<id>3020</id>
+		<ModelId>80011</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>3017</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="是否技能攻击范围内(技能)(Condition)">
+		<id>3021</id>
+		<ModelId>80013</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>3017</ParentId>
+		<Values>2</Values>
+	</robot>
+		<!--
+	public enum ESkillType
+{
+	Cure(0),//治疗
+	Hurt(1),
+	Control(2),//控制
+	Move(3); 
+	 -->
+	<robot info="技能类型检测（伤害技能）(Condition)">
+		<id>3022</id>
+		<ModelId>80012</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>3017</ParentId>
+		<Values>1</Values>
+	</robot>
+	<robot info="对敌方释放技能(Action)">
+		<id>3023</id>
+		<ModelId>90003</ModelId>
+		<NodeType>3</NodeType>
+		<ParentId>3017</ParentId>
+		<Values>2</Values>
+	</robot>
+	<robot info="支援(Selector)">
+		<id>4000</id>
+		<ModelId>0</ModelId>
+		<NodeType>0</NodeType>
+		<ParentId>1</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="防守支援(Sequence)">
+		<id>4001</id>
+		<ModelId>0</ModelId>
+		<NodeType>1</NodeType>
+		<ParentId>4000</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="在半径(?)是否我方英雄收到攻击(Condition)">
+		<id>4002</id>
+		<ModelId>80014</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>4001</ParentId>
+		<Values>4200</Values>
+	</robot>
+	<robot info="技能是否准备好(Condition)">
+		<id>4003</id>
+		<ModelId>80009</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>4001</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="是否技能冷却中(Condition)">
+		<id>4004</id>
+		<ModelId>80010</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>4001</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="是否被沉默(Condition)">
+		<id>4005</id>
+		<ModelId>80011</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>4001</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="是否技能攻击范围内(技能)(Condition)">
+		<id>4006</id>
+		<ModelId>80013</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>4001</ParentId>
+		<Values>2</Values>
+	</robot>
+		<!--
+	public enum ESkillType
+{
+	Cure(0),//治疗
+	Hurt(1),
+	Control(2),//控制
+	Move(3); 
+	 -->
+	<robot info="技能类型检测（治疗技能）(Condition)">
+		<id>4007</id>
+		<ModelId>80012</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>4001</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="对友方释放技能(Action)">
+		<id>4008</id>
+		<ModelId>90003</ModelId>
+		<NodeType>3</NodeType>
+		<ParentId>4001</ParentId>
+		<Values>1</Values>
+	</robot>
+	<robot info="进攻支援(Sequence)">
+		<id>4009</id>
+		<ModelId>0</ModelId>
+		<NodeType>1</NodeType>
+		<ParentId>4000</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="在半径(?)是否有敌方英雄(Condition)">
+		<id>4010</id>
+		<ModelId>80008</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>4009</ParentId>
+		<Values>4200</Values>
+	</robot>
+	<robot info="我方英雄血量低(Condition)">
+		<id>4011</id>
+		<ModelId>80014</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>4009</ParentId>
+		<Values>2000</Values>
+	</robot>
+	<robot info="伤害技能(Sequence)">
+		<id>4012</id>
+		<ModelId>0</ModelId>
+		<NodeType>1</NodeType>
+		<ParentId>4009</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="技能是否准备好(Condition)">
+		<id>4013</id>
+		<ModelId>80009</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>4011</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="是否技能冷却中(Condition)">
+		<id>4014</id>
+		<ModelId>80010</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>4011</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="是否被沉默(Condition)">
+		<id>4015</id>
+		<ModelId>80011</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>4011</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="是否技能攻击范围内(技能)(Condition)">
+		<id>4016</id>
+		<ModelId>80013</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>4011</ParentId>
+		<Values>2</Values>
+	</robot>
+		<!--
+	public enum ESkillType
+{
+	Cure(0),//治疗
+	Hurt(1),
+	Control(2),//控制
+	Move(3); 
+	 -->
+	<robot info="技能类型检测（伤害技能）(Condition)">
+		<id>4017</id>
+		<ModelId>80012</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>4011</ParentId>
+		<Values>1</Values>
+	</robot>
+	<robot info="对敌方释放技能(Action)">
+		<id>4018</id>
+		<ModelId>90003</ModelId>
+		<NodeType>3</NodeType>
+		<ParentId>4011</ParentId>
+		<Values>2</Values>
+	</robot>
+	<robot info="使用普攻(Sequence)">
+		<id>4019</id>
+		<ModelId>0</ModelId>
+		<NodeType>1</NodeType>
+		<ParentId>4000</ParentId>
+		<Values>0</Values>
+	</robot>
+		<robot info="在半径(?)是否有敌方英雄(Condition)">
+		<id>4020</id>
+		<ModelId>80008</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>4019</ParentId>
+		<Values>4200</Values>
+	</robot>
+	<robot info="我方英雄血量低(Condition)">
+		<id>4021</id>
+		<ModelId>80014</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>4019</ParentId>
+		<Values>2000</Values>
+	</robot>
+	<robot info="使用普攻(Selector)">
+		<id>4022</id>
+		<ModelId>0</ModelId>
+		<NodeType>0</NodeType>
+		<ParentId>4019</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="使用普攻(Sequence)">
+		<id>4023</id>
+		<ModelId>0</ModelId>
+		<NodeType>1</NodeType>
+		<ParentId>4022</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="是否自动攻击(Condition)">
+		<id>4024</id>
+		<ModelId>80015</ModelId>
+		<NodeType>2</NodeType>
+		<ParentId>4023</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="等待(Action)">
+		<id>4025</id>
+		<ModelId>90001</ModelId>
+		<NodeType>3</NodeType>
+		<ParentId>4023</ParentId>
+		<Values>0</Values>
+	</robot>
+	<robot info="开始自动攻击(Action)">
+		<id>4026</id>
+		<ModelId>90004</ModelId>
+		<NodeType>3</NodeType>
+		<ParentId>4022</ParentId>
+		<Values>0</Values>
+	</robot>
+</robots>

@@ -1,5 +1,6 @@
 package com.chen.battle.ai;
 
+import com.chen.battle.ai.structs.EAttackState;
 import com.chen.battle.skill.SSSkill;
 import com.chen.battle.skill.message.res.ResUseSkillResultMessage;
 import com.chen.battle.skill.structs.ESkillState;
@@ -12,13 +13,16 @@ import com.chen.utils.MessageUtil;
 
 public class SSAI_Hero extends SSAI
 {
+	public SSHero hero;
 	public boolean bIsMoveDir;
 	public SSSkill nowSkill;
 	public SSSkill wantUseSkill;
 	public SSSkill nextSkill;
+	public boolean bAutoAttack = false;
 	public SSAI_Hero(SSGameUnit _theOwner) 
 	{
 		super(_theOwner);
+		hero = (SSHero)theOwner;
 	}
 	public void AskMoveDir(CVector3D dir)
 	{
@@ -41,7 +45,6 @@ public class SSAI_Hero extends SSAI
 		}		
 		if (theOwner.battle.AskMoveDir(theOwner, dir) == false)
 		{
-			System.err.println("ffefeefefe");
 			theOwner.BeginActionIdle(true);
 			return;
 		}
@@ -223,6 +226,28 @@ public class SSAI_Hero extends SSAI
 		{
 			UseSkillHeartBeat(now, tick);
 		}
+		else if (bAutoAttack)
+		{
+			if (attackTarget == null || attackTarget.id != hero.lockedTargetId)
+			{
+				if (this.CheckAttackTarget() == false)
+				{
+					CancleAttack();
+					bAutoAttack = false;
+					TryFree();
+					return ;
+				}
+				eAttackState = EAttackState.Pursue;
+				this.lastCheckMoveTarTime = 0;
+			}
+			else if (attackTarget.IsDead() || attackTarget.curActionInfo.eOAS == EGOActionState.Reliving)
+			{
+				TryFree();
+				CancleAttack();
+				return;
+			}
+			AttackHeartBeat(now, tick);
+		}
 //		else if(bIsMoving == false)
 //		{
 //			this.DoStandNormalAttack(now, tick);
@@ -303,6 +328,36 @@ public class SSAI_Hero extends SSAI
 			TryFree();
 		}
 	}
+	public boolean AskStartAutoAttack()
+	{
+		if (IfPassitiveState() == true)
+		{
+			return true;
+		}
+		if (bAutoAttack)
+		{
+			return true;
+		}
+		if (this.bIsMoveDir == true)
+		{
+			return true;
+		}
+		if (this.CheckAttackTarget() == false)
+		{
+			return false;
+		}
+		if (this.StopAllSkills(true) == false)
+		{
+			return false;
+		}
+		bIsMoveDir = false;
+		bIsStandAttack = false;
+		bAutoAttack = true;
+		eAttackState = EAttackState.Pursue;
+		lastCheckMoveTarTime = 0;
+		AttackHeartBeat(this.theOwner.battle.battleHeartBeatTime, 0);
+		return true;
+	}
 	private void NotifyUseSkillResult(int skillId, int errorCode)
 	{
 		ResUseSkillResultMessage message = new ResUseSkillResultMessage();
@@ -314,5 +369,20 @@ public class SSAI_Hero extends SSAI
 			MessageUtil.tell_player_message(hero.player.player, message);
 		}
 
+	}
+	public boolean CheckAttackTarget()
+	{
+		SSGameUnit target = hero.battle.GetGameObjectById(hero.lockedTargetId);
+		if (hero.lockedTargetId <= 0 ||target  == null)
+		{
+			return false;
+		}
+		this.SetAttackTarget(target);
+		if (hero.IfEnemy(target) == false)
+		{
+			this.SetAttackTarget(null);
+			return false;
+		}
+		return true;
 	}
 }

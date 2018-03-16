@@ -14,7 +14,7 @@ public class GuideBattle extends Battle
 	public GuideBattle(EBattleModeType match_type, EBattleType type, long battleId, int mapId,
 			Map<Integer, Player> userList) 
 	{
-		super(match_type, type, battleId, mapId, userList);	
+		super(match_type, type, battleId, mapId, userList,null);	
 	}
 	/**
 	 * 向导结算

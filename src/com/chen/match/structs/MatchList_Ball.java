@@ -3,9 +3,13 @@ package com.chen.match.structs;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 public class MatchList_Ball extends MatchList
 {
+	private Logger logger = LogManager.getLogger(MatchList_Ball.class);
 	private ConcurrentHashMap<Integer, MatchRoom_Normal> roomList;
 	public MatchList_Ball(int mapId)
 	{
@@ -27,7 +31,7 @@ public class MatchList_Ball extends MatchList
 			}
 			else
 			{
-				System.err.println("Room == null");
+				logger.error("Room == null");
 			}					
 		}
 		MatchRoom_Normal room = new MatchRoom_Normal(this.mapBean.getM_nMapId());
@@ -51,12 +55,15 @@ public class MatchList_Ball extends MatchList
 		Iterator<MatchRoom_Normal> iter = roomList.values().iterator();
 		while (iter.hasNext()) {
 			room = iter.next();
+			if (room == null)
+			{
+				logger.error("Room == null(Update)");
+			}
 			if (room.update())
 			{
-				//MatchRoom_Normal match = roomList.remove(room.getRoomId());
-				//match = null;
+				room.Remove();
 				System.out.println("移除匹配房间");
-				iter.remove();				
+				iter.remove();			
 			}
 		}
 	}

@@ -101,7 +101,8 @@ public class Ball implements IBattleContextMode
 						long addTime = now - occupyStateTime;
 						hero.occupyTime += addTime;
 						this.campSorceTime.get(hero.camp).allTheTime += addTime;
-						this.campSorceTime.get(hero.camp).thePlayers.get(hero.player.player.getId()).sorce += addTime;
+						long id = hero.player == null ? hero.id : hero.player.player.getId();
+						this.campSorceTime.get(hero.camp).thePlayers.get(id).sorce += addTime;
 						if (this.campSorceTime.get(hero.camp).allTheTime >= this.campSorceTime.get(hero.camp).notifyTime)
 						{
 							this.campSorceTime.get(hero.camp).notifyTime += 4000;
@@ -172,16 +173,17 @@ public class Ball implements IBattleContextMode
 		{
 			if (info != null)
 			{
+				long id = info.bIfAI ? info.AIId : info.sPlayer.player.getId();
 				if (!campSorceTime.containsKey(info.camp))
 				{
 					//System.out.println(info.camp.toString());
 					BallSorce ballSorce = new BallSorce();
 					campSorceTime.put(info.camp, ballSorce);
-					campSorceTime.get(info.camp).thePlayers.put(info.sPlayer.player.getId(), new Sorce());
+					campSorceTime.get(info.camp).thePlayers.put(id, new Sorce());
 				}
 				else
 				{
-					campSorceTime.get(info.camp).thePlayers.put(info.sPlayer.player.getId(), new Sorce());
+					campSorceTime.get(info.camp).thePlayers.put(id, new Sorce());
 				}				
 			}
 		}

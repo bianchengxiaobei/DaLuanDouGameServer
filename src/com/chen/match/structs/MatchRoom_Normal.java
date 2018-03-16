@@ -2,6 +2,7 @@ package com.chen.match.structs;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Vector;
 
 import org.apache.logging.log4j.LogManager;
@@ -10,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import com.chen.battle.manager.BattleManager;
 import com.chen.data.bean.MapBean;
 import com.chen.data.manager.DataManager;
+import com.chen.match.manager.MatchManager;
 
 
 public class MatchRoom_Normal 
@@ -66,6 +68,10 @@ public class MatchRoom_Normal
 	private boolean isInvalid = false;
 	//队伍集合
 	private HashMap<Integer, Vector<MatchTeam>> teamMap;
+	//创建时间
+	private long createTime;
+	//是否需要添加机器人
+	private boolean bAddRobot;
 	
 	public MatchRoom_Normal(int mapId)
 	{
@@ -74,8 +80,17 @@ public class MatchRoom_Normal
 		teamMap = new HashMap<Integer, Vector<MatchTeam>>();
 		mapBean = DataManager.getInstance().mapContainer.getMap().get(mapId);
 		this.isInvalid = false;
+		this.createTime = System.currentTimeMillis();
+		this.bAddRobot = false;
 	}
-	
+	public void Remove()
+	{
+		this.roomId = 0;
+		this.isInvalid = true;
+		this.bAddRobot = false;
+		this.teamMap.clear();
+		this.teamMap = null;
+	}
 	public boolean addOneTeam(MatchTeam team)
 	{
 		if (isInvalid)
@@ -136,10 +151,55 @@ public class MatchRoom_Normal
 	{
 		if (this.userCount == 0 || isInvalid)
 			return true;
-		if (userCount == mapBean.getMaxCount())
+		if (userCount == mapBean.getMaxCount() || this.bAddRobot)
 		{
-			BattleManager.getInstance().onBattleMached(EBattleModeType.Game_Mode_Ball, mapBean.getM_nMapId(), teamMap);
-			return true;
+			try {
+				if (this.bAddRobot)
+				{
+					Map<Integer, Integer> robot = new HashMap<>();
+					for (int i=1;i<=this.mapBean.getPlayerModels().size();i++)
+					{
+						int curSize = 0;
+						Vector<MatchTeam> teams = this.teamMap.get(i);
+						if (teams == null)
+						{
+							continue;
+						}
+						for(MatchTeam team : teams)
+						{
+							if (team == null)
+							{
+								continue;
+							}
+							curSize += team.getPlayerCount();
+						}
+						while (curSize < mapBean.getMaxCount())
+						{
+							if (curSize >= (int)(mapBean.getMaxCount() * 0.5))
+							{
+								robot.put(i+curSize*this.mapBean.getPlayerModels().size(), 2);
+							}
+							else
+							{
+								robot.put(i+curSize*this.mapBean.getPlayerModels().size(), 1);
+							}
+							++curSize;
+						}					
+					}
+					BattleManager.getInstance().onBattleMached(EBattleModeType.Game_Mode_Ball, mapBean.getM_nMapId(), teamMap,robot);
+					return true;
+				}
+				BattleManager.getInstance().onBattleMached(EBattleModeType.Game_Mode_Ball, mapBean.getM_nMapId(), teamMap,null);
+				return true;
+			} catch (Exception e) {
+				logger.error(e);
+				return false;
+			}
+
+		}
+		if (System.currentTimeMillis() - this.createTime >= 90 * 1000 && MatchManager.StartRobot)
+		{
+			this.bAddRobot = true;
 		}
 		return false;
 	}

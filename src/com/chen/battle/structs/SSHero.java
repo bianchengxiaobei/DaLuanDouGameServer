@@ -4,6 +4,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.chen.battle.ai.SSAI_Hero;
+import com.chen.battle.ai.SSAI_Robot;
+import com.chen.battle.ai.structs.EAIRobotType;
 import com.chen.battle.hero.config.SHeroConfig;
 import com.chen.battle.message.res.ResHeroRebornTimeMessage;
 import com.chen.battle.skill.SSSkill;
@@ -19,6 +21,7 @@ public class SSHero extends SSGameUnit
 {
 	private Logger log = LogManager.getLogger(SSHero.class);
 	public SSPlayer player;
+	public boolean bIfAI;
 	public SHeroConfig config;
 	public CVector3D bornPos;
 	public float colliderRadius;
@@ -26,9 +29,10 @@ public class SSHero extends SSGameUnit
 	public long lockedTargetId;//技能锁定目标id
 	public long lastHeroDeadTime;
 	public long occupyTime;//占领百分比
-	public SSHero(long playerId, BattleContext battle,EGameObjectCamp camp)
+	public SSHero(long playerId, BattleContext battle,EGameObjectCamp camp,boolean bIfAI)
 	{
 		super(playerId, battle,camp);
+		this.bIfAI = bIfAI;
 		for (int i=0;i<skillArray.length;i++)
 		{
 			skillArray[i] = new SSSkill();
@@ -129,7 +133,24 @@ public class SSHero extends SSGameUnit
 		{
 			ai = null;
 		}
-		ai = new SSAI_Hero(this);
+		if (this.bIfAI)
+		{
+			EAIRobotType eaiRobotType = EAIRobotType.BallRobot;
+			switch (battle.battleType)
+			{
+			case Game_Mode_Ball:
+				eaiRobotType = EAIRobotType.BallRobot;
+				break;
+			case Game_Mode_Guide:
+				eaiRobotType = EAIRobotType.GuideRobot;
+				break;
+			} 
+			ai = new SSAI_Robot(this, eaiRobotType);
+		}
+		else
+		{
+			ai = new SSAI_Hero(this);
+		}
 		ai.attackSkill = normalAttackSkill;
 	}
 	/**

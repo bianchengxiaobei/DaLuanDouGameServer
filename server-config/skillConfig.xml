@@ -24,7 +24,7 @@
 		<!-- 飞腿  （向指定方向飞行，碰到敌人造成[phy+]伤害并击退敌人）-->
 		<skillId>1</skillId>
 		<eSkillType>1</eSkillType>
-		<eReleaseWay>0</eReleaseWay>
+		<eReleaseWay>4</eReleaseWay>
 		<bIsNormalAttack>false</bIsNormalAttack>
 		<prepareTime>0</prepareTime>
 		<cooldownTime>3000</cooldownTime>
@@ -106,7 +106,7 @@
 		<cooldownTime>10000</cooldownTime>
 		<releaseTime>100</releaseTime>
 		<lastTime>0</lastTime>
-		<releaseDis>0</releaseDis>
+		<releaseDis>400</releaseDis>
 		<bImpact>false</bImpact>
 		<eSkillTargetType>4</eSkillTargetType>
 		<eventId>30003</eventId>
@@ -121,7 +121,7 @@
 		<cooldownTime>8000</cooldownTime>
 		<releaseTime>1000</releaseTime>
 		<lastTime>0</lastTime>
-		<releaseDis>0</releaseDis>
+		<releaseDis>1200</releaseDis>
 		<bImpact>false</bImpact>
 		<eSkillTargetType>4</eSkillTargetType>
 		<eventId>30004</eventId>
@@ -136,7 +136,7 @@
 		<cooldownTime>8000</cooldownTime>
 		<releaseTime>0</releaseTime>
 		<lastTime>0</lastTime>
-		<releaseDis>0</releaseDis>
+		<releaseDis>1200</releaseDis>
 		<bImpact>true</bImpact>
 		<eSkillTargetType>4</eSkillTargetType>
 		<eventId>30005</eventId>

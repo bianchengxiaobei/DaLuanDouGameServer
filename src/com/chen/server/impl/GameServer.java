@@ -130,12 +130,17 @@ public class GameServer extends ClientServer
 				}
 			}
 		},1,1);
-		new Timer("Match Update").schedule(new TimerTask() {		
+		new Timer("Match Update").schedule(new TimerTask()
+		{		
 			@Override
-			public void run() {
-				try {
+			public void run() 
+			{
+				try 
+				{
 					MatchManager.getInstance().update();	
-				} catch (Exception e) {
+				} 
+				catch (Exception e)
+				{
 					log.error(e);
 				}	
 			}

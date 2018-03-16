@@ -2,6 +2,7 @@ package com.chen.data.manager;
 
 
 
+import com.chen.battle.ai.config.RobotAIConfigLoader;
 import com.chen.battle.ball.BallBornPosConfig;
 import com.chen.battle.hero.loader.SSHeroConfigXMLLoader;
 import com.chen.battle.map.structs.SSHeroBornConfigXMLLoader;
@@ -69,6 +70,9 @@ public class DataManager
 	public PassiveSkillConfigXMLLoader passiveSkillConfigXMLLoader = new PassiveSkillConfigXMLLoader();
 	private final static String passiveSkillConfigPath = "server-config/passiveSkillConfig.xml";
 	
+	public RobotAIConfigLoader robotAIConfigLoader = new RobotAIConfigLoader();
+	private final static String robotAIConfigPath = "server-config/robotAIConfig.xml";
+	
 	public BallBornPosConfig ballBornPosConfig = new BallBornPosConfig();
 	
 	private static Object obj = new Object();
@@ -105,6 +109,7 @@ public class DataManager
 		mapConfigLoader.load(mapConfigPath);
 		playerExpConfigXMLLoader.Load(playerExpConfigPath);
 		passiveSkillConfigXMLLoader.load(passiveSkillConfigPath);
+		robotAIConfigLoader.load(robotAIConfigPath);
 		ballBornPosConfig.Init();
 	}
 }

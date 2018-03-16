@@ -111,7 +111,7 @@ public class MessageUtil
 	{
 		for (int i=0; i<battle.memberCount; i++)
 		{
-			if (battle.m_battleUserInfo[i] != null && battle.m_battleUserInfo[i].sPlayer.bIfConnect)
+			if (battle.m_battleUserInfo[i] != null && battle.m_battleUserInfo[i].bIfAI == false && battle.m_battleUserInfo[i].sPlayer.bIfConnect)
 			{
 				message.getRoleId().add(battle.m_battleUserInfo[i].sPlayer.player.getId());
 			}

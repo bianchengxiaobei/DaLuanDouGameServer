@@ -1,5 +1,6 @@
 package com.chen.battle.impl;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -7,6 +8,7 @@ import java.util.Map.Entry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.chen.battle.ai.structs.AIRobot;
 import com.chen.battle.manager.BattleManager;
 import com.chen.battle.message.res.ResBattleFinishedAwardMessage;
 import com.chen.battle.structs.EBattleState;
@@ -27,6 +29,7 @@ public class Battle
 	private EBattleType battleType;
 	private EBattleModeType matchType;
 	protected Map<Integer, Player> userMap;
+	protected Map<Integer, AIRobot> robotMap;
 	private MapBean mapBean;
 	public long getBattleId() {
 		return battleId;
@@ -72,25 +75,39 @@ public class Battle
 	}
 	
 	public Battle(EBattleModeType match_type,EBattleType type,
-			long battleId,int mapId,Map<Integer, Player> userList)
+			long battleId,int mapId,Map<Integer, Player> userList,Map<Integer, Integer> robot)
 	{
 		this.matchType = match_type;
 		this.battleType = type;
 		this.battleId = battleId;
 		this.mapId = mapId;
 		this.mapBean = DataManager.getInstance().mapContainer.getMap().get(mapId);
+		this.robotMap = new HashMap<>();
 		log.info("开始创建战场："+this.battleId);
 		userMap = userList;		
 		for (Map.Entry<Integer, Player> entry : userList.entrySet())
 		{
 			entry.getValue().getBattleInfo().battleCampType = entry.getKey();
 		}
+		if (robot != null)
+		{
+			long startId = 1 << 48;
+			for (Entry<Integer, Integer> robotEntry : robot.entrySet())
+			{
+				AIRobot aiRobot = new AIRobot();
+				this.robotMap.put(robotEntry.getKey(), aiRobot);
+				aiRobot.id = startId++;
+				aiRobot.campId = robotEntry.getValue();
+				aiRobot.headId = 1;
+				aiRobot.nickName = "机器人";
+			}
+		}
 	}
 	public void start()
 	{
 		if (battleType != EBattleType.eBattleType_Room)
 		{			
-			BattleManager.getInstance().createBattle(this.userMap,this.battleId,this.matchType.getValue(),this.mapId);
+			BattleManager.getInstance().createBattle(this.userMap,this.robotMap,this.battleId,this.matchType.getValue(),this.mapId);
 		}
 	}
 	public void onCreate()

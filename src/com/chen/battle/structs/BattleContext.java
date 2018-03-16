@@ -44,7 +44,7 @@ public class BattleContext extends BattleServer
 	private EBattleServerState battleState = EBattleServerState.eSSBS_SelectHero;
 	private long battleId;
 	public int mapId;
-	private long battleStateTime;
+	public long battleStateTime;
 	protected long battleAllTime;//战斗时间
 	public long battleHeartBeatTime;
 	private long lastCheckPlayTimeout;
@@ -109,7 +109,7 @@ public class BattleContext extends BattleServer
 			long delTime = System.currentTimeMillis() - this.battleHeartBeatTime;
 			if(delTime > 50)
 			{
-				log.error(delTime);
+				log.error("战斗执行时间超过Sleep时间:"+delTime);
 			}
 			try {
 				Thread.sleep(50-delTime);
@@ -210,6 +210,28 @@ public class BattleContext extends BattleServer
 		{
 			return ;
 		}
+		//Ai模拟选择开始
+		for (int i = 0; i < memberCount; i++) {
+			if (this.m_battleUserInfo[i] != null)
+			{
+				if (this.m_battleUserInfo[i].bIfAI == false)
+					continue;
+				if (false == this.m_battleUserInfo[i].bIsHeroChoosed) {
+					//如果还没有选择神兽，就随机选择一个
+					if (this.m_battleUserInfo[i].selectedHeroId == -1)
+					{
+						this.m_battleUserInfo[i].selectedHeroId = randomPickHero(null);
+					}
+					this.m_battleUserInfo[i].bIsHeroChoosed = true;
+					//然后将选择该神兽的消息广播给其他玩家
+					ResSelectHeroMessage msg = new ResSelectHeroMessage();
+					msg.heroId = this.m_battleUserInfo[i].selectedHeroId;
+					msg.playerId = this.m_battleUserInfo[i].AIId;
+					MessageUtil.tell_battlePlayer_message(this, msg);
+				}
+			}
+		}
+		//AI模拟选择结束
 		boolean ifAllUserSelect = true;
 		for (int i=0; i<memberCount; i++)
 		{
@@ -232,14 +254,13 @@ public class BattleContext extends BattleServer
 						//如果还没有选择神兽，就随机选择一个
 						if (this.m_battleUserInfo[i].selectedHeroId == -1)
 						{
-							System.err.println("fefefe");
-							this.m_battleUserInfo[i].selectedHeroId = randomPickHero(this.m_battleUserInfo[i].sPlayer.player.getHeroList());
+							this.m_battleUserInfo[i].selectedHeroId = randomPickHero(this.m_battleUserInfo[i].bIfAI ? null : this.m_battleUserInfo[i].sPlayer.player.getHeroList());
 						}
 						this.m_battleUserInfo[i].bIsHeroChoosed = true;
 						//然后将选择该神兽的消息广播给其他玩家
 						ResSelectHeroMessage msg = new ResSelectHeroMessage();
 						msg.heroId = this.m_battleUserInfo[i].selectedHeroId;
-						msg.playerId = this.m_battleUserInfo[i].sPlayer.player.getId();
+						msg.playerId = this.m_battleUserInfo[i].bIfAI ? this.m_battleUserInfo[i].AIId : this.m_battleUserInfo[i].sPlayer.player.getId();
 						MessageUtil.tell_battlePlayer_message(this, msg);
 					}
 				}
@@ -262,7 +283,7 @@ public class BattleContext extends BattleServer
 			{
 				if (this.m_battleUserInfo[i] != null)
 				{
-					if (this.m_battleUserInfo[i].bIsLoadedComplete == false)
+					if (this.m_battleUserInfo[i].bIfAI == false && this.m_battleUserInfo[i].bIsLoadedComplete == false)
 					{
 						bIfAllPlayerConnect = false;
 						break;
@@ -294,13 +315,21 @@ public class BattleContext extends BattleServer
 					heroBornPosConfigMap.get(this.mapId).get(this.m_battleUserInfo[i].camp.value).
 					GetFirstBornPos();//这里需要通过配置文件加载
 			//将英雄的位置适当分散，修改出生位置
-			float bornAngle = ((i/2)%3) * (3.141592f*2 / 3);
+			int mod = (int)(this.memberCount *0.5);
+			float bornAngle = ((i/(mod-1)) % mod) * (3.141592f*(mod-1) / mod);
 			CVector3D movePos = new CVector3D((float)Math.cos(bornAngle),0,(float)Math.sin(bornAngle));
-			movePos = CVector3D.Mul(movePos, 2);
+			movePos = CVector3D.Mul(movePos, 0.2f);
 			bornPos = CVector3D.Add(bornPos, movePos);
 			CVector3D dir = new CVector3D(0,0,0);
 			SSHero hero = null;
-			hero = AddHero(user.player.getId(), bornPos, dir, user, selectHeroId,this.m_battleUserInfo[i].camp);
+			if (this.m_battleUserInfo[i].bIfAI)
+			{
+				hero = AddHero(this.m_battleUserInfo[i].AIId, bornPos, dir, user, selectHeroId,this.m_battleUserInfo[i].camp, true);
+			}
+			else
+			{
+				hero = AddHero(user.player.getId(), bornPos, dir, user, selectHeroId,this.m_battleUserInfo[i].camp, false);
+			}		
 			this.m_battleUserInfo[i].sHero = hero;
 		}		
 		this.PostStartGameMsg();
@@ -324,7 +353,7 @@ public class BattleContext extends BattleServer
 		boolean bAllUserOffline = true;
 		for (int i=0;i<memberCount;i++)
 		{
-			if (this.m_battleUserInfo[i] != null)
+			if (this.m_battleUserInfo[i] != null && this.m_battleUserInfo[i].bIfAI == false)
 			{
 				SSPlayer player = this.m_battleUserInfo[i].sPlayer;
 				//如果有一个人连上去的话，就没有所有人断线
@@ -467,6 +496,10 @@ public class BattleContext extends BattleServer
 		ColVector dir = new ColVector(_dir.x, _dir.y,_dir.z);
 		return moveManager.AskStartMoveDir(player, dir);
 	}
+	public boolean AskMoveToTargetPos(SSGameUnit theOwner,CVector3D pos,boolean ifMoveToblackPos,boolean bIfFliter)
+	{
+		return moveManager.AskStartMoveToTarget(theOwner, pos, ifMoveToblackPos, bIfFliter);
+	}
 	/**
 	 * 重置坐标
 	 * @param player
@@ -548,7 +581,7 @@ public class BattleContext extends BattleServer
 	{
 		return effectId.incrementAndGet();
 	}
-	public SSHero AddHero(Long playerId,CVector3D pos,CVector3D dir,SSPlayer user,int heroId,EGameObjectCamp _camp)
+	public SSHero AddHero(Long playerId,CVector3D pos,CVector3D dir,SSPlayer user,int heroId,EGameObjectCamp _camp,boolean bIfAI)
 	{
 		//取得英雄配置表加载基础数据
 		SHeroConfig heroConfig = DataManager.getInstance().heroConfigXMLLoader.heroConfigMap.get(heroId);
@@ -557,8 +590,12 @@ public class BattleContext extends BattleServer
 			log.error("找不到英雄："+heroId);
 			return null;
 		}
-		
-		SSHero hero = new SSHero(playerId,this,_camp);
+		if (!bIfAI && user == null)
+		{
+			log.error("user == null:"+playerId);
+			return null;
+		}
+		SSHero hero = new SSHero(playerId,this,_camp,bIfAI);
 		hero.LoadHeroConfig(heroConfig);
 		//hero.LOadHeroConfig
 		if (user != null)
@@ -673,11 +710,17 @@ public class BattleContext extends BattleServer
 		List<Integer> canChooseList = new ArrayList<Integer>();
 		if (heros == null || heros.size() == 0)
 		{
-			System.out.println("没有英雄可以选择");
+			//System.out.println("没有英雄可以选择");
+			//从配置文件中加载,这里暂时写死
+			canChooseList.add(1);
+			canChooseList.add(3);
 		}
-		for (Hero heroId : heros) 
+		else
 		{
-			canChooseList.add(heroId.getHeroId());
+			for (Hero heroId : heros) 
+			{
+				canChooseList.add(heroId.getHeroId());
+			}
 		}
 		return canChooseList.get((int) (Math.random()*canChooseList.size()));		
 	}
@@ -884,9 +927,13 @@ public class BattleContext extends BattleServer
 			{
 				continue;
 			}	
-			if (this.m_battleUserInfo[i].sPlayer != null)
+			if (this.m_battleUserInfo[i].sHero != null)
 			{
 				this.m_battleUserInfo[i].sHero.SendAppearMessage();
+			}
+			else
+			{
+				log.error("Hero == null");
 			}
 			//发送每个玩家的英雄信息
 			//然后通知客户端加载模型

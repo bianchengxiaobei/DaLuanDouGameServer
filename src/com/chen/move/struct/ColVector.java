@@ -1,5 +1,7 @@
 package com.chen.move.struct;
 
+import com.chen.battle.structs.CVector3D;
+
 public class ColVector
 {
 	public float x;
@@ -68,6 +70,11 @@ public class ColVector
 		temp.y = o1.y - o2.y;
 		temp.z = o1.z - o2.z;
 		return temp;
+	}
+	public CVector3D toCVector3D()
+	{
+		CVector3D point = new CVector3D(this.x,this.y,this.z);
+		return point;
 	}
 	@Override
 	public String toString()

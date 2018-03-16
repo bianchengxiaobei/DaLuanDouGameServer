@@ -131,7 +131,8 @@ public class SSSkill
 	}
 	private int CheckAndSetTarget()
 	{
-		if (this.skillConfig.eReleaseWay == ESkillReleaseWay.No_Target_Pos || this.skillConfig.eReleaseWay == ESkillReleaseWay.Auto)
+		if (this.skillConfig.eReleaseWay == ESkillReleaseWay.No_Target_Pos || this.skillConfig.eReleaseWay == ESkillReleaseWay.Auto
+	|| this.skillConfig.eReleaseWay == ESkillReleaseWay.No_Target_Dir)
 		{
 			this.target = null;
 		}

@@ -65,6 +65,36 @@ public class SSMoveManager
 		}
 		return true;
 	}
+	public boolean AskStartMoveToTarget(SSMoveObject obj,CVector3D targetPos,boolean bIfMoveToBlackPoint,boolean bIfFilter)
+	{
+		long now = battle.battleHeartBeatTime;
+		if (now - obj.lastFailedMoveTime < 150)
+		{
+			//同一个单位的最短尝试时间为150;
+			return false;
+		}
+		if (this.AskStartMoveCheck(obj) == false)
+		{
+			obj.lastFailedMoveTime = now;
+			return false;
+		}
+		obj.moveType = ESSMoveObjectMoveType.Target;
+		if (obj.moveStatus == SSMoveObjectStatus.SSMoveObjectStatus_Stand)
+		{
+			obj.startMoveTime = now;
+			this.SetNextMovePoint(obj, targetPos);
+			obj.CalculateStepMoveTarget(now+100);
+			if (TestNextStepMove(obj, true, false) == false)
+			{
+				obj.Stop(now, false);
+				return false;
+			}
+			obj.OnStartMove(obj.dir);			
+			return true;
+		}
+		obj.lastFailedMoveTime = now;
+		return false;
+	}
 	/**
 	 * 请求强制位移
 	 * @param obj
@@ -403,7 +433,7 @@ public class SSMoveManager
 		}
 		if (obj.moveStatus == SSMoveObjectStatus.SSMoveObjectStatus_ForceMove)
 		{
-			System.err.println("fefefe2323232");
+			logger.error("当前是强制位移状态，不能移动");
 			return false;
 		}
 		if (obj.moveStatus == SSMoveObjectStatus.SSMoveObjectStatus_Move)
@@ -469,4 +499,11 @@ public class SSMoveManager
 		moveDist =obj.Move(now); 
 		return moveDist;
 	}
+	private boolean SetNextMovePoint(SSMoveObject obj,CVector3D targetPos)
+	{
+		ColVector dir = ColVector.Sub(targetPos.toColVector(), obj.GetColVector()).Normalize();
+		obj.SetDir(dir);
+		obj.moveStatus = SSMoveObjectStatus.SSMoveObjectStatus_Move;
+		return true;
+	}	
 }

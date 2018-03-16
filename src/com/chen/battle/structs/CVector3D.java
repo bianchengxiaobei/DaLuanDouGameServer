@@ -1,5 +1,7 @@
 package com.chen.battle.structs;
 
+import com.chen.move.struct.ColVector;
+
 public class CVector3D implements Cloneable
 {
 	public static double dDegToRad = Math.PI / 180.0f;
@@ -88,6 +90,11 @@ public class CVector3D implements Cloneable
 	public boolean equals(CVector3D v)
 	{
 		return this.x == v.x && this.y == v.y && this.z == v.z;
+	}
+	public ColVector toColVector()
+	{
+		ColVector point = new ColVector(this.x,this.y,this.z);
+		return point;
 	}
 	public static CVector3D Sub(CVector3D v1,CVector3D v2)
 	{

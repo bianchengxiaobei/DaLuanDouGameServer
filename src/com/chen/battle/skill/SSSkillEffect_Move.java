@@ -241,19 +241,6 @@ public class SSSkillEffect_Move extends SSSkillEffect implements ISSMoveObjectHo
 						entry.setValue(true);
 					}
 				}
-//				for (HitPlayer unit : impactPlayers)
-//				{
-//					if (unit.bIsHitted == false)
-//					{
-//						if (unit.target.IsDead() == false && unit.target.bExpire == false)
-//						{
-//							System.out.println("开始碰到敌人");
-//							battle.effectManager.AddEffectsFromConfig(moveConfig.impactEvents, theMoveOwner, unit, unit.GetCurPos(), moveDir, skill, System.currentTimeMillis(), null);
-//							//触发技能命中的被动技能
-//						}
-//						unit.bIsHitted = true;
-//					}
-//				}
 			    return this.OnHeartBeatCheckEntityImpact(theMoveOwner, now, tick);
 			}
 			else
@@ -293,7 +280,7 @@ public class SSSkillEffect_Move extends SSSkillEffect implements ISSMoveObjectHo
 			{
 				continue;
 			}
-			if (obj.IsDead() || obj.bExpire)
+			if (obj.IsDead() || obj.bExpire || theOwner.IfEnemy(obj) == false)
 			{
 				continue;
 			}

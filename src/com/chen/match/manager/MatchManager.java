@@ -23,6 +23,7 @@ public class MatchManager
 	private static ConcurrentHashMap<Integer, ConcurrentHashMap<Integer, MatchList>> allMatchList;
 	private static Object obj = new Object();
 	private static MatchManager manager;
+	public static boolean StartRobot = true;//是否启用机器人匹配
 	private MatchManager()
 	{
 		allMatchList = new ConcurrentHashMap<Integer, ConcurrentHashMap<Integer, MatchList>>();
@@ -195,6 +196,11 @@ public class MatchManager
 			}
 			while (iter.hasNext()) {
 				MatchList matchList = iter.next();
+				if (matchList == null)
+				{
+					log.error("MatchList == null");
+					return;
+				}
 				matchList.update();
 			}
 		}
